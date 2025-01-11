@@ -3,9 +3,9 @@ package frc.robot.util;
 
 import static edu.wpi.first.units.Units.Degree;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation2d;3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Translation
 import edu.wpi.first.math.util.Units;
 
 //in meters/coordinates
@@ -17,7 +17,7 @@ public class FieldConstant {
     public static double field_midY = field_width / 2;
 
     public static double coral_length = Units.inchesToMeters(11.875);
-    public static double algae_radius = Units.inchesToMeters(41) / 2;
+    public static double algae_radius = Units.inchesToMeters(16.25) / 2;
     public static double algae_radius_offset = Units.inchesToMeters(0.25);
 
     public class Cage {
