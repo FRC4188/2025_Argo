@@ -24,6 +24,7 @@ public class FieldConstant {
         public static double deep_height_from_bottom = Units.inchesToMeters(3.50);
         public static double shallow_height_from_bottom = Units.inchesToMeters(29.375);
 
+        //cage in order of top blue to bottom red on field diagram
         public static Translation3d[] cage_positions = new Translation3d[6];
 
         static {

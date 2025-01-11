@@ -52,6 +52,7 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -134,9 +135,9 @@ public class Drive extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            Constants.robot.DRIVE_PID, Constants.robot.TURN_PID),
         PP_CONFIG,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        AllianceFlip::canFlip,
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(

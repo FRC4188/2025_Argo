@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -23,6 +25,9 @@ public final class Constants {
 
     public static final double A_SIDE = Units.inchesToMeters(30); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_SIDE, A_SIDE);
+
+    public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
+    public static  final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
