@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.math.Matrix;
@@ -8,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
@@ -22,6 +25,8 @@ public final class Constants {
   public static class robot {
     public static final Mode simMode = Mode.SIM;
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : simMode;
+
+    public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(12.6);
 
     public static final double A_SIDE = Units.inchesToMeters(30); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_SIDE, A_SIDE);

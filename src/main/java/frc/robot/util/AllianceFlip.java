@@ -17,6 +17,14 @@ public class AllianceFlip {
         }
     }
 
+    public static double flipY (double y){
+        if (canFlip()) {
+            return FieldConstant.field_width - y;
+        } else {
+            return y;
+        }
+    }
+
     /** Flips a translation to the correct side of the field based on the current alliance color. */
     public static Translation2d apply(Translation2d translation) {
         if (canFlip()) {
@@ -54,6 +62,6 @@ public class AllianceFlip {
     }
 
     public static boolean canFlip(){
-        return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+        return false;//DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
     }
 }
