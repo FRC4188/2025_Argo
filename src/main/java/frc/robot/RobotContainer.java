@@ -29,9 +29,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoConfig;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.FollowPath;
+import frc.robot.commands.AutoFactory;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.FollowPath;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -41,6 +41,7 @@ import frc.robot.subsystems.drivetrain.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
+import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -51,6 +52,9 @@ import frc.robot.util.FieldConstant.Reef.Base.*;
 
 import java.util.List;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -63,6 +67,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Limelight vis;
+  private SwerveDriveSimulation driveSim = null;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -91,13 +96,15 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
+                new GyroIOSim(driveSim.getGyroSimulation()),
+                new ModuleIOSim(driveSim.getModules()[0]),
+                new ModuleIOSim(driveSim.getModules()[1]),
+                new ModuleIOSim(driveSim.getModules()[2]),
+                new ModuleIOSim(driveSim.getModules()[3]));
 
         vis = new Limelight(drive::addVisionMeasurement, new VisionIO(){}, new VisionIO(){});
         break;
@@ -121,7 +128,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    NamedCommands.registerCommands(AutoConfig.EVENTS);
+    NamedCommands.registerCommands(AutoFactory.EVENTS);
   }
 
   /**
@@ -173,14 +180,14 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
-    autoChooser.addOption("Mid to 2 corals manual", AutoConfig.toBasetoSource());
-    autoChooser.addOption("Mid to 2 corals gui", AutoConfig.twoCoral());
+    autoChooser.addOption("Mid to 2 corals manual", AutoFactory.toBasetoSource());
+    autoChooser.addOption("Mid to 2 corals gui", AutoFactory.twoCoral());
 
     //follow path commd test
-    autoChooser.addOption("2 corals manual follow", AutoConfig.follow2Coral(drive));
+    autoChooser.addOption("2 corals manual follow", AutoFactory.follow2Coral(drive));
 
     //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoConfig.drive2Corals(drive));
+    autoChooser.addOption("2 corals drive", AutoFactory.drive2Corals(drive));
   }
 
   /**
@@ -190,5 +197,22 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public void resetSimulation(){
+    if (Constants.robot.currMode != Constants.Mode.SIM) return;
+
+        driveSim.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+        SimulatedArena.getInstance().resetFieldForAuto();
+  }
+
+  public void displaySimFieldToAdvantageScope() {
+    if (Constants.robot.currMode != Constants.Mode.SIM) return;
+
+    Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
+    Logger.recordOutput(
+            "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    Logger.recordOutput(
+            "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
   }
 }

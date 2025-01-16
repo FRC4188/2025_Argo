@@ -10,6 +10,8 @@ import edu.wpi.first.math.util.Units;
 
 //in meters/coordinates
 //all distances are measured from center to center
+
+//DISCLAIMER: MAKE SURE ROBOT IS A RADIUS AWAY FROM THE TARGET
 public class FieldConstant {
     public static double field_length = Units.inchesToMeters(690.875);
     public static double field_width = Units.inchesToMeters(317);
@@ -131,10 +133,13 @@ public class FieldConstant {
         public static double source_length = Units.inchesToMeters(79.268);
 
         //rotat is angle of robot facing da source
+
         public static Translation2d bottom_source_alliance = new Translation2d(Units.inchesToMeters(15.819), Units.inchesToMeters(35.809));
+        
         public static Translation2d bottom_source_mid = new Translation2d(Units.inchesToMeters(31.863), Units.inchesToMeters(23.8725));
+
         public static Translation2d bottom_source_reef = new Translation2d(Units.inchesToMeters(47.457), Units.inchesToMeters(11.936));
-        public static Rotation2d bottom_source_rotat = new Rotation2d(Degree.of(52.9636));
+        public static Rotation2d bottom_source_rotat = new Rotation2d(Degree.of(-127.036));
 
         public static Translation2d top_source_alliance = new Translation2d(bottom_source_alliance.getX(), AllianceFlip.flipY(bottom_source_alliance.getY()));
         public static Translation2d top_source_mid = new Translation2d(bottom_source_mid.getX(), AllianceFlip.flipY(bottom_source_mid.getY()));

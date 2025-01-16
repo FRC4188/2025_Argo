@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -71,7 +72,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.resetSimulation();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -117,4 +120,12 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  /** This function is called periodically whilst in simulation. */
+  @Override
+  public void simulationPeriodic() {
+      SimulatedArena.getInstance().simulationPeriodic();
+      m_robotContainer.displaySimFieldToAdvantageScope();
+  }
+
 }
