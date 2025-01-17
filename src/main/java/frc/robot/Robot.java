@@ -17,6 +17,8 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,7 +32,21 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
-    m_robotContainer = new RobotContainer();
+    Logger.recordMetadata("2025Bot", "Argo"); // Set a metadata value
+
+    if (isReal()) {
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+    } else {
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+        Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    }
+
+    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+        m_robotContainer = new RobotContainer();
 
     switch(Constants.robot.currMode){
       case REAL:

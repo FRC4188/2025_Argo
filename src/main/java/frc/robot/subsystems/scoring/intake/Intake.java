@@ -9,7 +9,7 @@ public class Intake extends SubsystemBase{
     //no getters for telemetry cuz thats wut the autologged inputs do
     private static Intake instance;
     private final IntakeIO io;
-    private final IntakeIOInputsAutologged inputs;
+    private final IntakeIOInputsAutoLogged inputs;
 
     public static Intake getInstance(IntakeIO io){
         if(instance == null){
@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase{
 
     private Intake(IntakeIO io){
         this.io = io;
-        inputs = new IntakeIOInputsAutologged();
+        inputs = new IntakeIOInputsAutoLogged();
     }
 
     public void runVolts(double volts){
