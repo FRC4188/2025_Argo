@@ -23,6 +23,8 @@ public final class Constants {
   }
 
   public static class robot {
+    public static final double loopPeriodSecs = 0.02;
+
     public static final Mode simMode = Mode.SIM;
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : simMode;
 
@@ -48,6 +50,31 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  public static class ids{
+    public static final int INTAKE = 16;
+
+    public static final int SHOULDER_LEADER = 17;
+    public static final int SHOULDER_FOLLOWER = 18;
+
+    public static final int LEFT_SHOOTER = 19;
+    public static final int RIGHT_SHOOTER = 20;
+
+    public static final int LEFT_CLIMBER = 21;
+    public static final int RIGHT_CLIMBER = 22;
+
+    public static final int FEEDER = 23;
+
+    public static final int SHOULDER_ENCODER = 24;
+
+    public static final int FEEDER_BEAM_BREAKER = 5; // input = 0
+    
+    public static final int INTAKE_BEAM_BREAKER_1 = 8;
+    public static final int INTAKE_BEAM_BREAKER_2 = 9;
+
+    public static final int CLIMBER_LEFT_LIMIT = 4;
+    public static final int CLIMBER_RIGHT_LIMIT = 1;
   }
 
 

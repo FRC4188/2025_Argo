@@ -34,13 +34,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.drive.FollowPath;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
 import frc.robot.util.FieldConstant.Reef;
 import frc.robot.util.FieldConstant.Source;
 
-public final class AutoConfig {
+public final class AutoFactory {
     private final static PathConstraints  constraints =  new PathConstraints(
             TunerConstants.kSpeedAt12Volts,
             MetersPerSecondPerSecond.of(3.6),
