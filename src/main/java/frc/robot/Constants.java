@@ -30,8 +30,9 @@ public final class Constants {
 
     public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(12.6);
 
-    public static final double A_SIDE = Units.inchesToMeters(30); //inches
-    public static final double A_CROSSLENGTH = Math.hypot(A_SIDE, A_SIDE);
+    public static final double A_LENGTH = Units.inchesToMeters(30); //inches
+    public static final double A_WIDTH = Units.inchesToMeters(29); //inches
+    public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
     public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
     public static  final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);

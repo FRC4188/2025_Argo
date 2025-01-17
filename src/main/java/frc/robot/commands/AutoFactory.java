@@ -24,6 +24,7 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -36,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
+import frc.robot.pathgen.PathPointsGen;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
@@ -107,6 +109,22 @@ public final class AutoFactory {
             );
     }
 
+    public static Command AG2Coral(){
+        Trajectory traj = PathPointsGen.getInstance().
+            generateTrajectory(
+                new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120))),
+                new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))), config);
+
+        Trajectory e = PathPointsGen.getInstance().
+            generateTrajectory(
+                new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))),
+                new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))), config);
+        
+        return Commands.sequence(
+            
+        );
+    }
+
     //literally FLAWLESS
     public static Command drive2Corals(Drive drive){
         return Commands.sequence(
@@ -118,6 +136,7 @@ public final class AutoFactory {
         );
     }
 
+    //add cmds for pathplanner events
     public static final HashMap<String, Command> EVENTS =
       new HashMap<>(
           Map.ofEntries(            

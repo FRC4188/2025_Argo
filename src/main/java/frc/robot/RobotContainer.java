@@ -50,6 +50,8 @@ import frc.robot.util.FieldConstant.Reef;
 import frc.robot.util.FieldConstant.Source;
 import frc.robot.util.FieldConstant.Reef.Base.*;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.util.List;
 
 import org.ironmaple.simulation.SimulatedArena;
@@ -96,7 +98,7 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 8.251, new Rotation2d(Degrees.of(-178.059))));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
@@ -202,7 +204,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-        driveSim.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+        driveSim.setSimulationWorldPose(new Pose2d(8.251, 8.251, new Rotation2d(Degrees.of(-178.059))));
         SimulatedArena.getInstance().resetFieldForAuto();
   }
 

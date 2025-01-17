@@ -1,5 +1,6 @@
 package frc.robot.pathgen.fieldobjects;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.pathgen.PG_mathutils;
 
 public abstract class FieldObject {
