@@ -23,13 +23,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.scoring.wrist.IntakeWristIO;
+import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 
 public class IntakeWrist extends SubsystemBase {
     private static IntakeWrist instance;
-        private IntakeWristIO IntakeWristIO;
-        private final IntakeWristIO io = IntakeWristIO;
-    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+        private IntakeWristIO io;
+    private final IntakeIOInputsAutoLogged inputs;
 
 
     private SparkMax motor = new SparkMax(Constants.wrist.WRIST, MotorType.kBrushless);
@@ -37,22 +37,21 @@ public class IntakeWrist extends SubsystemBase {
     private RelativeEncoder encoder = motor.getEncoder();
     
     private double setpoint = 0;
-    private final double appliedVolts;
-    private final double tempC;
+    private final double appliedVolts = 0.0;
+    private final double tempC = 0.0;
     private final double posRads = 0.0;
     private final double velRadsPerSec = 0.0;
 
-
-    IntakeWrist() {
-        SparkMax max = new SparkMax(1, MotorType.kBrushless);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true).idleMode(IdleMode.kBrake);
-        config.encoder.positionConversionFactor(1000).velocityConversionFactor(1000);
-        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
-        max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
-        tempC = max.getMotorTemperature();
+    public static IntakeWrist getInstance(IntakeWristIOReal io) {
+        if(instance == null){
+            instance = new IntakeWrist(io);
+        }
+        return instance;
     }
+    private IntakeWrist(IntakeWristIO io){
+      this.io = io;
+      inputs = new IntakeIOInputsAutoLogged();
+  }
 
   @Override
   public void periodic() {
