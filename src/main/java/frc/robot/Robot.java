@@ -75,7 +75,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    m_robotContainer.resetSimulation();
+    // m_robotContainer.resetSimulation();
   }
 
   @Override
@@ -124,10 +124,13 @@ public class Robot extends LoggedRobot {
   public void testExit() {}
 
   /** This function is called periodically whilst in simulation. */
-  @Override
+
+  /*
+  @Override 
   public void simulationPeriodic() {
       SimulatedArena.getInstance().simulationPeriodic();
       m_robotContainer.displaySimFieldToAdvantageScope();
   }
+  */
 
 }

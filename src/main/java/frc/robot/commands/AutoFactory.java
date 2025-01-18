@@ -130,8 +130,8 @@ public final class AutoFactory {
         return Commands.sequence(
             new DriveToPose(drive, () -> new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120)))),
             new WaitCommand(0.5),
-            new DriveToPose(drive, () -> new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55)))),
-            new WaitCommand(0.5),
+            // new DriveToPose(drive, () -> new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55)))),
+            // new WaitCommand(0.5),
             new DriveToPose(drive, () -> new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))))
         );
     }

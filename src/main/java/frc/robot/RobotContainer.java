@@ -97,16 +97,29 @@ public class RobotContainer {
         break;
 
       case SIM:
+        //maple sim
+
         // Sim robot, instantiate physics sim IO implementations
-        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 8.251, new Rotation2d(Degrees.of(-178.059))));
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+        //driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+        //SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+        // drive =
+        //     new Drive(
+        //         new GyroIOSim(driveSim.getGyroSimulation()),
+        //         new ModuleIOSim(driveSim.getModules()[0]),
+        //         new ModuleIOSim(driveSim.getModules()[1]),
+        //         new ModuleIOSim(driveSim.getModules()[2]),
+        //         new ModuleIOSim(driveSim.getModules()[3]));
+
+        //no maple sim
+
         drive =
-            new Drive(
-                new GyroIOSim(driveSim.getGyroSimulation()),
-                new ModuleIOSim(driveSim.getModules()[0]),
-                new ModuleIOSim(driveSim.getModules()[1]),
-                new ModuleIOSim(driveSim.getModules()[2]),
-                new ModuleIOSim(driveSim.getModules()[3]));
+             new Drive(
+                 new GyroIO() {},
+                 new ModuleIOSim(TunerConstants.FrontLeft),
+                 new ModuleIOSim(TunerConstants.FrontRight),
+                 new ModuleIOSim(TunerConstants.BackLeft),
+                 new ModuleIOSim(TunerConstants.BackRight));
+         
 
         vis = new Limelight(drive::addVisionMeasurement, new VisionIO(){}, new VisionIO(){});
         break;
@@ -147,8 +160,8 @@ public class RobotContainer {
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
     drivingInput.onTrue(DriveCommands.joystickDrive(drive,
-      () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
       () -> controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
     // Reset gyro to 0° when B button is pressed
     controller
@@ -204,7 +217,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-        driveSim.setSimulationWorldPose(new Pose2d(8.251, 8.251, new Rotation2d(Degrees.of(-178.059))));
+        driveSim.setSimulationWorldPose(driveSim.getSimulatedDriveTrainPose());
         SimulatedArena.getInstance().resetFieldForAuto();
   }
 
