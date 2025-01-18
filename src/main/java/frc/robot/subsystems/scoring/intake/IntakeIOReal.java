@@ -1,61 +1,61 @@
 package frc.robot.subsystems.scoring.intake;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.epilogue.Logged.Naming;
-import edu.wpi.first.units.FrequencyUnit;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 
 public class IntakeIOReal implements IntakeIO {
-    private TalonFX motor;
+    private SparkMax motor;
 
-    private final StatusSignal<Voltage> appliedVolts;
-    private final StatusSignal<Temperature> tempC;
-    private final StatusSignal<Angle> posRads;
-    private final StatusSignal<AngularVelocity> velRadsPerSec;
+    private final double appliedVolts;
+    private final double tempC;
+    // private final StatusSignal<Angle> posRads;
+    // private final StatusSignal<AngularVelocity> velRadsPerSec;
 
     private final VoltageOut voltageOut = new VoltageOut(0.0).withUpdateFreqHz(0.0);
     private final NeutralOut neutralOut = new NeutralOut();
 
     public IntakeIOReal(){
-        motor = new TalonFX(Constants.ids.INTAKE, "rio");
-        motor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+        motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
+        SparkMaxConfig sparkconfig = new SparkMaxConfig();
+        sparkconfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
 
-        appliedVolts = motor.getMotorVoltage();
-        tempC = motor.getDeviceTemp();
-        posRads = motor.getPosition();
-        velRadsPerSec = motor.getVelocity();
+        // we probably need safe params but not necessarily persist params
+        motor.configure(sparkconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        appliedVolts = motor.getOutputCurrent();
+        tempC = motor.getMotorTemperature();
+        // posRads = encoder.getPosition();
+        // velRadsPerSec = encoder.getVelocity();
 
         //signal updates less frequently since intake is less important, and to reduce CAN bus traffic
         //intake acc doesnt need status signal at all, i included it for options so we can monitor voltage usage
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            Frequency.ofRelativeUnits(10.0,
-            Units.Hertz), 
-            appliedVolts,
-            tempC,
-            posRads,
-            velRadsPerSec);
+    
+    
+    // "appliedVolts" and "tempC" both update automatically at 20.0 ms (50 hz)
+    //     BaseStatusSignal.setUpdateFrequencyForAll(
+    //         Frequency.ofRelativeUnits(10.0,
+    //         Units.Hertz), 
+    //         appliedVolts,
+    //         tempC
+    //         // posRads,
+    //         // velRadsPerSec);
+    //     );
         
-        motor.optimizeBusUtilization();
+    //     motor.optimizeBusUtilization();
     }
 
 
     @Override
     public void runVolts(double volts) {
-        motor.setControl(voltageOut.withOutput(volts));
+        // motor.set(voltageOut.withOutput(volts));
+        motor.setVoltage(volts);
     }
 
     @Override
@@ -65,10 +65,10 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.appliedVolts = appliedVolts.getValueAsDouble();
-        inputs.tempC = tempC.getValueAsDouble();
-        inputs.posRads = posRads.getValueAsDouble();
-        inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
+        inputs.appliedVolts = appliedVolts;
+        inputs.tempC = tempC;
+        // inputs.posRads = posRads.getValueAsDouble();
+        // inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
     }
     
 }
