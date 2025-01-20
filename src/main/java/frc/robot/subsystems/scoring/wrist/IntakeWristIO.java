@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public interface IntakeWristIO {
+public interface IntakeWristIO {//J.C
     @AutoLog
     public static class IntakeWristIOInputs {
         public boolean connected = true;

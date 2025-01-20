@@ -1,10 +1,8 @@
 package frc.robot.subsystems.scoring.wrist;
 
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -12,21 +10,17 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.subsystems.scoring.wrist.IntakeWristIOReal;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
+import com.revrobotics.spark.SparkMax;
+
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.wrist.IntakeWristIO;
-import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 
-public class IntakeWrist extends SubsystemBase {
+public class IntakeWrist extends SubsystemBase {//J.C
     private static IntakeWrist instance;
         private IntakeWristIO io;
     private final IntakeIOInputsAutoLogged inputs;
