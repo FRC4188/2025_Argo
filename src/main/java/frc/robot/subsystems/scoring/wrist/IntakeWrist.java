@@ -1,29 +1,32 @@
 package frc.robot.subsystems.scoring.wrist;
 
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.RelativeEncoder;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 import frc.robot.subsystems.scoring.wrist.IntakeWristIOReal;
 
 import com.revrobotics.spark.SparkMax;
-
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
+
 
 public class IntakeWrist extends SubsystemBase {//J.C
     private static IntakeWrist instance;
-        private IntakeWristIO io;
-    private final IntakeIOInputsAutoLogged inputs;
+    private IntakeWristIO io;
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
 
     private SparkMax motor = new SparkMax(Constants.wrist.WRIST, MotorType.kBrushless);
@@ -44,19 +47,14 @@ public class IntakeWrist extends SubsystemBase {//J.C
     }
     private IntakeWrist(IntakeWristIO io){
       this.io = io;
-      inputs = new IntakeIOInputsAutoLogged();
   }
 
   @Override
-  public void periodic() {
-    
-    SmartDashboard.putNumber("Wrist Angle", getMotorAngle());
-    SmartDashboard.putNumber("Wrist Setpoint", getSetpoint());
-    SmartDashboard.putNumber("Applied Volts", appliedVolts);
-    SmartDashboard.putNumber("Temperature(C)", tempC);
-    SmartDashboard.putNumber("Position(Rads)", posRads);
-    SmartDashboard.putNumber("Velocity(RadsPerSec)", velRadsPerSec);
+  public void periodic(){
+    io.updateInputs(inputs);
+    Logger.processInputs("Intake", inputs);
   }
+
 
   private void init() {
     pid.reset(Constants.ids.UPPER_LIMIT);
@@ -125,7 +123,8 @@ public class IntakeWrist extends SubsystemBase {//J.C
 
   }
   
-      
+  
+  
   
 
 }

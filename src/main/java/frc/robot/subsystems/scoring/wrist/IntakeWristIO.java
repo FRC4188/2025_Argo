@@ -1,8 +1,9 @@
 package frc.robot.subsystems.scoring.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
+
 
 public interface IntakeWristIO {//J.C
     @AutoLog
@@ -14,8 +15,7 @@ public interface IntakeWristIO {//J.C
         public double velRadsPerSec = 0.0;
     }
 
-    public default void updateInputs(IntakeWristIOInputs inputs) {
-
-    }
+    default void updateInputs(IntakeWristIOInputs inputs) {}
+    default void runVolts(double volts) {}
 
 }

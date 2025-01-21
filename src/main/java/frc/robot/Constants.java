@@ -55,6 +55,11 @@ public final class Constants {
     REPLAY
   }
 
+  public class mode{
+    int real = 0;
+    
+  }
+
   public static class ids{
     public static final int INTAKE = 16;
 
