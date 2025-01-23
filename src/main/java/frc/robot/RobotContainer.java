@@ -89,7 +89,8 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
                 new ModuleIOTalonFXReal(TunerConstants.FrontRight),
                 new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                new ModuleIOTalonFXReal(TunerConstants.BackRight));
+                new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                (pose) -> {});
         
         vis = new Limelight(drive, 
             new VisionIOLL("limelight-back", drive::getRotation),
@@ -113,7 +114,8 @@ public class RobotContainer {
                 new ModuleIOTalonFXSim(
                   TunerConstants.BackLeft, driveSim.getModules()[2]),
                 new ModuleIOTalonFXSim(
-                  TunerConstants.BackRight, driveSim.getModules()[3]));         
+                  TunerConstants.BackRight, driveSim.getModules()[3]),
+                driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
         break;
@@ -126,7 +128,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                new ModuleIO() {});
+                new ModuleIO() {},
+                (pose) -> {});
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
         break;
@@ -209,8 +212,8 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-        driveSim.setSimulationWorldPose(driveSim.getSimulatedDriveTrainPose());
-        SimulatedArena.getInstance().resetFieldForAuto();
+    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   public void displaySimFieldToAdvantageScope() {
