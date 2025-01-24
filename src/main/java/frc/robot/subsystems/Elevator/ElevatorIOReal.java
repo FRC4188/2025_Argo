@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Elevator;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
@@ -9,8 +10,13 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.subsystems.Elevator.ElevatorIO.ElevatorIOInputs;;
 
-public class ElevatorIOReal {
+public class ElevatorIOReal implements ElevatorIO {
 
     TalonFX RightMotor;
     TalonFX LeftMotor;
@@ -23,6 +29,17 @@ public class ElevatorIOReal {
 
     PIDController PID;
     double speedAfterPID;
+
+    private final StatusSignal<Voltage> appliedVoltsLeft;
+    private final StatusSignal<Temperature> tempCLeft;
+    private final StatusSignal<Angle> posRadsLeft;
+    private final StatusSignal<AngularVelocity> velRadsPerSecLeft;
+    private final StatusSignal<Voltage> appliedVoltsRight;
+    private final StatusSignal<Temperature> tempCRight;
+    private final StatusSignal<Angle> posRadsRight;
+    private final StatusSignal<AngularVelocity> velRadsPerSecRight;
+    private final StatusSignal<Angle> desiredPos;
+    private final StatusSignal<AngularVelocity> desiredVel;
 
     public ElevatorIOReal() {
 
@@ -77,7 +94,18 @@ public class ElevatorIOReal {
         RightMotor.optimizeBusUtilization();    
 
 
-
+         appliedVoltsLeft = LeftMotor.getMotorVoltage();
+        tempCLeft = LeftMotor.getDeviceTemp();
+        posRadsLeft = LeftMotor.getPosition();
+        velRadsPerSecLeft = LeftEncoder.getVelocity();
+        
+        appliedVoltsRight = RightMotor.getMotorVoltage();
+        tempCRight = RightMotor.getDeviceTemp();
+        posRadsRight = RightMotor.getPosition();
+        velRadsPerSecRight = RightEncoder.getVelocity();
+        //TODO: Set these to do something
+        desiredPos = RightEncoder.getAbsolutePosition();
+        desiredVel = RightEncoder.getVelocity();
         
     }
 
@@ -118,5 +146,19 @@ public class ElevatorIOReal {
     public void periodic() {
         
     }
-    
+    public void updateInputs(ElevatorIOInputs inputs) {
+        inputs.appliedVoltsLeft = appliedVoltsLeft.getValueAsDouble();
+        inputs.tempCLeft = tempCLeft.getValueAsDouble();
+        inputs.posRadsLeft = posRadsLeft.getValueAsDouble();
+        inputs.velRadsPerSecLeft = velRadsPerSecLeft.getValueAsDouble();
+        
+        inputs.appliedVoltsRight = appliedVoltsRight.getValueAsDouble();
+        inputs.tempCRight = tempCRight.getValueAsDouble();
+        inputs.posRadsRight = posRadsRight.getValueAsDouble();
+        inputs.velRadsPerSecRight = posRadsRight.getValueAsDouble();
+        //TODO: Set these to do something
+        inputs.desiredPos = posRadsRight.getValueAsDouble();
+        inputs.desiredVel = posRadsRight.getValueAsDouble();
+        
+    }
 }
