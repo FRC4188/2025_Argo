@@ -9,7 +9,7 @@ public class Elevator extends SubsystemBase{
     //no getters for telemetry cuz thats wut the autologged inputs do
     private static Elevator instance;
     private final ElevatorIO io;
-    private final Elevator inputs;
+    private final ElevatorIOInputsAutoLogged inputs;
 
     public static Elevator getInstance(ElevatorIO io){
         if(instance == null){
