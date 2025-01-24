@@ -155,7 +155,7 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.appliedVoltsRight = appliedVoltsRight.getValueAsDouble();
         inputs.tempCRight = tempCRight.getValueAsDouble();
         inputs.posRadsRight = posRadsRight.getValueAsDouble();
-        inputs.velRadsPerSecRight = posRadsRight.getValueAsDouble();
+        inputs.velRadsPerSecRight = velRadsPerSecRight.getValueAsDouble();
         //TODO: Set these to do something
         inputs.desiredPos = posRadsRight.getValueAsDouble();
         inputs.desiredVel = posRadsRight.getValueAsDouble();
