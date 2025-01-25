@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.scoring.lift;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -24,5 +24,5 @@ public interface ElevatorIO {
 
     public default void runVolts(double volts) {}
 
-    public default void stop(){}
+    public default void runPosition(double height){}
 }

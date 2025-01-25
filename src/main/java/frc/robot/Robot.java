@@ -17,6 +17,8 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.Threads;
@@ -123,11 +125,18 @@ public class Robot extends LoggedRobot {
   @Override
   public void testExit() {}
 
-  /** This function is called periodically whilst in simulation. */
-  @Override
+  /** This function is called periodically whilst in simulation. */  
+  @Override 
   public void simulationPeriodic() {
       SimulatedArena.getInstance().simulationPeriodic();
       m_robotContainer.displaySimFieldToAdvantageScope();
+
+      Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d()});
+      Logger.recordOutput("FinalComponentPoses", 
+        new Pose3d[]{
+          new Pose3d()
+        });
   }
+  
 
 }

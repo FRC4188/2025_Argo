@@ -1,35 +1,42 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.scoring.lift;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.subsystems.Elevator.ElevatorIO.ElevatorIOInputs;;
+import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.subsystems.scoring.lift.ElevatorIO.ElevatorIOInputs;;
 
 public class ElevatorIOReal implements ElevatorIO {
 
-    TalonFX RightMotor;
-    TalonFX LeftMotor;
+    private final TalonFX RightMotor;
+    private final TalonFX LeftMotor;
 
-    CANcoder RightEncoder;
-    CANcoder LeftEncoder;
-
-    double LeftZero = 0;
-    double RightZero = 0;
-
-    ElevatorFeedforward PID;
-    double speedAfterPID;
+    private final CANcoder RightEncoder;
+    private final CANcoder LeftEncoder;
 
     private final StatusSignal<Voltage> appliedVoltsLeft;
     private final StatusSignal<Temperature> tempCLeft;
@@ -45,56 +52,43 @@ public class ElevatorIOReal implements ElevatorIO {
     public ElevatorIOReal() {
 
         //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
-        LeftMotor = new TalonFX(0);
-        LeftEncoder = new CANcoder(0);
-        RightMotor = new TalonFX(0);
-        RightEncoder = new CANcoder(0);
+        LeftMotor = new TalonFX(ElevatorConstants.kLeadID);
+        LeftEncoder = new CANcoder(ElevatorConstants.kLeadCANID);
+        RightMotor = new TalonFX(ElevatorConstants.kFollowID);
+        RightEncoder = new CANcoder(ElevatorConstants.kFollowCANID);
 
-        //TODO: Tune this   
-        PID = new ElevatorFeedforward(0.0, 0.0, 0.0);
-        
-
+        RightMotor.setControl(new Follower(ElevatorConstants.kLeadID, false));
 
         LeftMotor.setNeutralMode(NeutralModeValue.Brake);
-        OpenLoopRampsConfigs openLoopRampsConfigs = new OpenLoopRampsConfigs();
-        openLoopRampsConfigs.VoltageOpenLoopRampPeriod = 0.5;
-        LeftMotor.getConfigurator().apply(openLoopRampsConfigs);
-        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
-        closedLoopRampsConfigs.VoltageClosedLoopRampPeriod = 0.5;
-        LeftMotor.getConfigurator().apply(closedLoopRampsConfigs);
         RightMotor.setNeutralMode(NeutralModeValue.Brake);
-        OpenLoopRampsConfigs openLoopRampsConfigsAngle = new OpenLoopRampsConfigs();
-        openLoopRampsConfigsAngle.VoltageOpenLoopRampPeriod = 0.5;
-        RightMotor.getConfigurator().apply(openLoopRampsConfigs);
-        ClosedLoopRampsConfigs closedLoopRampsConfigsAngle = new ClosedLoopRampsConfigs();
-        closedLoopRampsConfigsAngle.VoltageClosedLoopRampPeriod = 0.5;
-        RightMotor.getConfigurator().apply(closedLoopRampsConfigs);
-        RightMotor.setInverted(true);
 
         LeftMotor.clearStickyFaults();
         RightMotor.clearStickyFaults();
         LeftEncoder.clearStickyFaults();
         RightEncoder.clearStickyFaults();
 
-        MagnetSensorConfigs leftSensorConfigs = new MagnetSensorConfigs();
-        leftSensorConfigs.MagnetOffset = -(LeftZero / 360.0);
-        leftSensorConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        // MagnetSensorConfigs leftSensorConfigs = new MagnetSensorConfigs();
+        // leftSensorConfigs.MagnetOffset = constants.kLOffset;
+        // leftSensorConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
-        MagnetSensorConfigs rightSensorConfigs = new MagnetSensorConfigs();
-        rightSensorConfigs.MagnetOffset = -(LeftZero / 360.0);
-        rightSensorConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        // MagnetSensorConfigs rightSensorConfigs = new MagnetSensorConfigs();
+        // rightSensorConfigs.MagnetOffset = constants.kROffset;
+        // rightSensorConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 
-        LeftEncoder.getConfigurator().apply(leftSensorConfigs);
-        LeftMotor.getConfigurator().setPosition(LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+        // LeftEncoder.getConfigurator().apply(e);
+        // LeftMotor.getConfigurator().setPosition(LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
 
-        RightEncoder.getConfigurator().apply(rightSensorConfigs);
-        RightMotor.getConfigurator().setPosition(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+        // RightEncoder.getConfigurator().apply(rightSensorConfigs);
+        // RightMotor.getConfigurator().setPosition(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+
+        RightMotor.getConfigurator().apply(ElevatorConstants.kMotorConfig);
+        LeftMotor.getConfigurator().apply(ElevatorConstants.kMotorConfig);
 
         LeftMotor.optimizeBusUtilization();
         RightMotor.optimizeBusUtilization();    
+        
 
-
-         appliedVoltsLeft = LeftMotor.getMotorVoltage();
+        appliedVoltsLeft = LeftMotor.getMotorVoltage();
         tempCLeft = LeftMotor.getDeviceTemp();
         posRadsLeft = LeftMotor.getPosition();
         velRadsPerSecLeft = LeftEncoder.getVelocity();
@@ -109,14 +103,7 @@ public class ElevatorIOReal implements ElevatorIO {
         
     }
 
-    public void runVolts(double speed) {
-        LeftMotor.set(speed);
-        RightMotor.set(speed);
-    }
-    public void stop(){
-        LeftMotor.set(0.0);
-        RightMotor.set(0.0);
-    }
+    @Override
     public void updateInputs(ElevatorIOInputs inputs) {
         inputs.appliedVoltsLeft = appliedVoltsLeft.getValueAsDouble();
         inputs.tempCLeft = tempCLeft.getValueAsDouble();
@@ -130,6 +117,17 @@ public class ElevatorIOReal implements ElevatorIO {
         //TODO: Set these to do something
         inputs.desiredPos = posRadsRight.getValueAsDouble();
         inputs.desiredVel = posRadsRight.getValueAsDouble();
-        
+    }
+
+    @Override
+    public void runVolts(double volts){
+        LeftMotor.setControl(new VoltageOut(volts));
+        RightMotor.setControl(new VoltageOut(volts));
+    }
+
+    @Override
+    public void runPosition(double height){
+        LeftMotor.setControl(new PositionVoltage(height));
+        RightMotor.setControl(new PositionVoltage(height));
     }
 }
