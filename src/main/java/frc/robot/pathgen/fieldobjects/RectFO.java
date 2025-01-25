@@ -1,32 +1,34 @@
 package frc.robot.pathgen.fieldobjects;
 
-import frc.robot.pathgen.PG_mathutils;
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.pathgen.PG_math;
 
-public class RectFO extends FieldObject {
-    private float w = 0;
-    private float h = 0;
+public class RectFO extends FieldObject {   
+    private float length = 0;
+    private float width = 0;
     
     RectFO() {
-        super(0,0);
+
     }
 
-    RectFO(float x, float y, float w, float h) {
+    RectFO(float x, float y, float l, float w) {
         super(x, y);
-        this.w = w;
-        this.h = h;
+	    length = l;
+	    width = w;
     }
 
-    @Override
-    public boolean touching_point(double x0, double y0) {
-        return (x - 0.5 * w <= x0 && x0 <= x + 0.5 * w && y - 0.5 * h <= y0 && y0 <= y + 0.5 * h);
+    public boolean touching_point(Translation2d point) {
+	    return (point.getX() >= c_x - 0.5 * length && point.getX() <= c_x + 0.5 * length &&
+		    point.getY() >= c_y - 0.5 * width && point.getY() <= c_y + 0.5 * width);
     }
 
-    @Override
-    public boolean touching_line(double x0, double y0, double x1, double y1) {
-        return PG_mathutils.linesIntersect(x0, y0, x1, y1, x - w * 0.5, y - h * 0.5, x + w * 0.5, y - h * 0.5) ||
-        PG_mathutils.linesIntersect(x0, y0, x1, y1, x + w * 0.5, y - h * 0.5, x + w * 0.5, y + h * 0.5) ||
-        PG_mathutils.linesIntersect(x0, y0, x1, y1, x + w * 0.5, y + h * 0.5, x - w * 0.5, y + h * 0.5) ||
-        PG_mathutils.linesIntersect(x0, y0, x1, y1, x - w * 0.5, y + h * 0.5, x - w * 0.5, y - h * 0.5);
+    public boolean touching_line(Translation2d l1, Translation2d l2) {
+	    Translation2d q1 = new Translation2d(c_x + 0.5 * length, c_y + 0.5 * width);
+	    Translation2d q2 = new Translation2d(c_x - 0.5 * length, c_y + 0.5 * width);
+	    Translation2d q3 = new Translation2d(c_x - 0.5 * length, c_y - 0.5 * width);
+	    Translation2d q4 = new Translation2d(c_x + 0.5 * length, c_y - 0.5 * width);
+
+	    return (PG_math.intersect_lineseg(l1, l2, q1, q2) || PG_math.intersect_lineseg(l1, l2, q2, q3) || PG_math.intersect_lineseg(l1, l2, q3, q4) || PG_math.intersect_lineseg(l1, l2, q4, q1));
     }
 
 }

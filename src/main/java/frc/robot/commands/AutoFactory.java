@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
-import frc.robot.pathgen.PathPointsGen;
+import frc.robot.pathgen.PathGen;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
@@ -110,12 +110,12 @@ public final class AutoFactory {
     }
 
     public static Command AG2Coral(){
-        Trajectory traj = PathPointsGen.getInstance().
+        Trajectory traj = PathGen.getInstance().
             generateTrajectory(
                 new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120))),
                 new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))), config);
 
-        Trajectory e = PathPointsGen.getInstance().
+        Trajectory e = PathGen.getInstance().
             generateTrajectory(
                 new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))),
                 new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))), config);
