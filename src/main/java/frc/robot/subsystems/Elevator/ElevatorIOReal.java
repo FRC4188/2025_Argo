@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -27,7 +28,7 @@ public class ElevatorIOReal implements ElevatorIO {
     double LeftZero = 0;
     double RightZero = 0;
 
-    PIDController PID;
+    ElevatorFeedforward PID;
     double speedAfterPID;
 
     private final StatusSignal<Voltage> appliedVoltsLeft;
@@ -50,9 +51,8 @@ public class ElevatorIOReal implements ElevatorIO {
         RightEncoder = new CANcoder(0);
 
         //TODO: Tune this   
-        PID = new PIDController(0.0, 0.0, 0.0);
-        PID.enableContinuousInput(-180.0, 180.0);
-        PID.setTolerance(0, 0);
+        PID = new ElevatorFeedforward(0.0, 0.0, 0.0);
+        
 
 
         LeftMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -109,42 +109,13 @@ public class ElevatorIOReal implements ElevatorIO {
         
     }
 
-    public void manualPower(double speed) {
+    public void runVolts(double speed) {
         LeftMotor.set(speed);
         RightMotor.set(speed);
     }
-
-    public void stopElevator() {
-        // Stop the elevator
+    public void stop(){
         LeftMotor.set(0.0);
         RightMotor.set(0.0);
-        
-        double leftPosition = LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0;
-        double rightPosition = RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0;
-
-
-
-        LeftMotor.set(PID.calculate(LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0,leftPosition));
-        RightMotor.set(PID.calculate(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0,rightPosition));
-
-    }
-
-    public void setElevatorPosition(double position) {
-        LeftMotor.set(PID.calculate(LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0,position));
-        RightMotor.set(PID.calculate(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0,position));
-    }
-
-    public double getElevatorPosition() {
-        
-        return (LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0)+(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0)/2.0;
-    }
-
-    public void zeroElevator() {
-        
-    }
-
-    public void periodic() {
-        
     }
     public void updateInputs(ElevatorIOInputs inputs) {
         inputs.appliedVoltsLeft = appliedVoltsLeft.getValueAsDouble();
