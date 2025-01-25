@@ -1,6 +1,7 @@
 package frc.robot.subsystems.scoring.wrist;
 
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
@@ -47,26 +48,15 @@ public class IntakeWrist extends SubsystemBase {//J.C
     }
     private IntakeWrist(IntakeWristIO io){
       this.io = io;
+
+      pid.reset(Constants.ids.UPPER_LIMIT);
+      pid.setTolerance(Constants.ids.ALLOWED_ERROR);
   }
 
   @Override
   public void periodic(){
     io.updateInputs(inputs);
-    Logger.processInputs("Intake", inputs);
-  }
-
-
-  private void init() {
-    pid.reset(Constants.ids.UPPER_LIMIT);
-    pid.setTolerance(Constants.ids.ALLOWED_ERROR);
-  }
-
-  public void disable() {
-    motor.disable();
-  }
-
-  public void set(double percent) {
-    motor.set(percent);
+    Logger.processInputs("Wrist", inputs);    
   }
 
   public void setAngle(double angle) {
@@ -81,6 +71,7 @@ public class IntakeWrist extends SubsystemBase {//J.C
   //   return encoder.getAbsolutePosition();
   // }
 
+  @AutoLogOutput(key = "Wrist/Setpoint")
   public double getSetpoint() {
     return pid.getSetpoint().position;
   }
@@ -89,38 +80,23 @@ public class IntakeWrist extends SubsystemBase {//J.C
     return Math.abs(getMotorAngle() - angle) < Constants.ids.ALLOWED_ERROR;
   }
   public double getVelocity() {
-    return encoder.getVelocity();
+    return inputs.velRadsPerSec;
   }
 
   public double getPosition() {
-    return encoder.getPosition();
-  }
-
-  public int getID() {
-    return motor.getDeviceId();
+    return inputs.posRads;
   }
 
   public double getMotorAngle() {
-    return encoder.getPosition() * Constants.wrist.WRIST_DEGREES_PER_MOTOR_ROTATION;
-  }
-
-
-  public double getCurrent() {
-    return motor.getOutputCurrent();
+    return inputs.posRads * Constants.wrist.WRIST_DEGREES_PER_MOTOR_ROTATION;
   }
 
   public double getMotorVoltage(){
-    return motor.getAppliedOutput();
+    return inputs.appliedVolts;
   }
 
   public double getMotorTemperature() {
-    return motor.getMotorTemperature();
-  }
-  public double setMotorTemperature() {
-    return motor.getMotorTemperature();
-  }
-  public static void optimizeBusUtilization() {
-
+    return inputs.tempC;
   }
   
   
