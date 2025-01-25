@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring.lift;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -32,40 +33,36 @@ import frc.robot.subsystems.scoring.lift.ElevatorIO.ElevatorIOInputs;;
 
 public class ElevatorIOReal implements ElevatorIO {
 
-    private final TalonFX RightMotor;
-    private final TalonFX LeftMotor;
+    private final TalonFX leader;
+    private final TalonFX follower;
 
-    private final CANcoder RightEncoder;
-    private final CANcoder LeftEncoder;
+    private final CANcoder leadNcoder;
+    private final CANcoder followNcoder;
 
-    private final StatusSignal<Voltage> appliedVoltsLeft;
-    private final StatusSignal<Temperature> tempCLeft;
-    private final StatusSignal<Angle> posRadsLeft;
-    private final StatusSignal<AngularVelocity> velRadsPerSecLeft;
-    private final StatusSignal<Voltage> appliedVoltsRight;
-    private final StatusSignal<Temperature> tempCRight;
-    private final StatusSignal<Angle> posRadsRight;
-    private final StatusSignal<AngularVelocity> velRadsPerSecRight;
-    private final StatusSignal<Angle> desiredPos;
-    private final StatusSignal<AngularVelocity> desiredVel;
+    private final StatusSignal<Voltage> appliedVolts;
+    private final StatusSignal<Temperature> tempC;
+    private final StatusSignal<Angle> posRads;
+    private final StatusSignal<AngularVelocity> velRadsPerSec;
+    private final StatusSignal<Voltage> appliedVoltsFollow;
+    private final StatusSignal<Temperature> tempCFollow;
 
     public ElevatorIOReal() {
 
         //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
-        LeftMotor = new TalonFX(ElevatorConstants.kLeadID);
-        LeftEncoder = new CANcoder(ElevatorConstants.kLeadCANID);
-        RightMotor = new TalonFX(ElevatorConstants.kFollowID);
-        RightEncoder = new CANcoder(ElevatorConstants.kFollowCANID);
+        leader = new TalonFX(ElevatorConstants.kLeadID);
+        leadNcoder = new CANcoder(ElevatorConstants.kLeadCANID);
+        follower = new TalonFX(ElevatorConstants.kFollowID);
+        followNcoder = new CANcoder(ElevatorConstants.kFollowCANID);
 
-        RightMotor.setControl(new Follower(ElevatorConstants.kLeadID, false));
+        follower.setControl(new Follower(ElevatorConstants.kLeadID, false));
 
-        LeftMotor.setNeutralMode(NeutralModeValue.Brake);
-        RightMotor.setNeutralMode(NeutralModeValue.Brake);
+        leader.setNeutralMode(NeutralModeValue.Brake);
+        follower.setNeutralMode(NeutralModeValue.Brake);
 
-        LeftMotor.clearStickyFaults();
-        RightMotor.clearStickyFaults();
-        LeftEncoder.clearStickyFaults();
-        RightEncoder.clearStickyFaults();
+        leadNcoder.clearStickyFaults();
+        leader.clearStickyFaults();
+        follower.clearStickyFaults();
+        followNcoder.clearStickyFaults();
 
         // MagnetSensorConfigs leftSensorConfigs = new MagnetSensorConfigs();
         // leftSensorConfigs.MagnetOffset = constants.kLOffset;
@@ -81,53 +78,44 @@ public class ElevatorIOReal implements ElevatorIO {
         // RightEncoder.getConfigurator().apply(rightSensorConfigs);
         // RightMotor.getConfigurator().setPosition(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
 
-        RightMotor.getConfigurator().apply(ElevatorConstants.kMotorConfig);
-        LeftMotor.getConfigurator().apply(ElevatorConstants.kMotorConfig);
+        leader.getConfigurator().apply(ElevatorConstants.kMotorConfig);
+        follower.getConfigurator().apply(ElevatorConstants.kMotorConfig);
 
-        LeftMotor.optimizeBusUtilization();
-        RightMotor.optimizeBusUtilization();    
+        leader.optimizeBusUtilization();
+        follower.optimizeBusUtilization();    
         
-
-        appliedVoltsLeft = LeftMotor.getMotorVoltage();
-        tempCLeft = LeftMotor.getDeviceTemp();
-        posRadsLeft = LeftMotor.getPosition();
-        velRadsPerSecLeft = LeftEncoder.getVelocity();
-        
-        appliedVoltsRight = RightMotor.getMotorVoltage();
-        tempCRight = RightMotor.getDeviceTemp();
-        posRadsRight = RightMotor.getPosition();
-        velRadsPerSecRight = RightEncoder.getVelocity();
-        //TODO: Set these to do something
-        desiredPos = RightEncoder.getAbsolutePosition();
-        desiredVel = RightEncoder.getVelocity();
+        posRads = leader.getPosition();
+        appliedVolts = leader.getMotorVoltage();
+        tempC = leader.getDeviceTemp();
+        velRadsPerSec = leader.getVelocity();
+        appliedVoltsFollow = follower.getMotorVoltage();
+        tempCFollow = follower.getDeviceTemp();
         
     }
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.appliedVoltsLeft = appliedVoltsLeft.getValueAsDouble();
-        inputs.tempCLeft = tempCLeft.getValueAsDouble();
-        inputs.posRadsLeft = posRadsLeft.getValueAsDouble();
-        inputs.velRadsPerSecLeft = velRadsPerSecLeft.getValueAsDouble();
+        inputs.connected =
+        BaseStatusSignal.refreshAll(
+                posRads, appliedVolts, tempC, velRadsPerSec, appliedVoltsFollow, tempCFollow)
+            .isOK();
+    
+        inputs.appliedVolts = appliedVolts.getValueAsDouble();
+        inputs.tempC = tempC.getValueAsDouble();
+        inputs.posRads = posRads.getValueAsDouble();
+        inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
         
-        inputs.appliedVoltsRight = appliedVoltsRight.getValueAsDouble();
-        inputs.tempCRight = tempCRight.getValueAsDouble();
-        inputs.posRadsRight = posRadsRight.getValueAsDouble();
-        inputs.velRadsPerSecRight = velRadsPerSecRight.getValueAsDouble();
-        //TODO: Set these to do something
-        inputs.desiredPos = posRadsRight.getValueAsDouble();
-        inputs.desiredVel = posRadsRight.getValueAsDouble();
+        inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
+        inputs.followerTempC = tempCFollow.getValueAsDouble();
     }
 
     @Override
     public void runVolts(double volts){
-        LeftMotor.setControl(new VoltageOut(volts));
-        RightMotor.setControl(new VoltageOut(volts));
+        leader.setControl(new VoltageOut(volts));
     }
 
     @Override
     public void runPosition(double height){
-        LeftMotor.setControl(new PositionVoltage(height));
-        RightMotor.setControl(new PositionVoltage(height));
+        leader.setControl(new PositionVoltage(height));
     }
 }
