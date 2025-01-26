@@ -5,16 +5,25 @@ import static edu.wpi.first.units.Units.Meters;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+import org.dyn4j.dynamics.BodyFixture;
+import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Vector2;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
 
-public class IntakeIOSim implements IntakeIO {
+// EVERYTHING I DID MIGHT BE ABSOLUTELY USELESS
+// IF NO WORK USE "OldIntakeIOSim" INSTEAD!
+// BUILD ON THE AFOREMENTIONED FILE IF NECESSARY
+
+public class IntakeIOSim extends BodyFixture implements IntakeIO {
     // private final Distance width;
     // private final Distance extendyLength;
     
@@ -27,6 +36,8 @@ public class IntakeIOSim implements IntakeIO {
     // make a file for "GamePieceOnFieldSim" if needed
     private final Queue<GamePieceOnFieldSim> gamePiecesToRemove;
     private boolean intakeRunning;
+
+    private double appliedVolts = 0.0;
 
     public enum IntakeSide {
         FRONT,
@@ -84,18 +95,26 @@ public class IntakeIOSim implements IntakeIO {
         return rectangleyIntake;
         }
 
-        // remove void if necessary
-        public IntakeSimulation(String targetedGamePieceType, AbstractDriveTrainSimulation driveTrainSim, Convex shape, int capacity) {
+        // add/remove return type if necessary
+        public IntakeSimulation IntakeSimulation(
+            String targetedGamePieceType, 
+            AbstractDriveTrainSimulation driveTrainSim, 
+            Convex shape, 
+            int capacity) {
+            
+            
+
             super(shape);
             super.setDensity(0);
 
             this.targetedGamePieceType = targetedGamePieceType;
             this.gamePiecesInsideIntake = 0;
 
-            if (capacity > 1) throw new IllegalArgumentException("max capacity is 1 per game piece");
+            // change max capacity or error message later if needed (LEO NOT ALLOWED TO CHANGE)
+            if (capacity > 100) throw new IllegalArgumentException("no more, stop being big like Leo (max 100)");
             this.capacity = capacity;
 
-            this.gamePiecesToRemove = new ArrayDeque<>(capacity);
+            this.gamePiecesToTake = new ArrayDeque<>(capacity);
 
             this.intakeRunning = false;
             this.driveTrainSim = driveTrainSim;
@@ -103,6 +122,7 @@ public class IntakeIOSim implements IntakeIO {
             // register();
         }
 
+        // may have several redundant commands/functions
         public void runIntake() {
             if (intakeRunning) return;
 
@@ -127,6 +147,25 @@ public class IntakeIOSim implements IntakeIO {
             return true;
         }
 
+        public void runVolts(double volts) {
+            appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+            // sim.setInputVoltage(appliedVolts);
+        }
+
+        public void stop() {
+            runVolts(0.0);
+        }
+
+        // no work yet cuz sim messed up rn
+        public void updateInputs(IntakeIOInputs inputs) {
+        if(DriverStation.isDisabled())
+            runVolts(0.0);
+
+        // sim.update(Constants.robot.loopPeriodSecs);
+        // inputs.appliedVolts = appliedVolts;
+        // inputs.posRads = sim.getAngularPositionRad();
+        // inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
+        }   
 
 
         // TODO: need to add intake sim to field if not already done
