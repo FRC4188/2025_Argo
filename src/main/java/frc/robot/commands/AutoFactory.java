@@ -23,6 +23,7 @@ import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -37,7 +38,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
-import frc.robot.pathgen.PathPointsGen;
+import frc.robot.pathgen.PathGen;
+import frc.robot.pathgen.fieldobjects.PolygonFO;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
@@ -61,9 +63,9 @@ public final class AutoFactory {
     public static Command toBasetoSource(){
         Pose2d currPose = new Pose2d(FieldConstant.Cage.cage_positions[1].getX(), FieldConstant.Cage.cage_positions[1].getY(), new Rotation2d(Degrees.of(0)));
     
-        Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_barge_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_barge_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d source = new Pose2d(FieldConstant.Source.bottom_source_mid, new Rotation2d(Degrees.of(0)));
+        Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_brg_corner, new Rotation2d(Degrees.of(0)));
+        Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_brg_corner, new Rotation2d(Degrees.of(0)));
+        Pose2d source = new Pose2d(FieldConstant.Source.right_src_mid, new Rotation2d(Degrees.of(0)));
     
         List<Waypoint> pts  = PathPlannerPath.waypointsFromPoses(currPose,targetPose2d, source, targetPose2d1);
             
@@ -98,10 +100,10 @@ public final class AutoFactory {
             TrajectoryGenerator.generateTrajectory(
                 drive.getPose(), 
                 List.of(
-                    Reef.Base.left_barge_corner,
-                    Source.top_source_mid,
-                    Reef.Base.right_wall_corner),
-                new Pose2d(Reef.Base.right_wall_corner, drive.getRotation()),
+                    Reef.Base.left_brg_corner,
+                    Source.left_src_mid,
+                    Reef.Base.right_field_corner),
+                new Pose2d(Reef.Base.right_field_corner, drive.getRotation()),
                 config),
             
             new Rotation2d(Degrees.of(0)),
@@ -109,13 +111,23 @@ public final class AutoFactory {
             );
     }
 
-    public static Command AG2Coral(){
-        Trajectory traj = PathPointsGen.getInstance().
-            generateTrajectory(
-                new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120))),
-                new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))), config);
+    public static void pathgeninit() {
+        new PolygonFO(
+            FieldConstant.Reef.Base.left_brg_corner,
+            FieldConstant.Reef.Base.right_brg_corner,
+            FieldConstant.Reef.Base.right_field_corner,
+            FieldConstant.Reef.Base.right_src_corner,
+            FieldConstant.Reef.Base.left_src_corner,
+            FieldConstant.Reef.Base.left_field_corner);
+    }
 
-        Trajectory e = PathPointsGen.getInstance().
+    public static Command AG2Coral(Drive drive){
+        Translation2d goal = FieldConstant.Reef.Base.alliance_wall.getTranslation().plus(new Translation2d(-2, 0));
+
+        Trajectory traj = PathGen.getInstance().
+            generateTrajectory(drive.getPose().getTranslation(), goal, config);
+
+        Trajectory e = PathGen.getInstance().
             generateTrajectory(
                 new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))),
                 new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))), config);
