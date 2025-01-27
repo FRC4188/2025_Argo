@@ -19,13 +19,16 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -100,9 +103,10 @@ public class RobotContainer {
 
       case SIM:
         //maple sim
-
+        
         // Sim robot, instantiate physics sim IO implementations
         driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
@@ -156,19 +160,26 @@ public class RobotContainer {
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
-    drivingInput.onTrue(DriveCommands.joystickDrive(drive,
-      () -> controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
 
-    // Reset gyro to 0° when B button is pressed
+    // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
+    //   () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+    //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+    //   () -> (controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
+
+    drivingInput.onTrue(DriveCommands.TeleDrive(drive,
+      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
+
+    // Reset gyro to 0° when start button is pressed
     final Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
       ? () -> drive.setPose(
               driveSim
                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
-      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));  }
+      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));  
+    }
 
   private void configureDashboard() {
     // Set up auto routines
@@ -213,6 +224,7 @@ public class RobotContainer {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
@@ -220,6 +232,23 @@ public class RobotContainer {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
+    Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()});
+    Logger.recordOutput("FinalComponentPoses", 
+      new Pose3d[] {
+        new Pose3d(
+          0.127, 0.356, 0.08, new Rotation3d(0,0,-90)
+        ),
+        new Pose3d(
+          0.174, 0.153, 0.157, new Rotation3d(0,0,0)
+        ),
+        new Pose3d(
+          0.183, 0.177, 0.227, new Rotation3d(25,0,0)
+        ),
+        new Pose3d(
+          0.045, 0.103, 0.65, new Rotation3d(90,0,0)
+        )
+      }
+    );
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(

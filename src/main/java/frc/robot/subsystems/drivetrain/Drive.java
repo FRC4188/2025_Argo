@@ -367,4 +367,29 @@ public class Drive extends SubsystemBase implements VisionConsumer {
             new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
         };
     }
+
+    public void drive(
+            final double xSpeedMeterPerSec,
+            final double ySpeedMetersPerSec,
+            final double omegaRadsPerSec,
+            final boolean fieldRelative,
+            final boolean invertYaw
+    ) {
+        final ChassisSpeeds speeds;
+        if (fieldRelative) {
+            final Rotation2d poseYaw = getRotation();
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeedMeterPerSec,
+                    ySpeedMetersPerSec,
+                    omegaRadsPerSec,
+                    invertYaw
+                            ? poseYaw.plus(Rotation2d.fromRadians(Math.PI))
+                            : poseYaw
+            );
+        } else {
+            speeds = new ChassisSpeeds(xSpeedMeterPerSec, ySpeedMetersPerSec, omegaRadsPerSec);
+        }
+
+        runVelocity(speeds);
+    }
 }
