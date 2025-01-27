@@ -49,8 +49,8 @@ public class IntakeWrist extends SubsystemBase {//J.C
     private IntakeWrist(IntakeWristIO io){
       this.io = io;
 
-      pid.reset(Constants.ids.UPPER_LIMIT);
-      pid.setTolerance(Constants.ids.ALLOWED_ERROR);
+      pid.reset(Constants.wrist.UPPER_LIMIT);
+      pid.setTolerance(Constants.wrist.ALLOWED_ERROR);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class IntakeWrist extends SubsystemBase {//J.C
   }
 
   public boolean atGoal(double angle) {
-    return Math.abs(getMotorAngle() - angle) < Constants.ids.ALLOWED_ERROR;
+    return Math.abs(getMotorAngle() - angle) < Constants.wrist.ALLOWED_ERROR;
   }
   public double getVelocity() {
     return inputs.velRadsPerSec;
