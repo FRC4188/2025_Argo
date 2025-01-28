@@ -3,15 +3,25 @@ package frc.robot.subsystems.scoring.intake;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.util.ArrayDeque;
+import java.util.Objects;
 import java.util.Queue;
 
+import org.dyn4j.collision.CollisionBody;
+import org.dyn4j.collision.Fixture;
+import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
+import org.dyn4j.dynamics.contact.Contact;
+import org.dyn4j.dynamics.contact.SolvedContact;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Vector2;
+import org.dyn4j.world.ContactCollisionData;
+import org.dyn4j.world.listener.ContactListener;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
@@ -30,11 +40,11 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
     // change coral to algae and vice versa whenever :D
     private final String targetedGamePieceType = "Coral";
     private final int capacity;
-    private final int gamePiecesInsideIntake;
+    private int gamePiecesInsideIntake;
     private final AbstractDriveTrainSimulation driveTrainSim;
     
     // make a file for "GamePieceOnFieldSim" if needed
-    private final Queue<GamePieceOnFieldSim> gamePiecesToRemove;
+    private final Queue<GamePieceOnFieldSimulation> gamePiecesToRemove;
     private boolean intakeRunning;
 
     private double appliedVolts = 0.0;
@@ -114,7 +124,7 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
             if (capacity > 100) throw new IllegalArgumentException("no more, stop being big like Leo (max 100)");
             this.capacity = capacity;
 
-            this.gamePiecesToTake = new ArrayDeque<>(capacity);
+            this.gamePiecesToRemove = new ArrayDeque<>(capacity);
 
             this.intakeRunning = false;
             this.driveTrainSim = driveTrainSim;
@@ -147,11 +157,14 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
             return true;
         }
 
+        @Override
+        // doesn't apply volts properly since there is no motor in this file to set voltage to
         public void runVolts(double volts) {
             appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
-            // sim.setInputVoltage(appliedVolts);
+            // driveTrainSim.setInputVoltage(appliedVolts);
         }
 
+        @Override
         public void stop() {
             runVolts(0.0);
         }
@@ -167,14 +180,75 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
         // inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
         }   
 
+        public final class GamePieceContactListener implements ContactListener<Body> {
+            
+            private void indicateGamePieceRemoval(GamePieceOnFieldSimulation gamePiece) {
+                gamePiecesToRemove.add(gamePiece);
+                gamePiecesInsideIntake++;
+            }
 
-        // TODO: need to add intake sim to field if not already done
-        // public void register() {
-        //     register(SimulatedArena.getInstance()):
-        // }
+            @Override
+            public void begin(ContactCollisionData collision, Contact contact) {
+                if (!intakeRunning) return;
+                if (gamePiecesInsideIntake >= capacity) return;
 
-        // public void register(SimulatedArena arena) {
-        //     arena.addIntakeSimulation(this);
-        // }
-}
+                final CollisionBody<?> collisionBody1 = collision.getBody1(), collisionBody2 = collision.getBody2();
+                final Fixture fixture1 = collision.getFixture1(), fixture2 = collision.getFixture2();
+
+                if (collisionBody1 instanceof GamePieceOnFieldSimulation gamePiece
+                        && Objects.equals(gamePiece.type, targetedGamePieceType)
+                        && fixture2 == IntakeIOSim.this) indicateGamePieceRemoval(gamePiece);
+                else if (collisionBody2 instanceof GamePieceOnFieldSimulation gamePiece
+                        && Objects.equals(gamePiece.type, targetedGamePieceType)
+                        && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(gamePiece);
+
+                boolean coralOrAlgaeIntake = "Coral".equals(IntakeIOSim.this.targetedGamePieceType)
+                        || "Algae".equals(IntakeIOSim.this.targetedGamePieceType);
+                if (collisionBody1 instanceof ReefscapeCoralAlgaeStack stack
+                        && coralOrAlgaeIntake
+                        && fixture2 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
+                else if (collisionBody2 instanceof ReefscapeCoralAlgaeStack stack
+                        && coralOrAlgaeIntake
+                        && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
+            }
+            @Override
+            public void persist(ContactCollisionData collision, Contact oldContact, Contact newContact) {}
+    
+            @Override
+            public void end(ContactCollisionData collision, Contact contact) {}
+    
+            @Override
+            public void destroyed(ContactCollisionData collision, Contact contact) {}
+    
+            @Override
+            public void collision(ContactCollisionData collision) {}
+    
+            @Override
+            public void preSolve(ContactCollisionData collision, Contact contact) {}
+    
+            @Override
+            public void postSolve(ContactCollisionData collision, SolvedContact contact) {}
+        }
+
+        public GamePieceContactListener getGamePieceContactListener() {
+            return new GamePieceContactListener();
+        }
+
+        public void removeObtainedGamePieces(SimulatedArena arena) {
+            while (!gamePiecesToRemove.isEmpty()) {
+                GamePieceOnFieldSimulation gamePiece = gamePiecesToRemove.poll();
+                gamePiece.onIntake(this.targetedGamePieceType);
+                arena.removeGamePiece(gamePiece);
+            }
+        }
+        }
+
+        public void register() {
+            register(SimulatedArena.getInstance()):
+        }
+
+        public void register(SimulatedArena arena) {
+            arena.addIntakeSimulation(this);
+        }
+
 
