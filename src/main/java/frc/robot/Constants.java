@@ -78,5 +78,11 @@ public final class Constants {
     public static final int CLIMBER_RIGHT_LIMIT = 1;
   }
 
+  public static class arm{
+
+
+
+  }
+
 
 }
