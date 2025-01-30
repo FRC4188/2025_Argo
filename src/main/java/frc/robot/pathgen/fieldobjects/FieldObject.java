@@ -15,11 +15,11 @@ public abstract class FieldObject {
         FOHandler.getInstance().addFO(this);
     }
 
-    public boolean touching_line(Translation2d l1, Translation2d l2) {
-        return PG_math.point_from_lineseg_f(l1, l2, new Translation2d(c_x, c_y)) == 0;
+    public float from_line(Translation2d l1, Translation2d l2) {
+        return PG_math.point_from_lineseg_f(l1, l2, new Translation2d(c_x, c_y));
     }
     
-    public boolean touching_point(Translation2d point) {
-        return c_x == point.getX() && c_y == point.getY();
+    public float from_point(Translation2d point) {
+        return (float) Math.hypot(c_x - point.getX(), c_y - point.getY());
     }
 }

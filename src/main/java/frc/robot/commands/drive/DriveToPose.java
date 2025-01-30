@@ -104,6 +104,7 @@ public class DriveToPose extends Command {
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
+                
         driveSubsystem.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                 driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation()));
     }

@@ -209,6 +209,7 @@ public class RobotContainer {
 
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoFactory.drive2Corals(drive));
+    autoChooser.addOption("pathgen", AutoFactory.AG2Coral(drive));
   }
 
   /**
@@ -217,7 +218,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return AutoFactory.AG2Coral(drive);
   }
 
   public void resetSimulation(){
