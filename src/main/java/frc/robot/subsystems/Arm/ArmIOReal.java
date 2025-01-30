@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Arm
+package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
@@ -13,7 +13,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class ArmIOjinx implements ArmIO {
+public class ArmIOReal implements ArmIO {
     TalonFX armMotor;
     CANcoder armEncoder;
     double armZero = 0;
@@ -25,7 +25,7 @@ public class ArmIOjinx implements ArmIO {
     private final StatusSignal<Angle> desiredPos;
     private final StatusSignal<AngularVelocity> desiredVel;
 
-    public ArmIOjinx() {
+    public ArmIOReal() {
         //TODO: Set device IDs
         armMotor = new TalonFX(0);
         armEncoder = new CANcoder(0);
