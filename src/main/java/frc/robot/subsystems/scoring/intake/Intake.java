@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -21,11 +22,10 @@ public class Intake extends SubsystemBase{
     private static Intake instance;
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
-    private static int safeParams;
 
     private SparkMax motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
     SparkMaxConfig sparkconfig = new SparkMaxConfig();
-
+    
     public static Intake getInstance(IntakeIO io){
         if(instance == null){
             instance = new Intake(io);
@@ -46,36 +46,59 @@ public class Intake extends SubsystemBase{
         io.stop();
     }
 
-    public ResetMode disableSafeParameters() {
-        ResetMode safeParams = ResetMode.kNoResetSafeParameters;
-        return safeParams;
+    public boolean intakeVoltageSpike() {
+        if (motor.getAppliedOutput() > 5) {
+            stop();
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public ResetMode activateSafeParameters() {
-        ResetMode safeParams = ResetMode.kResetSafeParameters;
-        return safeParams;
-    }
+    // public ResetMode disableSafeParameters(ResetMode safeParams) {
+    //     safeParams = ResetMode.kNoResetSafeParameters;
+    //     return safeParams;
+    // }
+
+    // public ResetMode activateSafeParameters(ResetMode safeParams) {
+    //     safeParams = ResetMode.kResetSafeParameters;
+    //     return safeParams;
+    // }
 
 
     public Command ingest(Intake intake) {
         return Commands.run(
             () -> {
-                if () {}
-                // motor.setInverted(false);
                 sparkconfig.inverted(false);
-                runVolts(10);
-                
+                runVolts(1);
             }, intake);
     }
 
     public Command eject(Intake intake) {
         return Commands.run(
             () -> {
-                // motor.setInverted(true);
                 sparkconfig.inverted(true);
-                runVolts(10);
+                runVolts(1);
             }, intake);
     }
+
+    public Command halt(Intake intake) {
+        return Commands.run(
+            () -> {
+                stop();
+            }, intake);
+    }
+
+    public Command detectIntakeSpike(Intake intake) {
+        return Commands.run(
+            () -> {
+                intakeVoltageSpike();
+            }, intake);
+    }
+
+
+
+
 
     @Override
     public void periodic(){
