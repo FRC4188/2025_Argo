@@ -211,6 +211,7 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
                         && coralOrAlgaeIntake
                         && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
             }
+            
             @Override
             public void persist(ContactCollisionData collision, Contact oldContact, Contact newContact) {}
     

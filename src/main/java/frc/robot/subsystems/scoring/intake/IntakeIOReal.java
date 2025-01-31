@@ -25,6 +25,7 @@ public class IntakeIOReal implements IntakeIO {
     public IntakeIOReal(){
         motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
         SparkMaxConfig sparkconfig = new SparkMaxConfig();
+        //TODO: find actual stall limit
         sparkconfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
 
         // we probably need safe params but not necessarily persist params
