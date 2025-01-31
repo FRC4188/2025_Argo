@@ -99,6 +99,6 @@ public class ElevatorIOSim implements ElevatorIO{
         leader.setControl(new PositionVoltage(height));
         sim.setInput(leader.getSimState().getMotorVoltage());
     }
-
+    
     
 }
