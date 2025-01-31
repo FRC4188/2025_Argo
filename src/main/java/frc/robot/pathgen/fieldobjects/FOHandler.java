@@ -13,7 +13,7 @@ public class FOHandler {
         return instance;
     }
 
-    private List<FieldObject> fobjs;
+    public List<FieldObject> fobjs;
     
     private FOHandler() {
         fobjs = new ArrayList<FieldObject>();
@@ -30,18 +30,24 @@ public class FOHandler {
         if (index > -1) fobjs.remove(index);
     }
     
-    public boolean any_touching_line(Translation2d l1, Translation2d l2) {
+    public float shortest_from_line(Translation2d l1, Translation2d l2) {
+        float distance = Float.MAX_VALUE;
+
         for (FieldObject fo : fobjs) {
-            if (fo.touching_line(l1, l2)) return true;
+            float dis = fo.from_line(l1, l2);
+            if (dis < distance) distance = dis;
         }
-        return false;
+        return distance;
     }
     
-    public boolean any_touching_point(Translation2d point) {
+    public float shortest_from_point(Translation2d point) {
+        float distance = Float.MAX_VALUE;
+
         for (FieldObject fo : fobjs) {
-            if (fo.touching_point(point)) return true;
+            float dis = fo.from_point(point);
+            if (dis < distance) distance = dis;
         }
-        return false;
+        return distance;
     }
 
     public void clear() {

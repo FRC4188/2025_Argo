@@ -13,17 +13,29 @@ public class PolygonFO extends FieldObject{
         this.vertices = vertices;
     }
 
-    public boolean touching_line(Translation2d l1, Translation2d l2) {
+    @Override
+    public float from_line(Translation2d l1, Translation2d l2) {
+        float distance = Float.MAX_VALUE;
+
 	    for (int i = 0; i < vertices.length; i++) {
-		    if (PG_math.intersect_lineseg(vertices[i], vertices[(i + 1)%vertices.length], l1, l2)) return true;
+            float dis = PG_math.lineseg_distance_lineseg(vertices[i], vertices[(i + 1)%vertices.length], l1, l2);
+		    if (dis < distance) {
+                distance = dis;
+            } 
 	    }
-	    return false;
+	    return distance;
     }
 
-    public boolean touching_point(Translation2d point) {
-	for (int i = 0; i < vertices.length; i++) {
-		if (PG_math.point_from_lineseg_f(vertices[i], vertices[(i + 1)%vertices.length], point) == 0) return true;
-	}
-	return false;
-}
+    @Override
+    public float from_point(Translation2d point) {
+	    float distance = Float.MAX_VALUE;
+
+	    for (int i = 0; i < vertices.length; i++) {
+            float dis = PG_math.point_from_lineseg_f(vertices[i], vertices[(i + 1)%vertices.length], point);
+		    if (dis < distance) {
+                distance = dis;
+            } 
+	    }
+	    return distance;
+    }
 }

@@ -28,38 +28,6 @@ public final class Main {
 
 
   public static void main(String... args) {
-
-    /* 
-    PathGen pg = PathGen.getInstance();
-
-    //adds to handler upon construction; dw about it
-    new PolygonFO(
-      new Translation2d(0.89, 3.84), 
-      new Translation2d(1.8, 0.6),
-      new Translation2d(4.57, 2.69));
-
-    //use once when all fieldobjects have been registered
-    pg.update_grid_fo((float)Math.hypot(Units.inchesToMeters(30), Units.inchesToMeters(29)) / 2);
-
-    //difference between translation and pose https://www.desmos.com/calculator/j1qqnsaixy
-
-    //pose sets initial velocity direction
-    Trajectory traj_rotation = pg.generateTrajectory(new Pose2d(0, 0, new Rotation2d(Degrees.of(180))),new Pose2d(5, 5, new Rotation2d(Degrees.of(180))), 
-    new TrajectoryConfig(
-      6.37 / 4, 
-      12.6 / 4));
-
-    //translation sets initial direction towards next pivot point
-    Trajectory traj_translation = pg.generateTrajectory(new Translation2d(0, 0),new Translation2d(5, 5), 
-    new TrajectoryConfig(
-      6.37 / 4, 
-      12.6 / 4));
-
-    for (State s: traj_translation.getStates()) {
-      Translation2d t = s.poseMeters.getTranslation();
-      System.out.println("(" + t.getX() + ", " + t.getY() + ")");
-    }
-    */
     
     RobotBase.startRobot(Robot::new);
   }

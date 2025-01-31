@@ -1,5 +1,6 @@
 package frc.robot.pathgen;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class PG_math {
@@ -28,6 +29,23 @@ public class PG_math {
 	    Translation2d proj = l1.plus(m.times(t));
 	    return (float)point.getDistance(proj);
     }
+	
+	public static float lineseg_distance_lineseg(Translation2d l11, Translation2d l12, Translation2d l21, Translation2d l22) {
+		float result = Float.MAX_VALUE;
+
+		float[] vals = {
+			point_from_lineseg_f(l11, l12, l21),
+			point_from_lineseg_f(l11, l12, l22),
+			point_from_lineseg_f(l21, l22, l11),
+			point_from_lineseg_f(l21, l22, l12)
+		};
+
+		for (float val : vals) {
+			if (val < result) {result = val;}
+		}
+
+		return result;
+	}
 
     private static boolean ccw(Translation2d a, Translation2d b, Translation2d c) {
         return (c.getY() - a.getY()) * (b.getX() - a.getX()) > (b.getY() - a.getY()) * (c.getX() - a.getX()); 
@@ -37,5 +55,25 @@ public class PG_math {
 	    return ccw(l11, l21, l22) != ccw(l12, l21, l22) && ccw(l11, l12, l21) != ccw(l11, l12, l22);
     }   
 
+
+	//returns -180 - 180
+	public static Rotation2d interpolate_mod(Rotation2d orig, Rotation2d goal, double t) {
+		double orig_mod = modulate(orig).getDegrees();
+		double goal_mod = modulate(goal).getDegrees();
+
+		if (goal_mod - orig_mod > 180) {
+			goal_mod -= 360;
+		} else if (goal_mod - orig_mod < -180) {
+			orig_mod -= 360;
+		}
+
+		double result = t * (goal_mod - orig_mod) + orig_mod;
+
+		return Rotation2d.fromDegrees(result);
+	}
+
+	public static Rotation2d modulate(Rotation2d r) {
+		return Rotation2d.fromDegrees((r.getDegrees() + 180)%360 - 180);
+	}
 
 }

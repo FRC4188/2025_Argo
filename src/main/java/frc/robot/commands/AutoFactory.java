@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -36,9 +37,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
 import frc.robot.pathgen.PathGen;
+import frc.robot.pathgen.fieldobjects.FOHandler;
 import frc.robot.pathgen.fieldobjects.PolygonFO;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
@@ -56,8 +59,8 @@ public final class AutoFactory {
             false);
     
     public static TrajectoryConfig config = new TrajectoryConfig(
-        TunerConstants.kSpeedAt12Volts.magnitude() / 4, 
-        Constants.robot.MAX_ACCELERATION.magnitude() / 4);
+        TunerConstants.kSpeedAt12Volts.magnitude() / 2, 
+        Constants.robot.MAX_ACCELERATION.magnitude() / 2);
         
     //run barely, slow and not accurate
     public static Command toBasetoSource(){
@@ -119,22 +122,46 @@ public final class AutoFactory {
             FieldConstant.Reef.Base.right_src_corner,
             FieldConstant.Reef.Base.left_src_corner,
             FieldConstant.Reef.Base.left_field_corner);
+        
+        PathGen.getInstance().update_grid_fo();
+
     }
 
     public static Command AG2Coral(Drive drive){
-        Translation2d goal = FieldConstant.Reef.Base.alliance_wall.getTranslation().plus(new Translation2d(-2, 0));
+        pathgeninit();
 
-        Trajectory traj = PathGen.getInstance().
-            generateTrajectory(drive.getPose().getTranslation(), goal, config);
-
-        Trajectory e = PathGen.getInstance().
-            generateTrajectory(
-                new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))),
-                new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))), config);
+        Pose2d[] goals = {
+            FieldConstant.Reef.CoralGoal.alliance_left,
+            FieldConstant.Reef.CoralGoal.mid_brg_left,
+            FieldConstant.Reef.CoralGoal.left_src_right,
+            FieldConstant.Reef.CoralGoal.right_brg_right,
+            FieldConstant.Reef.CoralGoal.left_src_left,
+            FieldConstant.Reef.CoralGoal.right_brg_left,
+            FieldConstant.Reef.CoralGoal.left_brg_right,
+            FieldConstant.Reef.CoralGoal.right_src_right,
+            FieldConstant.Reef.CoralGoal.left_brg_left,
+            FieldConstant.Reef.CoralGoal.right_src_left,
+            FieldConstant.Reef.CoralGoal.mid_brg_right,
+            FieldConstant.Reef.CoralGoal.alliance_right
+        };
         
         return Commands.sequence(
-            
+            new DriveTo(drive, goals[0], config),
+            new DriveTo(drive, goals[1], config),
+            new DriveTo(drive, goals[2], config),
+            new DriveTo(drive, goals[3], config),
+            new DriveTo(drive, goals[4], config),
+            new DriveTo(drive, goals[5], config),
+            new DriveTo(drive, goals[6], config),
+            new DriveTo(drive, goals[7], config),
+            new DriveTo(drive, goals[8], config),
+            new DriveTo(drive, goals[9], config),
+            new DriveTo(drive, goals[10], config),
+            new DriveTo(drive, goals[11], config)
         );
+        
+        
+        
     }
 
     //literally FLAWLESS
