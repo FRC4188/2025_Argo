@@ -1,7 +1,10 @@
-/*package frc.robot.subsystems.Arm;
+package frc.robot.subsystems.Arm;
 
-public class ArmCommands {
-    public static Command 
+import edu.wpi.first.wpilibj2.command.Command;
+
+public class ArmCommands extends Command {
+    
+
+
     
 }
-*/
