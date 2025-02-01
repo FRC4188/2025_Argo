@@ -1,39 +1,54 @@
-/* 
-
 package frc.robot.subsystems.Arm;
 
-import static edu.wpi.first.units.Units.Meters;
-
-import java.util.ArrayDeque;
-import java.util.Objects;
-import java.util.Queue;
-
-import org.dyn4j.collision.CollisionBody;
-import org.dyn4j.collision.Fixture;
-import org.dyn4j.dynamics.Body;
-import org.dyn4j.dynamics.BodyFixture;
-import org.dyn4j.dynamics.contact.Contact;
-import org.dyn4j.dynamics.contact.SolvedContact;
-import org.dyn4j.geometry.Convex;
-import org.dyn4j.geometry.Rectangle;
-import org.dyn4j.geometry.Vector2;
-import org.dyn4j.world.ContactCollisionData;
-import org.dyn4j.world.listener.ContactListener;
-import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
-import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.Constants;
+// This is definetly wrong but work in progress I think I got the wrong concept
+public class ArmIOSim implements ArmIO {
+    private final DCMotorSim sim;
+    private double appliedVolts = 0.0;
+    
+    
+    //random values for moment of inertia and gearing cuz not that important for precision
+    public ArmIOSim() {
+        
+        sim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                DCMotor.getFalcon500(1), 
+                18.0 / 12.0,
+                0.001), 
+            DCMotor.getFalcon500(1));
+    }
 
-//Empty class for now
+    @Override
+    public void runVolts(double volts) {
+        appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+        sim.setInputVoltage(appliedVolts);
+    }
 
-public class ArmIOSim extends BodyFixture{
+    @Override
+    public void stop() {
+        // TODO Auto-generated method stub
+        runVolts(0.0);
+    }
 
+    @Override
+    public void updateInputs(ArmIOInputs inputs) {
+        if(DriverStation.isDisabled())
+            runVolts(0.0);
+
+        sim.update(Constants.robot.loopPeriodSecs);
+        inputs.appliedVolts = appliedVolts;
+        inputs.positionRads = sim.getAngularPositionRad();
+        inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
+    } 
+    
+    public static enum Mode{
+        L1, L2_3, L4;
+    }
     
 }
-*/

@@ -39,17 +39,32 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
     }
     
-    public Command setAngle(ArmIO IO, double angle) {
-        return Commands.run(()->{
+    public Command setAngle(Arm arm, double angle) {
+     return Commands.run(()->{
         // why is it angle two? becuase thats what makes it stop yelling
         double angle2 = Math.min(Math.max(angle, MIN_ANGLE), MAX_ANGLE);
         double currentAngle = inputs.positionRads-armZero;
         double output = armPID.calculate(currentAngle, angle2);
-        io.runVolts(output);});
+        io.runVolts(output);}, arm);
     }
+
+
+    
     // Commands need to be reviewed may have implemented them incorrectly
-    public Command stopArm(ArmIO IO) {
-        return Commands.run(()->{ IO.stop();});
+    public Command stopArm(Arm arm) {
+        return Commands.run(()->{ io.stop();}, arm);
+    }
+    // The following commands will be used for going to 
+    public Command customAngle1 (Arm arm){
+        return Commands.run(()->{
+         setAngle(arm, MAX_ANGLE);
+        }, arm);
+    }
+
+    public Command customAngle2(Arm arm){
+        return Commands.run(()->{
+            setAngle(arm, MIN_ANGLE);
+        }, arm);
     }
     
     public  double getAngle() {
