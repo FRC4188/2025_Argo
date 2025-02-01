@@ -28,7 +28,7 @@ import frc.robot.Constants;
 public class IntakeWrist extends SubsystemBase {//J.C
     private static IntakeWrist instance;
     private IntakeWristIO io;
-    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    private final IntakeWristIOInputsAutoLogged inputs = new IntakeWristIOInputsAutoLogged();
 
 
     private SparkMax motor = new SparkMax(Constants.wrist.WRIST, MotorType.kBrushless);
