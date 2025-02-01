@@ -32,7 +32,7 @@ public class SuperstructureConfig {
     static final double LOWEST_H = Inches.of(8.990645).magnitude();
     static final double HIGHEST_H = Inches.of(8.990645 + 72.0).magnitude();
 
-    public static Pose3d origin = new Pose3d(0.127, 0.356, 0.08, new Rotation3d(0,0,-90));
+    public static Pose3d origin = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0,0,0));
 
     public record Joint(
         double mass,

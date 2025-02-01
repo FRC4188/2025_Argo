@@ -46,6 +46,7 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
+import frc.robot.subsystems.scoring.SuperVisualizer;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -74,6 +75,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
+  private SuperVisualizer armSim;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -122,6 +124,8 @@ public class RobotContainer {
                 driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
+
+        armSim = new SuperVisualizer("Superstructure");
         break;
 
       default:
@@ -250,6 +254,7 @@ public class RobotContainer {
         )
       }
     );
+    armSim.update(0, 0, 0);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
