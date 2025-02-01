@@ -1,48 +1,265 @@
 package frc.robot.subsystems.scoring.intake;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import java.util.ArrayDeque;
+import java.util.Objects;
+import java.util.Queue;
+
+import org.dyn4j.collision.CollisionBody;
+import org.dyn4j.collision.Fixture;
+import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.BodyFixture;
+import org.dyn4j.dynamics.contact.Contact;
+import org.dyn4j.dynamics.contact.SolvedContact;
+import org.dyn4j.geometry.Convex;
+import org.dyn4j.geometry.Rectangle;
+import org.dyn4j.geometry.Vector2;
+import org.dyn4j.world.ContactCollisionData;
+import org.dyn4j.world.listener.ContactListener;
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
+
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
-public class IntakeIOSim implements IntakeIO {
-    private final DCMotorSim sim;
+// EVERYTHING I DID MIGHT BE ABSOLUTELY USELESS
+// IF NO WORK USE "OldIntakeIOSim" INSTEAD!
+// BUILD ON THE AFOREMENTIONED FILE IF NECESSARY
+
+public class IntakeIOSim extends BodyFixture implements IntakeIO {
+    // private final Distance width;
+    // private final Distance extendyLength;
+    
+    // change coral to algae and vice versa whenever :D
+    private final String targetedGamePieceType = "Coral";
+    private final int capacity;
+    private int gamePiecesInsideIntake;
+    private final AbstractDriveTrainSimulation driveTrainSim;
+    
+    // make a file for "GamePieceOnFieldSim" if needed
+    private final Queue<GamePieceOnFieldSimulation> gamePiecesToRemove;
+    private boolean intakeRunning;
+
     private double appliedVolts = 0.0;
 
-    //random values for moment of inertia and gearing cuz not that important for precision
-    public IntakeIOSim() {
-        sim = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                DCMotor.getFalcon500(1), 
-                18.0 / 12.0,
-                0.001), 
-            DCMotor.getFalcon500(1));
+    // public IntakeIOSim(targetedGamePieceType, capacity, gamePiecesInsideIntake, driveTrainSim, gamePiecesToRemove, intakeRunning, appliedVolts) {
+    //     this.targetedGamePieceType = targetedGamePieceType;
+    //     this.capacity = capacity;
+    //     this.gamePiecesInsideIntake = gamePiecesInsideIntake;
+    //     this.driveTrainSim = driveTrainSim;
+    //     this.gamePiecesToRemove = gamePiecesToRemove;
+    //     this.appliedVolts = appliedVolts;
+    // }
+    public enum IntakeSide {
+        FRONT,
+        LEFT,
+        RIGHT,
+        BACK
     }
 
-    @Override
-    public void runVolts(double volts) {
-        appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
-        sim.setInputVoltage(appliedVolts);
+// TODO: Find actual width of intake and extension of intake over bumper    
+    // private final IntakeSimulation IntakeSimulation;
+    // public IntakeIOSim(AbstractDriveTrainSimulation driveTrain) {
+    //     this.IntakeSimulation = IntakeSimulation.OverTheBumperIntake(
+    //         targetedGamePieceType, 
+    //         driveTrain,
+    //         width,
+    //         extendyLength,
+    //         IntakeSimulation.IntakeSide.BACK,
+    //         1
+    //     );  
+        
+    public static IntakeSimulation OverTheBumperIntake (
+        String targetedGamePieceType,
+        AbstractDriveTrainSimulation driveTrainSim,
+        Distance width,
+        Distance extendyLength,
+        IntakeSide intakeside,
+        int capacity
+    ) {
+        return new IntakeSimulation (
+            targetedGamePieceType,
+            driveTrainSim,
+            getIntakeRectangle(driveTrainSim, width.in(Meters), extendyLength.in(Meters), intakeside),
+            capacity);
     }
 
-    @Override
-    public void stop() {
-        // TODO Auto-generated method stub
-        runVolts(0.0);
-    }
+    private static Rectangle getIntakeRectangle(AbstractDriveTrainSimulation driveTrainSim, double width, double extendyLength, IntakeSide intakeside) {
+        final Rectangle rectangleyIntake = new Rectangle(width, extendyLength);
+        rectangleyIntake.rotate (
+            switch (intakeside) {
+                case LEFT, RIGHT -> 0;
+                case FRONT, BACK -> Math.toRadians(90);
+            });
+    
+            //TODO: fix/tune transformed distance
+        final double transformedDistance = extendyLength / 2 - 0.01;
 
-    @Override
-    public void updateInputs(IntakeIOInputs inputs) {
+        rectangleyIntake.translate (
+            switch (intakeside) {
+                case LEFT -> new Vector2(0, driveTrainSim.config.bumperWidthY.in(Meters) / 2 + transformedDistance);
+                case RIGHT -> new Vector2(0, -driveTrainSim.config.bumperWidthY.in(Meters) / 2 - transformedDistance);
+                case FRONT -> new Vector2(driveTrainSim.config.bumperLengthX.in(Meters) / 2 + transformedDistance, 0);
+                case BACK -> new Vector2(-driveTrainSim.config.bumperLengthX.in(Meters) / 2 - transformedDistance / 2 , 0);
+            });
+
+        return rectangleyIntake;
+        }
+
+        // add/remove return type if necessary
+        public IntakeSimulation IntakeSimulation (
+            String targetedGamePieceType, 
+            AbstractDriveTrainSimulation driveTrainSim, 
+            Convex shape, 
+            int capacity) {
+
+            super(shape);
+            super.setDensity(0);
+
+            this.targetedGamePieceType = targetedGamePieceType;
+            this.gamePiecesInsideIntake = 0;
+
+            // change max capacity or error message later if needed (LEO NOT ALLOWED TO CHANGE)
+            if (capacity > 100) throw new IllegalArgumentException("no more, stop being big like Leo (max 100)");
+            this.capacity = capacity;
+
+            this.gamePiecesToRemove = new ArrayDeque<>(capacity);
+
+            this.intakeRunning = false;
+            this.driveTrainSim = driveTrainSim;
+
+            // register();
+        }
+
+        // may have several redundant commands/functions
+        public void runIntake() {
+            if (intakeRunning) return;
+
+            driveTrainSim.addFixture(this);
+            this.intakeRunning = true;
+        }
+
+        public void stopIntake() {
+            if (!intakeRunning) return;
+            
+            driveTrainSim.removeFixture(this);
+            this.intakeRunning = false;
+        }
+
+        public int getHowManyGamePieces() {
+            return gamePiecesInsideIntake;
+        }
+
+        public boolean obtainGamePieceFromIntake() {
+            if (gamePiecesInsideIntake < 1) return false;
+            gamePiecesInsideIntake--;
+            return true;
+        }
+
+        @Override
+        // doesn't apply volts properly since there is no motor in this file to set voltage to
+        public void runVolts(double volts) {
+            appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+            // driveTrainSim.setInputVoltage(appliedVolts);
+        }
+
+        @Override
+        public void stop() {
+            runVolts(0.0);
+        }
+
+        // no work yet cuz sim messed up rn
+        public void updateInputs(IntakeIOInputs inputs) {
         if(DriverStation.isDisabled())
             runVolts(0.0);
 
-        sim.update(Constants.robot.loopPeriodSecs);
-        inputs.appliedVolts = appliedVolts;
-        inputs.posRads = sim.getAngularPositionRad();
-        inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
-    }   
+        // sim.update(Constants.robot.loopPeriodSecs);
+        // inputs.appliedVolts = appliedVolts;
+        // inputs.posRads = sim.getAngularPositionRad();
+        // inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
+        }   
+
+        public final class GamePieceContactListener implements ContactListener<Body> {
+            
+            private void indicateGamePieceRemoval(GamePieceOnFieldSimulation gamePiece) {
+                gamePiecesToRemove.add(gamePiece);
+                gamePiecesInsideIntake++;
+            }
+
+            @Override
+            public void begin(ContactCollisionData collision, Contact contact) {
+                if (!intakeRunning) return;
+                if (gamePiecesInsideIntake >= capacity) return;
+
+                final CollisionBody<?> collisionBody1 = collision.getBody1(), collisionBody2 = collision.getBody2();
+                final Fixture fixture1 = collision.getFixture1(), fixture2 = collision.getFixture2();
+
+                if (collisionBody1 instanceof GamePieceOnFieldSimulation gamePiece
+                        && Objects.equals(gamePiece.type, targetedGamePieceType)
+                        && fixture2 == IntakeIOSim.this) indicateGamePieceRemoval(gamePiece);
+                else if (collisionBody2 instanceof GamePieceOnFieldSimulation gamePiece
+                        && Objects.equals(gamePiece.type, targetedGamePieceType)
+                        && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(gamePiece);
+
+                boolean coralOrAlgaeIntake = "Coral".equals(IntakeIOSim.this.targetedGamePieceType)
+                        || "Algae".equals(IntakeIOSim.this.targetedGamePieceType);
+                if (collisionBody1 instanceof ReefscapeCoralAlgaeStack stack
+                        && coralOrAlgaeIntake
+                        && fixture2 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
+                else if (collisionBody2 instanceof ReefscapeCoralAlgaeStack stack
+                        && coralOrAlgaeIntake
+                        && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
+            }
+            
+            @Override
+            public void persist(ContactCollisionData collision, Contact oldContact, Contact newContact) {}
     
-}
+            @Override
+            public void end(ContactCollisionData collision, Contact contact) {}
+    
+            @Override
+            public void destroyed(ContactCollisionData collision, Contact contact) {}
+    
+            @Override
+            public void collision(ContactCollisionData collision) {}
+    
+            @Override
+            public void preSolve(ContactCollisionData collision, Contact contact) {}
+    
+            @Override
+            public void postSolve(ContactCollisionData collision, SolvedContact contact) {}
+        }
+
+        public GamePieceContactListener getGamePieceContactListener() {
+            return new GamePieceContactListener();
+        }
+
+        public void removeObtainedGamePieces(SimulatedArena arena) {
+            while (!gamePiecesToRemove.isEmpty()) {
+                GamePieceOnFieldSimulation gamePiece = gamePiecesToRemove.poll();
+                gamePiece.onIntake(this.targetedGamePieceType);
+                arena.removeGamePiece(gamePiece);
+            }
+        }
+
+
+    /*
+     * don't need register since it automatically registers the intake
+     * in the intakesimulation constructor (WHiCH ISN'T FINISHED YET AHHHH)
+     */
+        // public void register() {
+        //     register(SimulatedArena.getInstance());
+        // }
+
+        // public void register(SimulatedArena arena) {
+        //     arena.addIntakeSimulation(this);
+        // }
+    }
+

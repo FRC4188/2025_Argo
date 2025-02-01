@@ -51,8 +51,8 @@ public final class Constants {
     public static final double A_WIDTH = Units.inchesToMeters(29); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
-    public static  final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
@@ -185,6 +185,16 @@ public final class Constants {
       .withSlot0(kSlot0Configs)
       .withClosedLoopRamps(kClosedLoopRampsConfigs)
       .withOpenLoopRamps(kOpenLoopRampsConfigs);
+  }
+
+  public static class wristConstraints {
+    public static final double CORAL_PICKUP_MIN_POS = -15;
+    public static final double CORAL_ELEVATOR_MIN_POS = -110; // ONLY FOR WHEN CORAL CAN FIT UNDERNEATH
+    public static final double CORAL_MAX_POS = 75;
+
+    // public static final double ALGAE_PICKUP_MIN_POS = 15;
+    // public static final double ALGAE_ELEVATOR_MIN_POS = 75;// ONLY FOR WHEN ALGAE CAN FIT UNDERNEATH
+    // public static final double ALGAE_MAX_POS = -75;
   }
 
 
