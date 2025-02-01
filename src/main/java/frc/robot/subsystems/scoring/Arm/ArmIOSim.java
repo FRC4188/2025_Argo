@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring.Arm;
+package frc.robot.subsystems.scoring.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.LinearSystem;
