@@ -99,10 +99,11 @@ public final class Constants {
     public static final int CLIMBER_LEFT_LIMIT = 4;
     public static final int CLIMBER_RIGHT_LIMIT = 1;
 
-    public static final double UPPER_LIMIT = 117.0;
-    public static final double LOWER_LIMIT = -117.0;
+  public static class arm{
 
-    public static final double ALLOWED_ERROR = 0.75;
+
+
+  }
 
 
   }
@@ -118,7 +119,7 @@ public final class Constants {
     public static final int WRIST_ENCODER = 10;
 
     public static final float WRIST_SOFT_LIMIT = 0.0f;
-    public static final double WRIST_GEAR_RATIO = 133.33333;
+    public static final double WRIST_GEAR_RATIO = 4.6666666667;
 
     public static final double WRIST_DEGREES_PER_MOTOR_ROTATION = (360 / WRIST_GEAR_RATIO);
     public static final float WRIST_OUT_SOFT_LIMIT = 111f;
@@ -127,55 +128,20 @@ public final class Constants {
     public static final double MAX_TEMP = 50.0;
     public static final double MAX_TEMP_WARNING = 60.0;
 
+    public static final double UPPER_LIMIT = 117.0;
+    public static final double LOWER_LIMIT = -117.0;
+
+    public static final double ALLOWED_ERROR = 0.75;
+
     public static final double kP = 0.1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
-    public static final double kIz = 0.0;
-    public static final double kFF = 0.0;
-    public static final double kMaxOutput = 1.0;
-    public static final double kMinOutput = -1.0;
-    public static final double kMaxInput = 117.0;
-    public static final double kMinInput = -117.0;
-    public static final double kTolerance = 0.5;
-    public static final double kSetpoint = 0.0;
-    public static final double kMaxVelocity = 0.0;
-    public static final double kMaxAcceleration = 0.0;
-    public static final double kMaxVoltage = 12.0;
-    public static final double kMinVoltage = -12.0;
-    public static final double kMaxAngle = 117.0;
-    public static final double kMinAngle = -117.0;
-    public static final double kMaxAngularVelocity = 0.0;
-    public static final double kMaxAngularAcceleration = 0.0;
-    public static final double kMaxAngularVoltage = 12.0;
-    public static final double kMinAngularVoltage = -12.0;
-    public static final double kMaxAngularError = 0.5;
-    public static final double kMaxAngularTolerance = 0.5;
-    public static final double kMaxAngularSetpoint = 0.0;
-    public static final double kMaxAngularVelocitySetpoint = 0.0;
-    public static final double kMaxAngularAccelerationSetpoint = 0.0;
-    public static final double kMaxAngularVoltageSetpoint = 12.0;
-    public static final double kMinAngularVoltageSetpoint = -12.0;
-    public static final double kMaxAngularOutput = 1.0;
-    public static final double kMinAngularOutput = -1.0;
-    public static final double kMaxAngularInput = 117.0;
-    public static final double kMinAngularInput = -117.0;
-    public static final double kMaxAngularVelocityOutput = 1.0;
-    public static final double kMinAngularVelocityOutput = -1.0;
-    public static final double kMaxAngularAccelerationOutput = 1.0;
-    public static final double kMinAngularAccelerationOutput = -1.0;
-    public static final double kMaxAngularVoltageOutput = 12.0;
-    public static final double kMinAngularVoltageOutput = -12.0;
-    public static final double kMaxAngularVelocityInput = 0.0;
-    public static final double kMinAngularVelocityInput = 0.0;
-    public static final double kMaxAngularAccelerationInput = 0.0;
-    public static final double kMinAngularAccelerationInput = 0.0;
-    public static final double kMaxAngularVoltageInput = 12.0;
-    public static final double kMinAngularVoltageInput = -12.0;
-
-
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
     
-    }
+  }
   
   
 
