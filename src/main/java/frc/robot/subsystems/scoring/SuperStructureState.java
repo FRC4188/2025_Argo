@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose3d;
 
-public class SuperstructureState {
+public class SuperStructureState {
     public record SuperState(Pose3d endEffectorPos){
 
         public double getWristAngle(){
