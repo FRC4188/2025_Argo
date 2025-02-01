@@ -249,12 +249,17 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
             }
         }
 
-    //     public void register() {
-    //         register(SimulatedArena.getInstance());
-    //     }
 
-    //     public void register(SimulatedArena arena) {
-    //         arena.addIntakeSimulation(this);
-    //     }
+    /*
+     * don't need register since it automatically registers the intake
+     * in the intakesimulation constructor (WHiCH ISN'T FINISHED YET AHHHH)
+     */
+        // public void register() {
+        //     register(SimulatedArena.getInstance());
+        // }
+
+        // public void register(SimulatedArena arena) {
+        //     arena.addIntakeSimulation(this);
+        // }
     }
 
