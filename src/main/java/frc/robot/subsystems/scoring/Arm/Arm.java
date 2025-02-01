@@ -1,6 +1,7 @@
-package frc.robot.subsystems.Arm;
+package frc.robot.subsystems.scoring.Arm;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Arm.ArmIOInputsAutoLogged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -25,6 +26,11 @@ public class Arm extends SubsystemBase {
         }
         return instance;
     }
+
+    public enum ArmPreset{
+        MAX,
+        MIN,
+        }
     
     private Arm(ArmIO io) {
         this.io = io;
@@ -35,19 +41,21 @@ public class Arm extends SubsystemBase {
     
     @Override
     public void periodic() {
+
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
     }
     
-    public Command setAngle(Arm arm, double angle) {
+    public Command setAngle(double angle) {
      return Commands.run(()->{
         // why is it angle two? becuase thats what makes it stop yelling
         double angle2 = Math.min(Math.max(angle, MIN_ANGLE), MAX_ANGLE);
         double currentAngle = inputs.positionRads-armZero;
         double output = armPID.calculate(currentAngle, angle2);
-        io.runVolts(output);}, arm);
+        io.runVolts(output);});
     }
-
+    
+    
 
     
     // Commands need to be reviewed may have implemented them incorrectly
@@ -55,17 +63,7 @@ public class Arm extends SubsystemBase {
         return Commands.run(()->{ io.stop();}, arm);
     }
     // The following commands will be used for going to 
-    public Command customAngle1 (Arm arm){
-        return Commands.run(()->{
-         setAngle(arm, MAX_ANGLE);
-        }, arm);
-    }
 
-    public Command customAngle2(Arm arm){
-        return Commands.run(()->{
-            setAngle(arm, MIN_ANGLE);
-        }, arm);
-    }
     
     public  double getAngle() {
         return inputs.positionRads - armZero;
