@@ -1,5 +1,6 @@
 package frc.robot.pathgen;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -74,6 +75,26 @@ public class PG_math {
 
 	public static Rotation2d modulate(Rotation2d r) {
 		return Rotation2d.fromDegrees((r.getDegrees() + 180)%360 - 180);
+	}
+
+	public static void printpose(Translation2d t) {
+		System.out.println("(" + t.getX() + ", " + t.getY() + ")");
+	}
+
+	public static void printpose(Pose2d p) {
+		System.out.println("(" + p.getX() + ", " + p.getY() + ")");
+	}
+
+	public static void printpose(Translation2d[] t) {
+		for (Translation2d t2 : t) {
+			printpose(t2);
+		}
+	}
+
+	public static void printpose(Pose2d[] t) {
+		for (Pose2d t2 : t) {
+			printpose(t2);
+		}
 	}
 
 }

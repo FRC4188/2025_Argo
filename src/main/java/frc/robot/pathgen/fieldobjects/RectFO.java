@@ -9,7 +9,7 @@ public class RectFO extends PolygonFO {
 
     }
 
-    RectFO(float x, float y, float l, float w) {
+    public RectFO(float x, float y, float l, float w) {
         super(
             new Translation2d(x + 0.5 * l, y + 0.5 * w), 
             new Translation2d(x + 0.5 * l, y + 0.5 * w), 

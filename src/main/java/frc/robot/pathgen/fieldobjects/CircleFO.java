@@ -10,7 +10,7 @@ public class CircleFO extends FieldObject{
 
     }
     
-    CircleFO(float x, float y, float radius) {
+    public CircleFO(float x, float y, float radius) {
         super(x, y);
 	    this.radius = radius;
     }

@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dyn4j.world.CollisionWorld;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
@@ -40,9 +42,12 @@ import frc.robot.Constants;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
+import frc.robot.pathgen.PG_math;
 import frc.robot.pathgen.PathGen;
+import frc.robot.pathgen.fieldobjects.CircleFO;
 import frc.robot.pathgen.fieldobjects.FOHandler;
 import frc.robot.pathgen.fieldobjects.PolygonFO;
+import frc.robot.pathgen.fieldobjects.RectFO;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
@@ -68,7 +73,7 @@ public final class AutoFactory {
     
         Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_brg_corner, new Rotation2d(Degrees.of(0)));
         Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_brg_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d source = new Pose2d(FieldConstant.Source.right_src_mid, new Rotation2d(Degrees.of(0)));
+        Pose2d source = FieldConstant.Source.right_srcs[4];
     
         List<Waypoint> pts  = PathPlannerPath.waypointsFromPoses(currPose,targetPose2d, source, targetPose2d1);
             
@@ -104,7 +109,7 @@ public final class AutoFactory {
                 drive.getPose(), 
                 List.of(
                     Reef.Base.left_brg_corner,
-                    Source.left_src_mid,
+                    Source.left_srcs[4].getTranslation(),
                     Reef.Base.right_field_corner),
                 new Pose2d(Reef.Base.right_field_corner, drive.getRotation()),
                 config),
@@ -123,44 +128,74 @@ public final class AutoFactory {
             FieldConstant.Reef.Base.left_src_corner,
             FieldConstant.Reef.Base.left_field_corner);
         
-        PathGen.getInstance().update_grid_fo();
+        new PolygonFO(
+            FieldConstant.Field.all_wall_left_corner,
+            FieldConstant.Field.alliance_left_corner,
+            FieldConstant.Field.alliance_right_corner,
+            FieldConstant.Field.all_wall_right_corner,
+            FieldConstant.Field.opp_wall_right_corner,
+            FieldConstant.Field.opposing_right_corner,
+            FieldConstant.Field.opposing_left_corner,
+            FieldConstant.Field.opp_wall_left_corner
+        );
 
+        new RectFO(
+            (float) FieldConstant.field_center_x,
+            (float) FieldConstant.field_center_y,
+            (float) FieldConstant.Field.brg_length,
+            (float) FieldConstant.Field.brg_width
+        );
+
+        new CircleFO(
+            (float) FieldConstant.Elem_Locations.corals_locations[0].getX(),
+            (float) FieldConstant.Elem_Locations.corals_locations[0].getY(),
+            (float) FieldConstant.algae_radius
+        );
+
+        PathGen.getInstance().update_grid_fo();
     }
+
+    public static void printObstacles() {
+        Translation2d[] borders = {
+            FieldConstant.Field.all_wall_left_corner,
+            FieldConstant.Field.alliance_left_corner,
+            FieldConstant.Field.alliance_right_corner,
+            FieldConstant.Field.all_wall_right_corner,
+            FieldConstant.Field.opp_wall_right_corner,
+            FieldConstant.Field.opposing_right_corner,
+            FieldConstant.Field.opposing_left_corner,
+            FieldConstant.Field.opp_wall_left_corner
+        };
+
+        Translation2d[] reef = {
+            FieldConstant.Reef.Base.left_brg_corner,
+            FieldConstant.Reef.Base.right_brg_corner,
+            FieldConstant.Reef.Base.right_field_corner,
+            FieldConstant.Reef.Base.right_src_corner,
+            FieldConstant.Reef.Base.left_src_corner,
+            FieldConstant.Reef.Base.left_field_corner
+        };
+
+        PG_math.printpose(reef);
+        PG_math.printpose(borders);
+        PG_math.printpose(FieldConstant.Source.left_srcs);
+        PG_math.printpose(FieldConstant.Source.right_srcs);
+    }
+
 
     public static Command AG2Coral(Drive drive){
         pathgeninit();
+        
+        //printObstacles();
 
-        Pose2d[] goals = {
-            FieldConstant.Reef.CoralGoal.alliance_left,
-            FieldConstant.Reef.CoralGoal.mid_brg_left,
-            FieldConstant.Reef.CoralGoal.left_src_right,
-            FieldConstant.Reef.CoralGoal.right_brg_right,
-            FieldConstant.Reef.CoralGoal.left_src_left,
-            FieldConstant.Reef.CoralGoal.right_brg_left,
-            FieldConstant.Reef.CoralGoal.left_brg_right,
-            FieldConstant.Reef.CoralGoal.right_src_right,
-            FieldConstant.Reef.CoralGoal.left_brg_left,
-            FieldConstant.Reef.CoralGoal.right_src_left,
-            FieldConstant.Reef.CoralGoal.mid_brg_right,
-            FieldConstant.Reef.CoralGoal.alliance_right
-        };
-        
         return Commands.sequence(
-            new DriveTo(drive, goals[0], config),
-            new DriveTo(drive, goals[1], config),
-            new DriveTo(drive, goals[2], config),
-            new DriveTo(drive, goals[3], config),
-            new DriveTo(drive, goals[4], config),
-            new DriveTo(drive, goals[5], config),
-            new DriveTo(drive, goals[6], config),
-            new DriveTo(drive, goals[7], config),
-            new DriveTo(drive, goals[8], config),
-            new DriveTo(drive, goals[9], config),
-            new DriveTo(drive, goals[10], config),
-            new DriveTo(drive, goals[11], config)
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src, config),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config),
+            new DriveTo(drive, FieldConstant.Source.left_srcs[6], config),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right, config),
+            new DriveTo(drive, FieldConstant.Source.right_srcs[7], config),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config)
         );
-        
-        
         
     }
 
