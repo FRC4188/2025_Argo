@@ -48,7 +48,6 @@ public class Intake extends SubsystemBase{
 
     public boolean intakeVoltageSpike() {
         if (motor.getAppliedOutput() > 5) {
-            stop();
             return true;
         } else {
             return false;
@@ -96,9 +95,14 @@ public class Intake extends SubsystemBase{
             }, intake);
     }
 
+    public ConditionalCommand stopOrIngest(Command halt, Command ingest, boolean intakeVoltageSpike) {
+        return stopOrIngest(halt, ingest, intakeVoltageSpike);
+    }
 
-
-
+    // idk if we need to check for voltagespike while ejecting
+    public ConditionalCommand stopOrEject(Command halt, Command eject, boolean intakeVoltageSpike) {
+        return stopOrEject(halt, eject, intakeVoltageSpike);
+    }
 
     @Override
     public void periodic(){

@@ -49,6 +49,14 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
 
     private double appliedVolts = 0.0;
 
+    // public IntakeIOSim(targetedGamePieceType, capacity, gamePiecesInsideIntake, driveTrainSim, gamePiecesToRemove, intakeRunning, appliedVolts) {
+    //     this.targetedGamePieceType = targetedGamePieceType;
+    //     this.capacity = capacity;
+    //     this.gamePiecesInsideIntake = gamePiecesInsideIntake;
+    //     this.driveTrainSim = driveTrainSim;
+    //     this.gamePiecesToRemove = gamePiecesToRemove;
+    //     this.appliedVolts = appliedVolts;
+    // }
     public enum IntakeSide {
         FRONT,
         LEFT,
@@ -106,13 +114,11 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
         }
 
         // add/remove return type if necessary
-        public IntakeSimulation IntakeSimulation(
+        public IntakeSimulation IntakeSimulation (
             String targetedGamePieceType, 
             AbstractDriveTrainSimulation driveTrainSim, 
             Convex shape, 
             int capacity) {
-            
-            
 
             super(shape);
             super.setDensity(0);
@@ -242,14 +248,13 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
                 arena.removeGamePiece(gamePiece);
             }
         }
-        }
 
-        public void register() {
-            register(SimulatedArena.getInstance()):
-        }
+    //     public void register() {
+    //         register(SimulatedArena.getInstance());
+    //     }
 
-        public void register(SimulatedArena arena) {
-            arena.addIntakeSimulation(this);
-        }
-
+    //     public void register(SimulatedArena arena) {
+    //         arena.addIntakeSimulation(this);
+    //     }
+    }
 
