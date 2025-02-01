@@ -1,11 +1,13 @@
-package frc.robot.subsystems.scoring.intake;
+package frc.robot.subsystems.scoring.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 
-public interface IntakeIO {
+
+public interface IntakeWristIO {//J.C
     @AutoLog
-    public static class IntakeIOInputs {
+    public static class IntakeWristIOInputs {
         public boolean connected = true;
         public double appliedVolts = 0.0;
         public double tempC = 0.0;
@@ -13,9 +15,7 @@ public interface IntakeIO {
         public double velRadsPerSec = 0.0;
     }
 
-    public default void updateInputs(IntakeIOInputs inputs) {}
+    default void updateInputs(IntakeWristIOInputs inputs) {}
+    default void runVolts(double volts) {}
 
-    public default void runVolts(double volts) {}
-
-    public default void stop(){}
 }
