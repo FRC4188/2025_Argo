@@ -38,6 +38,11 @@ public class Intake extends SubsystemBase{
         inputs = new IntakeIOInputsAutoLogged();
     }
 
+    public static enum GamePieceType {
+        CORAL,
+        ALGAE
+    }
+
     public void runVolts(double volts){
         io.runVolts(volts);
     }
@@ -65,10 +70,19 @@ public class Intake extends SubsystemBase{
     // }
 
 
+    //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest(Intake intake) {
         return Commands.run(
             () -> {
-                sparkconfig.inverted(false);
+                GamePieceType type = GamePieceType.CORAL;
+                switch (type) {
+                    case CORAL:
+                        sparkconfig.inverted(false);
+                        break;
+                    case ALGAE:
+                        sparkconfig.inverted(true);
+                        break;
+                }
                 runVolts(1);
             }, intake);
     }
@@ -76,6 +90,15 @@ public class Intake extends SubsystemBase{
     public Command eject(Intake intake) {
         return Commands.run(
             () -> {
+                GamePieceType type = GamePieceType.CORAL;
+                switch (type) {
+                    case CORAL:
+                        sparkconfig.inverted(true);
+                        break;
+                    case ALGAE:
+                        sparkconfig.inverted(false);
+                        break;
+                }
                 sparkconfig.inverted(true);
                 runVolts(1);
             }, intake);
