@@ -1,5 +1,7 @@
 package frc.robot.subsystems.scoring.lift;
 
+import org.dyn4j.dynamics.BodyFixture;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -97,7 +99,7 @@ public class ElevatorIOSim implements ElevatorIO{
     @Override
     public void runPosition(double height){
         leader.setControl(new PositionVoltage(height));
-        sim.setInput(leader.getSimState().getMotorVoltage());
+        sim.setInputVoltage(leader.getSimState().getMotorVoltage());
     }
     
     
