@@ -1,0 +1,125 @@
+package frc.robot.subsystems.scoring.lift;
+
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.subsystems.scoring.lift.ElevatorIO.ElevatorIOInputs;;
+
+public class ElevatorIOReal implements ElevatorIO {
+
+    private final TalonFX leader;
+    private final TalonFX follower;
+
+    private final CANcoder leadNcoder;
+    private final CANcoder followNcoder;
+
+    private final StatusSignal<Voltage> appliedVolts;
+    private final StatusSignal<Temperature> tempC;
+    private final StatusSignal<Angle> posRads;
+    private final StatusSignal<AngularVelocity> velRadsPerSec;
+    private final StatusSignal<Voltage> appliedVoltsFollow;
+    private final StatusSignal<Temperature> tempCFollow;
+
+    public ElevatorIOReal() {
+
+        //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
+        leader = new TalonFX(ElevatorConstants.kLeadID);
+        leadNcoder = new CANcoder(ElevatorConstants.kLeadCANID);
+        follower = new TalonFX(ElevatorConstants.kFollowID);
+        followNcoder = new CANcoder(ElevatorConstants.kFollowCANID);
+
+        follower.setControl(new Follower(ElevatorConstants.kLeadID, false));
+
+        leader.setNeutralMode(NeutralModeValue.Brake);
+        follower.setNeutralMode(NeutralModeValue.Brake);
+
+        leadNcoder.clearStickyFaults();
+        leader.clearStickyFaults();
+        follower.clearStickyFaults();
+        followNcoder.clearStickyFaults();
+
+        // MagnetSensorConfigs leftSensorConfigs = new MagnetSensorConfigs();
+        // leftSensorConfigs.MagnetOffset = constants.kLOffset;
+        // leftSensorConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+
+        // MagnetSensorConfigs rightSensorConfigs = new MagnetSensorConfigs();
+        // rightSensorConfigs.MagnetOffset = constants.kROffset;
+        // rightSensorConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+
+        // LeftEncoder.getConfigurator().apply(e);
+        // LeftMotor.getConfigurator().setPosition(LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+
+        // RightEncoder.getConfigurator().apply(rightSensorConfigs);
+        // RightMotor.getConfigurator().setPosition(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+
+        leader.getConfigurator().apply(ElevatorConstants.kMotorConfig);
+        follower.getConfigurator().apply(ElevatorConstants.kMotorConfig);
+
+        leader.optimizeBusUtilization();
+        follower.optimizeBusUtilization();    
+        
+        posRads = leader.getPosition();
+        appliedVolts = leader.getMotorVoltage();
+        tempC = leader.getDeviceTemp();
+        velRadsPerSec = leader.getVelocity();
+        appliedVoltsFollow = follower.getMotorVoltage();
+        tempCFollow = follower.getDeviceTemp();
+        
+    }
+
+    @Override
+    public void updateInputs(ElevatorIOInputs inputs) {
+        inputs.connected =
+        BaseStatusSignal.refreshAll(
+                posRads, appliedVolts, tempC, velRadsPerSec, appliedVoltsFollow, tempCFollow)
+            .isOK();
+    
+        inputs.appliedVolts = appliedVolts.getValueAsDouble();
+        inputs.tempC = tempC.getValueAsDouble();
+        inputs.posRads = posRads.getValueAsDouble();
+        inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
+        
+        inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
+        inputs.followerTempC = tempCFollow.getValueAsDouble();
+    }
+
+    @Override
+    public void runVolts(double volts){
+        leader.setControl(new VoltageOut(volts));
+    }
+
+    @Override
+    public void runPosition(double height){
+        leader.setControl(new PositionVoltage(height));
+    }
+    
+    
+}
