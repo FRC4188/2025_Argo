@@ -13,6 +13,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 import frc.robot.subsystems.scoring.wrist.IntakeWristIOReal;
 
@@ -24,13 +26,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ids.arm;
 
 
 public class IntakeWrist extends SubsystemBase {//J.C
     private static IntakeWrist instance;
     private IntakeWristIO io;
     private final IntakeWristIOInputsAutoLogged inputs = new IntakeWristIOInputsAutoLogged();
-
+    private ArmIO armIO;
+    private Arm arm = Arm.getInstance(armIO);
 
     private SparkMax motor = new SparkMax(Constants.wrist.WRIST, MotorType.kBrushless);
     private ProfiledPIDController pid = new ProfiledPIDController(Constants.wrist.kP, Constants.wrist.kI, Constants.wrist.kD, Constants.wrist.CONSTRAINTS);
@@ -58,7 +62,19 @@ public class IntakeWrist extends SubsystemBase {//J.C
   @Override
   public void periodic(){
     io.updateInputs(inputs);
-    Logger.processInputs("Wrist", inputs);    
+    Logger.processInputs("Wrist", inputs);
+
+    if (getMotorAngle() < Constants.wristConstraints.CORAL_PICKUP_MIN_POS){
+      setAngle(Constants.wristConstraints.CORAL_PICKUP_MIN_POS);
+    }
+
+    if (getMotorAngle() > Constants.wristConstraints.CORAL_MAX_POS){
+      setAngle(Constants.wristConstraints.CORAL_MAX_POS);
+    }
+
+    if (getMotorAngle() < Constants.wristConstraints.CORAL_ELEVATOR_MIN_POS && arm.getAngle() == Constants.armConstraints.ELEVATOR_MAX_POS){
+      setAngle(Constants.wristConstraints.CORAL_ELEVATOR_MIN_POS);
+    }
   }
 
   public void setAngle(double angle) {
@@ -106,12 +122,5 @@ public class IntakeWrist extends SubsystemBase {//J.C
       setAngle(angle);
     });
   }
-
-  //PLEAOSEJAAKSENSAKENJAKSEN
- 
-  
-  
-  
-  
 
 }

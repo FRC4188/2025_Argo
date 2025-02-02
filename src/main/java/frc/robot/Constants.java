@@ -197,5 +197,12 @@ public final class Constants {
     // public static final double ALGAE_MAX_POS = -75;
   }
 
+  public static class armConstraints {
+    //TODO: FIND THE MAX AND MIN VALUES
+    public static final double ELEVATOR_MIN_POS = 0.0; //placeholder
+    public static final double ELEVATOR_MAX_POS = 0.0; //placeholder
+    
+  }
+
 
 }
