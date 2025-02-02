@@ -144,7 +144,7 @@ public class DriveCommands {
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(speeds);(
+              drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
                       isFlipped
