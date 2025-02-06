@@ -96,14 +96,47 @@ public final class Constants {
 
     public static final int CLIMBER_LEFT_LIMIT = 4;
     public static final int CLIMBER_RIGHT_LIMIT = 1;
-
-  public static class arm{
-
-
-
   }
+  public static class ElevatorConstants{
+    public static final int kLeadID = 0;
+    public static final int kFollowID = 0;
+    public static final int kLeadCANID = 0;
+    public static final int kFollowCANID = 0;
+    
+    
+    public static final double kGearRatio = 0;
 
+    private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(100)
+      .withSupplyCurrentLimit(60)
+      .withStatorCurrentLimitEnable(true);
 
+    private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
+      .withSensorToMechanismRatio(kGearRatio);
+    
+    private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
+      .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
+      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
+      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
+
+    private static final Slot0Configs kSlot0Configs = new Slot0Configs()
+      .withGravityType(GravityTypeValue.Elevator_Static)
+      .withKP(0.0)
+      .withKD(0.0)
+      .withKS(0)
+      .withKV(0.0)
+      .withKA(0.0);
+
+    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
+    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
+
+    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
+      .withCurrentLimits(kCurrentLimitsConfigs)
+      .withFeedback(kFeedbackConfigs)
+      .withMotionMagic(kMagicConfigs)
+      .withSlot0(kSlot0Configs)
+      .withClosedLoopRamps(kClosedLoopRampsConfigs)
+      .withOpenLoopRamps(kOpenLoopRampsConfigs);
   }
   public static class wrist {
 

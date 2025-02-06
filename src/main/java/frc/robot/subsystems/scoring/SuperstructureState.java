@@ -1,4 +1,3 @@
-
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Inches;
@@ -6,7 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose3d;
 
-public class SuperstructureState {
+public class SuperStructureState {
     public record SuperState(Pose3d endEffectorPos){
 
         public double getWristAngle(){
@@ -23,7 +22,6 @@ public class SuperstructureState {
     }
 
     public enum ElevatorPreset{
-        // I believe all of these need to be found
         MAX(0.0),
         MIN(0.0),
         L4(0.0),
