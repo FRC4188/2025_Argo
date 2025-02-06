@@ -38,6 +38,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.scoring.intake.IntakeIO.IntakeIOInputs;
 import frc.robot.subsystems.scoring.wrist.IntakeWristIO;
 
 
@@ -70,9 +71,8 @@ public class IntakeWristIOReal implements IntakeWristIO {//J.C
         velRadsPerSec = max.configAccessor.encoder.getVelocityConversionFactor();
     }
 
-    
     @Override
-    public void updateInputs(IntakeWristIOInputs inputs) {
+    public void updateInputs(IntakeIOInputs inputs) {
         inputs.appliedVolts = appliedVolts;
         inputs.tempC = tempC;
         inputs.posRads = posRads;
