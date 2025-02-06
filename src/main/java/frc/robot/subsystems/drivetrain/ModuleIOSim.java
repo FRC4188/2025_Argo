@@ -71,7 +71,6 @@ public class ModuleIOSim implements ModuleIO {
     this.drive = sim
       .useGenericMotorControllerForDrive()
       .withCurrentLimit(Amps.of(TunerConstants.FrontLeft.SlipCurrent));
-
     this.turn = sim
       .useGenericControllerForSteer()
       .withCurrentLimit(Amps.of(20));

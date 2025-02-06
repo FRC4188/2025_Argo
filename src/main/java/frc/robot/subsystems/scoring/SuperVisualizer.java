@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.Main;
 
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
@@ -17,16 +16,16 @@ import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 import org.littletonrobotics.junction.Logger;
 
 public class SuperVisualizer {
-    Mechanism2d mainMech;
+    Mechanism2d main;
     MechanismRoot2d root;
-    MechanismLigament2d elevatorLig, armLig, wristLig;
+    MechanismLigament2d elevator, arm, wrist;
     String key;
 
     public SuperVisualizer(String logkey){
-        mainMech = new Mechanism2d(4, 3);
-        root = mainMech.getRoot("superstructure", origin.getX(), origin.getY());
+        main = new Mechanism2d(4, 3);
+        root = main.getRoot("superstructure", origin.getX(), origin.getY());
 
-        elevatorLig = root.append(
+        elevator = root.append(
             new MechanismLigament2d(
                 "Ele Carriage", 
                 Meters.of(origin.getZ()).magnitude(),
@@ -35,19 +34,19 @@ public class SuperVisualizer {
                 new Color8Bit(Color.kBlack)
         ));
 
-        armLig = elevatorLig.append(
+        arm = elevator.append(
             new MechanismLigament2d(
                 "arm",
-                arm.length(),
+                arm.getLength(),
                 0,
                 4,
                 new Color8Bit(Color.kAliceBlue))
         );
 
-        wristLig = armLig.append(
+        wrist = arm.append(
             new MechanismLigament2d(
                 "wrist", 
-                wrist.length(),
+                wrist.getLength(),
                 0,
                 4,
                 new Color8Bit(Color.kAquamarine))
@@ -57,10 +56,9 @@ public class SuperVisualizer {
     }
 
     public void update(double elevatorHeight, double armAngle, double wristAngle){
-        armLig.setAngle(armAngle);
-        wristLig.setAngle(wristAngle);
-        elevatorLig.setLength(elevatorHeight);
-        // Logger.recordOutput("Mechanism2d", mainMech);
+        arm.setAngle(armAngle);
+        wrist.setAngle(wristAngle);
+        elevator.setLength(elevatorHeight);
 
         //update pose3d for 3d simulation (ligaments alone are 2d)
         Pose3d carriage = 
@@ -82,7 +80,7 @@ public class SuperVisualizer {
         Pose3d wristPos = 
             armPos.transformBy(
                 new Transform3d(
-                    new Translation3d(0.0, arm.length(), elevatorHeight),
+                    new Translation3d(0.0, arm.getLength(), elevatorHeight),
                     new Rotation3d(-wristAngle, 0.0, 0.0)
                 )
             );
