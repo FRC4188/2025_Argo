@@ -115,10 +115,12 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
 
         // add/remove return type if necessary
         public IntakeSimulation IntakeSimulation (
+
             String targetedGamePieceType, 
             AbstractDriveTrainSimulation driveTrainSim, 
             Convex shape, 
-            int capacity) {
+            int capacity) 
+            {
 
             super(shape);
             super.setDensity(0);
