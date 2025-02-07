@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoFactory;
+import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.FollowPath;
 import frc.robot.inputs.CSP_Controller;
@@ -63,6 +63,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -79,6 +80,7 @@ public class RobotContainer {
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
+  private final CSP_Controller controller2 = new CSP_Controller(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -148,7 +150,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    NamedCommands.registerCommands(AutoFactory.EVENTS);
+    NamedCommands.registerCommands(AutoTests.EVENTS);
   }
 
   /**
@@ -182,8 +184,10 @@ public class RobotContainer {
                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
-      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));  
-    }
+      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
+      
+      
+  }
 
   private void configureDashboard() {
     // Set up auto routines
@@ -205,15 +209,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
-    autoChooser.addOption("Mid to 2 corals manual", AutoFactory.toBasetoSource());
-    autoChooser.addOption("Mid to 2 corals gui", AutoFactory.twoCoral());
+    autoChooser.addOption("Mid to 2 corals manual", AutoTests.toBasetoSource());
+    autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
 
     //follow path commd test
-    autoChooser.addOption("2 corals manual follow", AutoFactory.follow2Coral(drive));
+    autoChooser.addOption("2 corals manual follow", AutoTests.follow2Coral(drive));
 
     //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoFactory.drive2Corals(drive));
-    autoChooser.addOption("pathgen", AutoFactory.AG2Coral(drive));
+    autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
+    autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
   }
 
   /**
@@ -222,14 +226,14 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoFactory.AG2Coral(drive);
+    return AutoTests.AG2Coral(drive);
   }
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
+    //drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
@@ -254,7 +258,7 @@ public class RobotContainer {
         )
       }
     );
-    armSim.update(0, 0, 0);
+    armSim.update(12, 0, 100);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(

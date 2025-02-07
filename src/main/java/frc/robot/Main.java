@@ -18,8 +18,8 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.pathgen.PathGen;
-import frc.robot.pathgen.fieldobjects.*;
+import frc.robot.commands.autos.pathgen.PathGen;
+import frc.robot.commands.autos.pathgen.fieldobjects.*;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
 
