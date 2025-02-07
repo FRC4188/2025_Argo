@@ -49,18 +49,10 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
 
     private double appliedVolts = 0.0;
 
-    // public IntakeIOSim(targetedGamePieceType, capacity, gamePiecesInsideIntake, driveTrainSim, gamePiecesToRemove, intakeRunning, appliedVolts) {
-    //     this.targetedGamePieceType = targetedGamePieceType;
-    //     this.capacity = capacity;
-    //     this.gamePiecesInsideIntake = gamePiecesInsideIntake;
-    //     this.driveTrainSim = driveTrainSim;
-    //     this.gamePiecesToRemove = gamePiecesToRemove;
-    //     this.appliedVolts = appliedVolts;
-    // }
     public enum IntakeSide {
         FRONT,
-        LEFT,
-        RIGHT,
+        // LEFT,
+        // RIGHT,
         BACK
     }
 
@@ -95,7 +87,7 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
         final Rectangle rectangleyIntake = new Rectangle(width, extendyLength);
         rectangleyIntake.rotate (
             switch (intakeside) {
-                case LEFT, RIGHT -> 0;
+                // case LEFT, RIGHT -> 0;
                 case FRONT, BACK -> Math.toRadians(90);
             });
     
@@ -104,8 +96,8 @@ public class IntakeIOSim extends BodyFixture implements IntakeIO {
 
         rectangleyIntake.translate (
             switch (intakeside) {
-                case LEFT -> new Vector2(0, driveTrainSim.config.bumperWidthY.in(Meters) / 2 + transformedDistance);
-                case RIGHT -> new Vector2(0, -driveTrainSim.config.bumperWidthY.in(Meters) / 2 - transformedDistance);
+                // case LEFT -> new Vector2(0, driveTrainSim.config.bumperWidthY.in(Meters) / 2 + transformedDistance);
+                // case RIGHT -> new Vector2(0, -driveTrainSim.config.bumperWidthY.in(Meters) / 2 - transformedDistance);
                 case FRONT -> new Vector2(driveTrainSim.config.bumperLengthX.in(Meters) / 2 + transformedDistance, 0);
                 case BACK -> new Vector2(-driveTrainSim.config.bumperLengthX.in(Meters) / 2 - transformedDistance / 2 , 0);
             });
