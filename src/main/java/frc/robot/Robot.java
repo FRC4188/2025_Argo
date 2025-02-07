@@ -20,6 +20,15 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.Threads;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -32,6 +41,25 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
+    
+    switch(Constants.robot.currMode){
+      case REAL:
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case SIM:
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case REPLAY:
+        setUseTiming(false);
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+
+    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
     m_robotContainer = new RobotContainer();
 
     switch(Constants.robot.currMode){
@@ -51,16 +79,6 @@ public class Robot extends LoggedRobot {
     }
 
     Logger.start();
-
-    var modules = 
-      new SwerveModuleConstants[] {
-        TunerConstants.FrontLeft,
-        TunerConstants.FrontRight,
-        TunerConstants.BackLeft,
-        TunerConstants.BackRight
-      };
-
-      Pathfinding.setPathfinder(new LocalADStarAK());
 
   }
 
@@ -123,11 +141,12 @@ public class Robot extends LoggedRobot {
   @Override
   public void testExit() {}
 
-  /** This function is called periodically whilst in simulation. */
-  @Override
+  /** This function is called periodically whilst in simulation. */  
+  @Override 
   public void simulationPeriodic() {
       SimulatedArena.getInstance().simulationPeriodic();
       m_robotContainer.displaySimFieldToAdvantageScope();
   }
+  
 
 }

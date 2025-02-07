@@ -23,8 +23,10 @@ import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -35,9 +37,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
-import frc.robot.pathgen.PathPointsGen;
+import frc.robot.pathgen.PathGen;
+import frc.robot.pathgen.fieldobjects.FOHandler;
+import frc.robot.pathgen.fieldobjects.PolygonFO;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
@@ -54,16 +59,16 @@ public final class AutoFactory {
             false);
     
     public static TrajectoryConfig config = new TrajectoryConfig(
-        TunerConstants.kSpeedAt12Volts.magnitude() / 4, 
-        Constants.robot.MAX_ACCELERATION.magnitude() / 4);
+        TunerConstants.kSpeedAt12Volts.magnitude() / 2, 
+        Constants.robot.MAX_ACCELERATION.magnitude() / 2);
         
     //run barely, slow and not accurate
     public static Command toBasetoSource(){
         Pose2d currPose = new Pose2d(FieldConstant.Cage.cage_positions[1].getX(), FieldConstant.Cage.cage_positions[1].getY(), new Rotation2d(Degrees.of(0)));
     
-        Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_barge_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_barge_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d source = new Pose2d(FieldConstant.Source.bottom_source_mid, new Rotation2d(Degrees.of(0)));
+        Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_brg_corner, new Rotation2d(Degrees.of(0)));
+        Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_brg_corner, new Rotation2d(Degrees.of(0)));
+        Pose2d source = new Pose2d(FieldConstant.Source.right_src_mid, new Rotation2d(Degrees.of(0)));
     
         List<Waypoint> pts  = PathPlannerPath.waypointsFromPoses(currPose,targetPose2d, source, targetPose2d1);
             
@@ -98,10 +103,10 @@ public final class AutoFactory {
             TrajectoryGenerator.generateTrajectory(
                 drive.getPose(), 
                 List.of(
-                    Reef.Base.left_barge_corner,
-                    Source.top_source_mid,
-                    Reef.Base.right_wall_corner),
-                new Pose2d(Reef.Base.right_wall_corner, drive.getRotation()),
+                    Reef.Base.left_brg_corner,
+                    Source.left_src_mid,
+                    Reef.Base.right_field_corner),
+                new Pose2d(Reef.Base.right_field_corner, drive.getRotation()),
                 config),
             
             new Rotation2d(Degrees.of(0)),
@@ -109,20 +114,54 @@ public final class AutoFactory {
             );
     }
 
-    public static Command AG2Coral(){
-        Trajectory traj = PathPointsGen.getInstance().
-            generateTrajectory(
-                new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120))),
-                new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))), config);
+    public static void pathgeninit() {
+        new PolygonFO(
+            FieldConstant.Reef.Base.left_brg_corner,
+            FieldConstant.Reef.Base.right_brg_corner,
+            FieldConstant.Reef.Base.right_field_corner,
+            FieldConstant.Reef.Base.right_src_corner,
+            FieldConstant.Reef.Base.left_src_corner,
+            FieldConstant.Reef.Base.left_field_corner);
+        
+        PathGen.getInstance().update_grid_fo();
 
-        Trajectory e = PathPointsGen.getInstance().
-            generateTrajectory(
-                new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55))),
-                new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))), config);
+    }
+
+    public static Command AG2Coral(Drive drive){
+        pathgeninit();
+
+        Pose2d[] goals = {
+            FieldConstant.Reef.CoralGoal.alliance_left,
+            FieldConstant.Reef.CoralGoal.mid_brg_left,
+            FieldConstant.Reef.CoralGoal.left_src_right,
+            FieldConstant.Reef.CoralGoal.right_brg_right,
+            FieldConstant.Reef.CoralGoal.left_src_left,
+            FieldConstant.Reef.CoralGoal.right_brg_left,
+            FieldConstant.Reef.CoralGoal.left_brg_right,
+            FieldConstant.Reef.CoralGoal.right_src_right,
+            FieldConstant.Reef.CoralGoal.left_brg_left,
+            FieldConstant.Reef.CoralGoal.right_src_left,
+            FieldConstant.Reef.CoralGoal.mid_brg_right,
+            FieldConstant.Reef.CoralGoal.alliance_right
+        };
         
         return Commands.sequence(
-            
+            new DriveTo(drive, goals[0], config),
+            new DriveTo(drive, goals[1], config),
+            new DriveTo(drive, goals[2], config),
+            new DriveTo(drive, goals[3], config),
+            new DriveTo(drive, goals[4], config),
+            new DriveTo(drive, goals[5], config),
+            new DriveTo(drive, goals[6], config),
+            new DriveTo(drive, goals[7], config),
+            new DriveTo(drive, goals[8], config),
+            new DriveTo(drive, goals[9], config),
+            new DriveTo(drive, goals[10], config),
+            new DriveTo(drive, goals[11], config)
         );
+        
+        
+        
     }
 
     //literally FLAWLESS
@@ -130,8 +169,8 @@ public final class AutoFactory {
         return Commands.sequence(
             new DriveToPose(drive, () -> new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120)))),
             new WaitCommand(0.5),
-            new DriveToPose(drive, () -> new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55)))),
-            new WaitCommand(0.5),
+            // new DriveToPose(drive, () -> new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55)))),
+            // new WaitCommand(0.5),
             new DriveToPose(drive, () -> new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))))
         );
     }

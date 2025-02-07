@@ -40,19 +40,16 @@ public final class Constants {
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
 
+    public static final double ARM_GEAR_RATIO = 5.0625;
   }
 
   public static enum Mode {
-    /** Running on a real robot. */
     REAL,
-
-    /** Running a physics simulator. */
     SIM,
-
-    /** Replaying from a log file. */
-    REPLAY
+    REPLAY,
   }
 
+  //last year's ids, change as soon as robot is obtained
   public static class ids{
     public static final int INTAKE = 16;
 
@@ -77,16 +74,5 @@ public final class Constants {
     public static final int CLIMBER_LEFT_LIMIT = 4;
     public static final int CLIMBER_RIGHT_LIMIT = 1;
   }
-
-  public static class wristConstraints {
-    public static final double CORAL_PICKUP_MIN_POS = -15;
-    public static final double CORAL_ELEVATOR_MIN_POS = -110; // ONLY FOR WHEN CORAL CAN FIT UNDERNEATH
-    public static final double CORAL_MAX_POS = 75;
-
-    // public static final double ALGAE_PICKUP_MIN_POS = 15;
-    // public static final double ALGAE_ELEVATOR_MIN_POS = 75;// ONLY FOR WHEN ALGAE CAN FIT UNDERNEATH
-    // public static final double ALGAE_MAX_POS = -75;
-  }
-
 
 }

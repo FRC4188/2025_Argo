@@ -1,34 +1,28 @@
 package frc.robot.pathgen.fieldobjects;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.pathgen.PG_math;
+
 public class CircleFO extends FieldObject{
-    protected float r = 0;
+    protected float radius = 0;
 
     CircleFO() {
-        super(0,0);
-    }
 
-    CircleFO(float x, float y, float r) {
+    }
+    
+    CircleFO(float x, float y, float radius) {
         super(x, y);
-        this.r = r;
+	    this.radius = radius;
     }
 
     @Override
-    public boolean touching_line(double x0, double y0, double x1, double y1) {
-        double b = 2.f * ((x0 - x) * (x1 - x0) + (y0 - y) * (y1 - y0));
-        double c = ((x0 - x) * (x0 - x) + (y0 - y) * (y0 - y) - r * r);
-        double a = ((y1 - y0) * (y1 - y0) + (x1 - x0) * (x1 - x0));
-    
-        double discriminate = b * b - 4.f * a * c;
-    
-        if (discriminate < 0) { return false; }
-        double val1 = (-b + Math.sqrt(discriminate)) / (2.f * a);
-        double val2 = (-b - Math.sqrt(discriminate)) / (2.f * a);
-        return ((0 <= val1 && val1 <= 1) || (0 <= val2 && val2 <= 1));
+    public float from_line(Translation2d l1, Translation2d l2) {
+	    return Math.abs(PG_math.point_from_lineseg_f(l1, l2, new Translation2d(c_x, c_y)) - radius);
     }
 
     @Override
-    public boolean touching_point(double x0, double y0) {
-        return (x0 - x) * (x0 - x) + (y0 - y) * (y0 - y) <= r * r;
+    public float from_point(Translation2d point) {
+	    return (float) Math.abs((c_x - point.getX()) * (c_x - point.getX()) + (c_y - point.getY()) * (c_y - point.getY()) - radius);
     }
     
 }
