@@ -19,17 +19,20 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoFactory;
+import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.FollowPath;
 import frc.robot.inputs.CSP_Controller;
@@ -43,6 +46,7 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
+import frc.robot.subsystems.scoring.SuperVisualizer;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -59,6 +63,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,9 +76,11 @@ public class RobotContainer {
   private final Drive drive;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
+  private SuperVisualizer armSim;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
+  private final CSP_Controller controller2 = new CSP_Controller(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -100,9 +107,10 @@ public class RobotContainer {
 
       case SIM:
         //maple sim
-
+        
         // Sim robot, instantiate physics sim IO implementations
         driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
@@ -118,6 +126,8 @@ public class RobotContainer {
                 driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
+
+        armSim = new SuperVisualizer("Superstructure");
         break;
 
       default:
@@ -140,7 +150,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    NamedCommands.registerCommands(AutoFactory.EVENTS);
+    NamedCommands.registerCommands(AutoTests.EVENTS);
   }
 
   /**
@@ -156,22 +166,28 @@ public class RobotContainer {
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
-    drivingInput.onTrue(DriveCommands.joystickDrive(drive,
-      () -> controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
 
-    // Reset gyro to 0° when B button is pressed
+    // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
+    //   () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+    //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+    //   () -> (controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
+
+    drivingInput.onTrue(DriveCommands.TeleDrive(drive,
+      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
+
+    // Reset gyro to 0° when start button is pressed
     final Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
       ? () -> drive.setPose(
               driveSim
                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
-      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));  
-
+      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-    }
+      
+  }
 
   private void configureDashboard() {
     // Set up auto routines
@@ -193,14 +209,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
-    autoChooser.addOption("Mid to 2 corals manual", AutoFactory.toBasetoSource());
-    autoChooser.addOption("Mid to 2 corals gui", AutoFactory.twoCoral());
+    autoChooser.addOption("Mid to 2 corals manual", AutoTests.toBasetoSource());
+    autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
 
     //follow path commd test
-    autoChooser.addOption("2 corals manual follow", AutoFactory.follow2Coral(drive));
+    autoChooser.addOption("2 corals manual follow", AutoTests.follow2Coral(drive));
 
     //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoFactory.drive2Corals(drive));
+    autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
+    autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
   }
 
   /**
@@ -209,13 +226,14 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return AutoTests.AG2Coral(drive);
   }
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    //drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
@@ -223,6 +241,24 @@ public class RobotContainer {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
+    Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()});
+    Logger.recordOutput("FinalComponentPoses", 
+      new Pose3d[] {
+        new Pose3d(
+          0.127, 0.356, 0.08, new Rotation3d(0,0,-90)
+        ),
+        new Pose3d(
+          0.174, 0.153, 0.157, new Rotation3d(0,0,0)
+        ),
+        new Pose3d(
+          0.183, 0.177, 0.227, new Rotation3d(25,0,0)
+        ),
+        new Pose3d(
+          0.045, 0.103, 0.65, new Rotation3d(90,0,0)
+        )
+      }
+    );
+    armSim.update(12, 0, 100);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(

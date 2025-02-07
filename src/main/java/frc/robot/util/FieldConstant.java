@@ -2,7 +2,7 @@ package frc.robot.util;
 
 
 import static edu.wpi.first.units.Units.Degree;
-
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Degree;
 
 import edu.wpi.first.math.geometry.Translation3d;
@@ -45,10 +45,10 @@ public class FieldConstant {
         public static Translation2d alliance_left_corner = new Translation2d(Units.inchesToMeters(0), field_width - Units.inchesToMeters(50.750));
         public static Translation2d all_wall_left_corner = new Translation2d(Units.inchesToMeters(67.039), field_width);
 
-        public static Translation2d opposing_left_corner = new Translation2d(field_length, Units.inchesToMeters(50.750));
-        public static Translation2d opp_wall_left_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), 0);
-        public static Translation2d opposing_right_corner = new Translation2d(field_length, field_width - Units.inchesToMeters(50.750));
-        public static Translation2d opp_wall_right_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), field_width);
+        public static Translation2d opposing_right_corner = new Translation2d(field_length, Units.inchesToMeters(50.750));
+        public static Translation2d opp_wall_right_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), 0);
+        public static Translation2d opposing_left_corner = new Translation2d(field_length, field_width - Units.inchesToMeters(50.750));
+        public static Translation2d opp_wall_left_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), field_width);
     }
 
     public class Cage {
@@ -88,7 +88,7 @@ public class FieldConstant {
     public class Reef{
         
         public static double center_x = field_center_x - Units.inchesToMeters(168.692);
-        public static double center_y = field_center_y/2;
+        public static double center_y = field_width/2;
         public static double from_reef = Units.inchesToMeters(65.5 / 2); 
         public static double long_radius = Units.inchesToMeters(75.238 / 2); 
         public static double side_length = Units.inchesToMeters(37.043);
@@ -113,52 +113,52 @@ public class FieldConstant {
             //god help us
             //left and right relative to robot facing into the reef
             public static Pose2d alliance_left = new Pose2d(
-                Base.alliance_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degree.of(0)))),
-                new Rotation2d(Degree.of(0)));
+                Base.alliance_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degrees.of(0)))),
+                new Rotation2d(Degrees.of(0)));
             
             public static Pose2d alliance_right = new Pose2d(
-                Base.alliance_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degree.of(0)))),
-                new Rotation2d(Degree.of(0)));
+                Base.alliance_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(0)))),
+                new Rotation2d(Degrees.of(0)));
 
             public static Pose2d left_src_left = new Pose2d(
-                Base.left_src_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degree.of(-60)))),
-                new Rotation2d(Degree.of(-60)));
+                Base.left_src_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degrees.of(-60)))),
+                new Rotation2d(Degrees.of(-60)));
 
             public static Pose2d left_src_right = new Pose2d(
-                Base.left_src_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degree.of(-60)))),
-                new Rotation2d(Degree.of(-60)));
+                Base.left_src_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(-60)))),
+                new Rotation2d(Degrees.of(-60)));
 
             public static Pose2d right_src_left = new Pose2d(
-                Base.right_src_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degree.of(60)))),
-                new Rotation2d(Degree.of(60)));
+                Base.right_src_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degrees.of(60)))),
+                new Rotation2d(Degrees.of(60)));
 
             public static Pose2d right_src_right = new Pose2d(
-                Base.right_src_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degree.of(60)))),
-                new Rotation2d(Degree.of(60)));
+                Base.right_src_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(60)))),
+                new Rotation2d(Degrees.of(60)));
 
             public static Pose2d left_brg_left = new Pose2d(
-                Base.left_brg_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degree.of(-120)))),
-                new Rotation2d(Degree.of(-120)));
+                Base.left_brg_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degrees.of(-120)))),
+                new Rotation2d(Degrees.of(-120)));
 
             public static Pose2d left_brg_right = new Pose2d(
-                Base.left_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degree.of(-120)))),
-                new Rotation2d(Degree.of(-120)));
+                Base.left_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(-120)))),
+                new Rotation2d(Degrees.of(-120)));
 
             public static Pose2d right_brg_left  = new Pose2d(
-                Base.right_brg_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degree.of(120)))),
-                new Rotation2d(Degree.of(120)));
+                Base.right_brg_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degrees.of(120)))),
+                new Rotation2d(Degrees.of(120)));
             
             public static Pose2d right_brg_right = new Pose2d(
-                Base.right_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degree.of(120)))),
-                new Rotation2d(Degree.of(120)));
+                Base.right_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(120)))),
+                new Rotation2d(Degrees.of(120)));
 
             public static Pose2d mid_brg_left = new Pose2d(
-                Base.mid_brg_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degree.of(180)))),
-                new Rotation2d(Degree.of(180)));
+                Base.mid_brg_wall.getTranslation().plus(score_left.rotateBy(new Rotation2d(Degrees.of(180)))),
+                new Rotation2d(Degrees.of(180)));
 
             public static Pose2d mid_brg_right = new Pose2d(
-                Base.mid_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degree.of(180)))),
-                new Rotation2d(Degree.of(180)));
+                Base.mid_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(180)))),
+                new Rotation2d(Degrees.of(180)));
         }
 
         public class AlgaeSource {
@@ -170,28 +170,28 @@ public class FieldConstant {
             public static Translation2d source = new Translation2d(-src_perp, src_parallel);
 
             public static Pose2d alliance_src = new Pose2d(
-                Base.alliance_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degree.of(0)))),
-                new Rotation2d(Degree.of(0)));
+                Base.alliance_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(0)))),
+                new Rotation2d(Degrees.of(0)));
             
             public static Pose2d left_brg_src = new Pose2d(
-                Base.left_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degree.of(-120)))),
-                new Rotation2d(Degree.of(-120)));
+                Base.left_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(-120)))),
+                new Rotation2d(Degrees.of(-120)));
 
             public static Pose2d right_brg_src = new Pose2d(
-                Base.right_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degree.of(120)))),
-                new Rotation2d(Degree.of(120)));
+                Base.right_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(120)))),
+                new Rotation2d(Degrees.of(120)));
 
             public static Pose2d left_src_src = new Pose2d(
-                Base.left_src_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degree.of(-60)))),
-                new Rotation2d(Degree.of(-60)));
+                Base.left_src_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(-60)))),
+                new Rotation2d(Degrees.of(-60)));
 
             public static Pose2d right_src_src = new Pose2d(
-                Base.right_src_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degree.of(60)))),
-                new Rotation2d(Degree.of(60)));
+                Base.right_src_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(60)))),
+                new Rotation2d(Degrees.of(60)));
 
             public static Pose2d mid_brg_src = new Pose2d(
-                Base.mid_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degree.of(180)))),
-                new Rotation2d(Degree.of(180)));
+                Base.mid_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(180)))),
+                new Rotation2d(Degrees.of(180)));
 
         }
 
@@ -227,32 +227,32 @@ public class FieldConstant {
             public static Pose2d alliance_wall = new  Pose2d(
                 center_x + from_reef * Math.cos(Units.degreesToRadians(180)) , 
                 center_y + from_reef * Math.sin(Units.degreesToRadians(180)), 
-                new Rotation2d(Degree.of(180.0)));
+                new Rotation2d(Degrees.of(180.0)));
 
             public static Pose2d left_src_wall = new  Pose2d(
                 center_x + from_reef * Math.cos(Units.degreesToRadians(120)) , 
                 center_y + from_reef * Math.sin(Units.degreesToRadians(120)), 
-                new Rotation2d(Degree.of(120.0)));
+                new Rotation2d(Degrees.of(120.0)));
                 
             public static  Pose2d left_brg_wall = new  Pose2d(
                 center_x + from_reef * Math.cos(Units.degreesToRadians(60)) , 
                 center_y + from_reef * Math.sin(Units.degreesToRadians(60)), 
-                new Rotation2d(Degree.of(60.0)));
+                new Rotation2d(Degrees.of(60.0)));
 
             public static Pose2d mid_brg_wall = new Pose2d(
                 center_x + from_reef * Math.cos(Units.degreesToRadians(0)) , 
                 center_y + from_reef * Math.sin(Units.degreesToRadians(0)), 
-                new Rotation2d(Degree.of(0)));
+                new Rotation2d(Degrees.of(0)));
 
             public static  Pose2d right_brg_wall = new Pose2d(
                 center_x + from_reef * Math.cos(Units.degreesToRadians(-60)) , 
                 center_y + from_reef * Math.sin(Units.degreesToRadians(-60)), 
-                new Rotation2d(Degree.of(-60)));
+                new Rotation2d(Degrees.of(-60)));
 
             public static Pose2d right_src_wall = new  Pose2d(
                 center_x + from_reef * Math.cos(Units.degreesToRadians(-120)) , 
                 center_y + from_reef * Math.sin(Units.degreesToRadians(-120)), 
-                new Rotation2d(Degree.of(-120)));
+                new Rotation2d(Degrees.of(-120)));
             
             
         }
@@ -340,12 +340,6 @@ public class FieldConstant {
         //order from closets to ds to farthest
         public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH, 0);
 
-<<<<<<< HEAD
-        public static Translation2d right_src_alliance = new Translation2d(left_src_alliance.getX(), AllianceFlip.flipY(left_src_alliance.getY()));
-        public static Translation2d right_src_mid = new Translation2d(left_src_mid.getX(), AllianceFlip.flipY(left_src_mid.getY()));
-        public static Translation2d right_src_reef = new Translation2d( left_src_reef.getX(), AllianceFlip.flipY( left_src_reef.getY()));
-        public static Rotation2d right_source_rotat = new Rotation2d(Degree.of(-54.0112));      
-=======
         public static Translation2d right_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(54.0112 - 90));
         public static Translation2d left_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(-54.0112 + 90));
 
@@ -424,7 +418,6 @@ public class FieldConstant {
             .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
             Rotation2d.fromDegrees(-54.0112 + 180))
         };
->>>>>>> e414efe039e48842fcd00ff9d6215a633f7c9554
     }
 
 }
