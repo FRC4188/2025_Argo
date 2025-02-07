@@ -228,8 +228,8 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
+    //drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
@@ -254,7 +254,7 @@ public class RobotContainer {
         )
       }
     );
-    armSim.update(0, 0, 0);
+    armSim.update(0.2, 45, 20);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
