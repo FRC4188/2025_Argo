@@ -56,7 +56,11 @@ public class Arm extends SubsystemBase {
         io.runVolts(output);});
     }
     
-    
+    public Command setVolt(double percent){
+        return Commands.run(()->{
+            io.runVolts(percent);
+        });
+    }
 
     
     // Commands need to be reviewed may have implemented them incorrectly

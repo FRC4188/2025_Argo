@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,6 +15,8 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Main;
 
+import static edu.wpi.first.units.Units.Inch;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 
@@ -59,7 +62,12 @@ public class SuperVisualizer {
         key = logkey;
     }
 
+
     public void update(double elevatorHeight, double armAngle, double wristAngle){
+        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, HIGHEST_H - LOWEST_H);
+        elevatorHeight = Meters.convertFrom(elevatorHeight, Inches);
+
+
         armLig.setAngle(armAngle);
         wristLig.setAngle(wristAngle);
         elevatorLig.setLength(elevatorHeight);

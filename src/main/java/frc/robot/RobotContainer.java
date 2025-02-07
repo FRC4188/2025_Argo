@@ -63,6 +63,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -79,6 +80,7 @@ public class RobotContainer {
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
+  private final CSP_Controller controller2 = new CSP_Controller(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -182,8 +184,10 @@ public class RobotContainer {
                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
-      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));  
-    }
+      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
+      
+      
+  }
 
   private void configureDashboard() {
     // Set up auto routines
@@ -254,7 +258,7 @@ public class RobotContainer {
         )
       }
     );
-    armSim.update(0.2, 45, 20);
+    armSim.update(12, 0, 100);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
