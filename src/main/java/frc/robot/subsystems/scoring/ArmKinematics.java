@@ -16,7 +16,7 @@ import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 public class ArmKinematics {
     //0,0 = x; 0,1 = y
     //get angle for wrist and arm from pose3d of endpoint of intake
-    private Vector<N2> apply(Pose2d endPos){
+    public static Vector<N2> apply(Pose2d endPos){
         double angle1 = -Math.cos(
             (Math.pow(endPos.getX(), 2) 
             + Math.pow(endPos.getY(), 2) 
@@ -32,7 +32,7 @@ public class ArmKinematics {
     }
     
     //get endpoint of intake using angles of arm n wrist
-    public Translation2d forward(Vector<N2> angles) {
+    public static Translation2d forward(Vector<N2> angles) {
         return new Translation2d(
             origin.getX()
                 + arm.length() * Math.cos(angles.get(0, 0))

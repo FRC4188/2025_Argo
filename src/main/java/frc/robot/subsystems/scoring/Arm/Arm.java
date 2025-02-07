@@ -1,4 +1,5 @@
 package frc.robot.subsystems.scoring.Arm;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.scoring.Arm.ArmIOInputsAutoLogged;
@@ -11,6 +12,7 @@ public class Arm extends SubsystemBase {
     private static Arm instance = null;
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs;
+    private double targetAngle = 0, armAngle = 0;
     // maybe work
     
     // need to be calibrated
@@ -44,18 +46,19 @@ public class Arm extends SubsystemBase {
 
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+                
     }
     
     public Command setAngle(double angle) {
-     return Commands.run(()->{
-        // why is it angle two? becuase thats what makes it stop yelling
-        double angle2 = Math.min(Math.max(angle, MIN_ANGLE), MAX_ANGLE);
-        double currentAngle = inputs.positionRads-armZero;
-        double output = armPID.calculate(currentAngle, angle2);
-        io.runVolts(output);});
+        return Commands.run(()->{
+            // why is it angle two? becuase thats what makes it stop yelling
+            targetAngle = angle;
+        });
     }
     
-    
+    public Command setVolt(double volts) {
+        return Commands.run(()->{ io.runVolts(volts);});
+    }
 
     
     // Commands need to be reviewed may have implemented them incorrectly

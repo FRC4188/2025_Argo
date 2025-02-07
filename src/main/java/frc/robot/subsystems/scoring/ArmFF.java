@@ -18,11 +18,11 @@ public class ArmFF {
     static final double g = 9.80;
 
     //gearbox of da 2 motors
-    DCMotor arm = DCMotor.getKrakenX60(1);
-    DCMotor wrist = DCMotor.getNeo550(1);
+    static DCMotor arm = DCMotor.getKrakenX60(1);
+    static DCMotor wrist = DCMotor.getNeo550(1);
     
-    Joint armConfig = SuperstructureConfig.arm;
-    Joint wristConfig = SuperstructureConfig.wrist;
+    static Joint armConfig = SuperstructureConfig.arm;
+    static Joint wristConfig = SuperstructureConfig.wrist;
 
     //FF model that convert betw voltage and joing pos, vel, and accel
     
@@ -33,27 +33,27 @@ public class ArmFF {
 
     //dcmotor can calculate voltage based on torque and target velocity
 
-    public double getArmVoltFF(Vector<N2> pos){
+    public static double getArmVoltFF(Vector<N2> pos){
         return calculate(pos).get(0,0);
     }
 
-    public double getWristVoltFF(Vector<N2> pos){
+    public static double getWristVoltFF(Vector<N2> pos){
         return calculate(pos).get(1,0);
     }
 
-    public double getArmVoltFF(Vector<N2> pos, Vector<N2> vel, Vector<N2> accel){
+    public static double getArmVoltFF(Vector<N2> pos, Vector<N2> vel, Vector<N2> accel){
         return calculate(pos, vel, accel).get(0,0);
     }
 
-    public double getWristVoltFF(Vector<N2> pos, Vector<N2> vel, Vector<N2> accel){
+    public static double getWristVoltFF(Vector<N2> pos, Vector<N2> vel, Vector<N2> accel){
         return calculate(pos, vel, accel).get(1,0);
     }
 
-    public Vector<N2> calculate(Vector<N2> pos){
+    public static Vector<N2> calculate(Vector<N2> pos){
         return calculate(pos, VecBuilder.fill(0.0, 0.0), VecBuilder.fill(0.0,0.0));
     }
     
-    public Vector<N2> calculate(Vector<N2> pos, Vector<N2> vel, Vector<N2> accel){
+    public static Vector<N2> calculate(Vector<N2> pos, Vector<N2> vel, Vector<N2> accel){
         var t = M(pos)
             .times(accel)
             .plus(C(pos, vel).times(vel))
@@ -72,7 +72,7 @@ public class ArmFF {
      * @param dt
      * @return the antiderivative of vector of (vel1, vel2, accel1, accel2) aka new (pos1, pos2, vel1, vel2)
      */
-    public Vector<N4> simState(Vector<N4> state, Vector<N2> volt, double dt){
+    public static Vector<N4> simState(Vector<N4> state, Vector<N2> volt, double dt){
         return new Vector<>(
             NumericalIntegration.rkdp(
                 (Matrix<N4, N1> x, Matrix<N2, N1> u) -> {
@@ -103,7 +103,7 @@ public class ArmFF {
     }
 
     //inertia matrix calculation
-    private Matrix<N2, N2> M(Vector<N2> pos){
+    private static Matrix<N2, N2> M(Vector<N2> pos){
         var m = new Matrix<>(N2.instance, N2.instance);
 
         //set value at 0,0 of matrix
@@ -144,7 +144,7 @@ public class ArmFF {
         return m;
     }
 
-    private Matrix<N2, N2> C(Vector<N2> velocity, Vector<N2> pos){
+    private static Matrix<N2, N2> C(Vector<N2> velocity, Vector<N2> pos){
         Matrix<N2, N2> c = new Matrix<>(N2.instance, N2.instance);
         
         c.set(
@@ -180,7 +180,7 @@ public class ArmFF {
         return c;
     }
 
-    private Matrix<N2, N1> T(Vector<N2> pos){
+    private static Matrix<N2, N1> T(Vector<N2> pos){
         Matrix<N2, N1> t = new Matrix<>(N2.instance, N1.instance);
 
         t.set(

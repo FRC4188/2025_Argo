@@ -18,6 +18,7 @@ import frc.robot.subsystems.scoring.wrist.IntakeWristIOReal;
 
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,14 +30,14 @@ import frc.robot.Constants;
 public class IntakeWrist extends SubsystemBase {//J.C
     private static IntakeWrist instance;
     private IntakeWristIO io;
-    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    private final IntakeWristIOInputsAutoLogged inputs = new IntakeWristIOInputsAutoLogged();
 
 
     private SparkMax motor = new SparkMax(Constants.wrist.WRIST, MotorType.kBrushless);
     private ProfiledPIDController pid = new ProfiledPIDController(Constants.wrist.kP, Constants.wrist.kI, Constants.wrist.kD, Constants.wrist.CONSTRAINTS);
     private RelativeEncoder encoder = motor.getEncoder();
     
-    private double setpoint = 0;
+    private double targetAngle = 0, wristAngle = 0;
     private final double appliedVolts = 0.0;
     private final double tempC = 0.0;
     private final double posRads = 0.0;
@@ -58,12 +59,19 @@ public class IntakeWrist extends SubsystemBase {//J.C
   @Override
   public void periodic(){
     io.updateInputs(inputs);
+    //TODO: fix conversion error ^
     Logger.processInputs("Wrist", inputs);    
+
+    targetAngle = MathUtil.clamp(targetAngle, Constants.wrist.LOWER_LIMIT, Constants.wrist.UPPER_LIMIT);
+    wristAngle = pid.calculate(inputs.posRads, targetAngle);
+    io.runVolts(wristAngle);
   }
 
-  public void setAngle(double angle) {
-    motor.set(pid.calculate(getMotorAngle(), angle));
-  }
+  public Command setAngle(double angle) {
+    return Commands.run(()->{
+        targetAngle = angle;
+    });
+}
 
   public void setPID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);

@@ -173,6 +173,10 @@ public final class Constants {
     public static final double kA = 0.0;
     
   }
+
+  public static class ArmConstants {
+    
+  }
   
 
 }

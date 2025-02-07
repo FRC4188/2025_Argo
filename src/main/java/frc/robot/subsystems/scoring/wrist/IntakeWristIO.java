@@ -2,7 +2,6 @@ package frc.robot.subsystems.scoring.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 import frc.robot.subsystems.scoring.intake.IntakeIO.IntakeIOInputs;
 
 

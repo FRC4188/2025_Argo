@@ -2,6 +2,8 @@ package frc.robot.subsystems.scoring.intake;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
@@ -10,6 +12,7 @@ public class Intake extends SubsystemBase{
     private static Intake instance;
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
+    private boolean isInverted = false;
 
     public static Intake getInstance(IntakeIO io){
         if(instance == null){
@@ -34,8 +37,15 @@ public class Intake extends SubsystemBase{
     @Override
     public void periodic(){
         io.updateInputs(inputs);
-        Logger.processInputs("Intake", inputs);    }
+        Logger.processInputs("Intake", inputs);    
+    
+        io.runVolts(isInverted ? -3 : 3);
+    }
 
-
+    public Command setInverted(boolean inverted){
+        return run(()->{
+            isInverted = inverted;
+        });
+    }
     
 }
