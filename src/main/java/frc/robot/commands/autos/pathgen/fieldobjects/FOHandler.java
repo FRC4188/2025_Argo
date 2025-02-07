@@ -1,4 +1,4 @@
-package frc.robot.pathgen.fieldobjects;
+package frc.robot.commands.autos.pathgen.fieldobjects;
 
 import java.util.ArrayList;
 import java.util.List;

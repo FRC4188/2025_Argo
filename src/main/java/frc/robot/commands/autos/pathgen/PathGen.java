@@ -1,4 +1,4 @@
-package frc.robot.pathgen;
+package frc.robot.commands.autos.pathgen;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import frc.robot.Constants;
-import frc.robot.pathgen.fieldobjects.FOHandler;
+import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
 import frc.robot.util.FieldConstant;
 
 public class PathGen {

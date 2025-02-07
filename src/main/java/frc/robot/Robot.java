@@ -80,16 +80,6 @@ public class Robot extends LoggedRobot {
 
     Logger.start();
 
-    var modules = 
-      new SwerveModuleConstants[] {
-        TunerConstants.FrontLeft,
-        TunerConstants.FrontRight,
-        TunerConstants.BackLeft,
-        TunerConstants.BackRight
-      };
-
-      Pathfinding.setPathfinder(new LocalADStarAK());
-
   }
 
   @Override

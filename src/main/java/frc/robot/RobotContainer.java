@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoFactory;
+import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.FollowPath;
 import frc.robot.inputs.CSP_Controller;
@@ -46,6 +46,7 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
+import frc.robot.subsystems.scoring.SuperVisualizer;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -74,6 +75,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
+  private SuperVisualizer armSim;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -122,6 +124,8 @@ public class RobotContainer {
                 driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
+
+        armSim = new SuperVisualizer("Superstructure");
         break;
 
       default:
@@ -144,7 +148,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    NamedCommands.registerCommands(AutoFactory.EVENTS);
+    NamedCommands.registerCommands(AutoTests.EVENTS);
   }
 
   /**
@@ -201,15 +205,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
-    autoChooser.addOption("Mid to 2 corals manual", AutoFactory.toBasetoSource());
-    autoChooser.addOption("Mid to 2 corals gui", AutoFactory.twoCoral());
+    autoChooser.addOption("Mid to 2 corals manual", AutoTests.toBasetoSource());
+    autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
 
     //follow path commd test
-    autoChooser.addOption("2 corals manual follow", AutoFactory.follow2Coral(drive));
+    autoChooser.addOption("2 corals manual follow", AutoTests.follow2Coral(drive));
 
     //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoFactory.drive2Corals(drive));
-    autoChooser.addOption("pathgen", AutoFactory.AG2Coral(drive));
+    autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
+    autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
   }
 
   /**
@@ -218,7 +222,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoFactory.AG2Coral(drive);
+    return AutoTests.AG2Coral(drive);
   }
 
   public void resetSimulation(){
@@ -250,6 +254,7 @@ public class RobotContainer {
         )
       }
     );
+    armSim.update(0, 0, 0);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(

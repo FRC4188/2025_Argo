@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.autos;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degree;
@@ -39,22 +39,22 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.autos.pathgen.PG_math;
+import frc.robot.commands.autos.pathgen.PathGen;
+import frc.robot.commands.autos.pathgen.fieldobjects.CircleFO;
+import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
+import frc.robot.commands.autos.pathgen.fieldobjects.PolygonFO;
+import frc.robot.commands.autos.pathgen.fieldobjects.RectFO;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.drive.FollowPath;
-import frc.robot.pathgen.PG_math;
-import frc.robot.pathgen.PathGen;
-import frc.robot.pathgen.fieldobjects.CircleFO;
-import frc.robot.pathgen.fieldobjects.FOHandler;
-import frc.robot.pathgen.fieldobjects.PolygonFO;
-import frc.robot.pathgen.fieldobjects.RectFO;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
 import frc.robot.util.FieldConstant.Reef;
 import frc.robot.util.FieldConstant.Source;
 
-public final class AutoFactory {
+public final class AutoTests {
     private final static PathConstraints  constraints =  new PathConstraints(
             TunerConstants.kSpeedAt12Volts,
             MetersPerSecondPerSecond.of(3.6),
@@ -120,7 +120,7 @@ public final class AutoFactory {
     }
 
     public static void pathgeninit() {
-        new PolygonFO(
+        new PolygonFO(true,
             FieldConstant.Reef.Base.left_brg_corner,
             FieldConstant.Reef.Base.right_brg_corner,
             FieldConstant.Reef.Base.right_field_corner,
@@ -128,7 +128,7 @@ public final class AutoFactory {
             FieldConstant.Reef.Base.left_src_corner,
             FieldConstant.Reef.Base.left_field_corner);
         
-        new PolygonFO(
+        new PolygonFO(true,
             FieldConstant.Field.all_wall_left_corner,
             FieldConstant.Field.alliance_left_corner,
             FieldConstant.Field.alliance_right_corner,
@@ -152,41 +152,26 @@ public final class AutoFactory {
             (float) FieldConstant.algae_radius
         );
 
+        new CircleFO(
+            (float) FieldConstant.Elem_Locations.corals_locations[1].getX(),
+            (float) FieldConstant.Elem_Locations.corals_locations[1].getY(),
+            (float) FieldConstant.algae_radius
+        );
+
+        new CircleFO(
+            (float) FieldConstant.Elem_Locations.corals_locations[2].getX(),
+            (float) FieldConstant.Elem_Locations.corals_locations[2].getY(),
+            (float) FieldConstant.algae_radius
+        );
+
         PathGen.getInstance().update_grid_fo();
     }
-
-    public static void printObstacles() {
-        Translation2d[] borders = {
-            FieldConstant.Field.all_wall_left_corner,
-            FieldConstant.Field.alliance_left_corner,
-            FieldConstant.Field.alliance_right_corner,
-            FieldConstant.Field.all_wall_right_corner,
-            FieldConstant.Field.opp_wall_right_corner,
-            FieldConstant.Field.opposing_right_corner,
-            FieldConstant.Field.opposing_left_corner,
-            FieldConstant.Field.opp_wall_left_corner
-        };
-
-        Translation2d[] reef = {
-            FieldConstant.Reef.Base.left_brg_corner,
-            FieldConstant.Reef.Base.right_brg_corner,
-            FieldConstant.Reef.Base.right_field_corner,
-            FieldConstant.Reef.Base.right_src_corner,
-            FieldConstant.Reef.Base.left_src_corner,
-            FieldConstant.Reef.Base.left_field_corner
-        };
-
-        PG_math.printpose(reef);
-        PG_math.printpose(borders);
-        PG_math.printpose(FieldConstant.Source.left_srcs);
-        PG_math.printpose(FieldConstant.Source.right_srcs);
-    }
-
 
     public static Command AG2Coral(Drive drive){
         pathgeninit();
         
-        //printObstacles();
+        System.out.println(FieldConstant.Processor.processor_wall);
+        System.out.println(FieldConstant.Processor.processor_goal);
 
         return Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src, config),
@@ -194,7 +179,8 @@ public final class AutoFactory {
             new DriveTo(drive, FieldConstant.Source.left_srcs[6], config),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right, config),
             new DriveTo(drive, FieldConstant.Source.right_srcs[7], config),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config)
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config),
+            new DriveTo(drive, FieldConstant.Processor.processor_goal, config)
         );
         
     }
