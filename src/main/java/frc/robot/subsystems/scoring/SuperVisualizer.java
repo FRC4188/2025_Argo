@@ -63,6 +63,7 @@ public class SuperVisualizer {
         armLig.setAngle(armAngle);
         wristLig.setAngle(wristAngle);
         elevatorLig.setLength(elevatorHeight);
+        //Logger.recordOutput("Mechanism2d", mainMech);
 
         //update pose3d for 3d simulation (ligaments alone are 2d)
         Pose3d carriage = carriageOrigin.transformBy(

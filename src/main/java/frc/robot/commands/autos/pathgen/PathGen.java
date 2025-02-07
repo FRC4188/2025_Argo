@@ -1,4 +1,4 @@
-package frc.robot.pathgen;
+package frc.robot.commands.autos.pathgen;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import frc.robot.Constants;
-import frc.robot.pathgen.fieldobjects.FOHandler;
+import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
 import frc.robot.util.FieldConstant;
 
 public class PathGen {
@@ -72,7 +72,6 @@ public class PathGen {
 	    ArrayList<Node> backward_nodes = new ArrayList<Node>();
 
 	    if(!a_star.pathFind(a_star.t2d_to_node(start), a_star.t2d_to_node(end))) return pivots;
-        System.out.println("generated path");
 
 	    backward_nodes.add(a_star.endNode);
 	    backward_nodes.add(a_star.startNode);
@@ -128,11 +127,9 @@ public class PathGen {
 	    if (pivots.size() < 2) return pivots;
 
 	    if (a_star.t2d_to_node(start) == backward_nodes.get(backward_nodes.size() - 1)) {
-            System.out.println("No correction on start");
             pivots.remove(0);
         }
 	    if (a_star.t2d_to_node(end) == backward_nodes.get(0)) {
-            System.out.println("No correction on end");
             pivots.remove(pivots.size() - 1);
         }
         
@@ -140,11 +137,6 @@ public class PathGen {
 		    pivots.add(end.plus(start.minus(end).times(0.5)));
 	    }
         
-        System.out.println("pivots: " + pivots.size());
-        for (Translation2d t2d : pivots) {
-            System.out.println("(" + t2d.getX() + ", " + t2d.getY() + ")");
-        }
-
 	    return pivots;
     }
 

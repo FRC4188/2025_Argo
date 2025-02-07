@@ -1,7 +1,7 @@
-package frc.robot.pathgen.fieldobjects;
+package frc.robot.commands.autos.pathgen.fieldobjects;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.pathgen.PG_math;
+import frc.robot.commands.autos.pathgen.PG_math;
 
 public abstract class FieldObject {
     protected float c_x = 0;
