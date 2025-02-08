@@ -13,7 +13,6 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import frc.robot.subsystems.scoring.intake.IntakeIOInputsAutoLogged;
 import frc.robot.subsystems.scoring.wrist.IntakeWristIOReal;
 
 import com.revrobotics.spark.SparkMax;

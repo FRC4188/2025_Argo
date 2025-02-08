@@ -1,7 +1,7 @@
 package frc.robot.subsystems.scoring;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.scoring.SuperstructureState.SuperPreset;
-import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.SuperstructureState;
+import frc.robot.subsystems.scoring.Arm.Arm;
 import frc.robot.subsystems.scoring.lift.Elevator;
 import frc.robot.subsystems.scoring.wrist.IntakeWrist;
 

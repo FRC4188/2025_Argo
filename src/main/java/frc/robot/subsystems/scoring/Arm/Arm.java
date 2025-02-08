@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring.arm;
+package frc.robot.subsystems.scoring.Arm;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
