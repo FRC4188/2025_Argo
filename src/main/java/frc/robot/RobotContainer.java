@@ -186,6 +186,8 @@ public class RobotContainer {
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
+     
+      armSim.update(controller2.getLeftY(), controller2.getRightX(), (controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis()));
       
   }
 
