@@ -56,6 +56,12 @@ public final class Constants {
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
+    public static enum STATE {
+      EMPTY,
+      ALGAE,
+      CORAL
+  }
+    public static STATE robotstate; //to be set
 
   }
 

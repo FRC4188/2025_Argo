@@ -1,0 +1,69 @@
+{
+  "name": "Argo",
+  "rotations": [
+    {
+      "axis":"z",
+      "degrees": -90
+    },
+    {
+      "axis":"y",
+      "degrees": 180
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0  
+],
+  "cameras": [],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis":"z",
+          "degrees": 180
+        }
+      ],
+      "zeroedPosition": [0.35577, -0.115056, 0.040725] 
+    },
+
+    {
+      "zeroedRotations": [
+	{
+	"axis":"x",
+        "degrees": 0
+	}
+	],
+      "zeroedPosition": [0, 0, 0] 
+    },
+
+    {
+      "zeroedRotations": [
+        {
+          "axis":"x",
+          "degrees":0
+        },
+	{
+          "axis":"z",
+          "degrees": 0
+        }
+      ],
+      "zeroedPosition": [0, 0, 0] 
+    },
+
+    {
+      "zeroedRotations": [
+        {
+          "axis":"x",
+          "degrees": 0
+        },
+	{
+          "axis":"z",
+          "degrees": 0
+        }
+	
+      ],
+      "zeroedPosition": [0, 0, 0] 
+    }
+  ]
+}
