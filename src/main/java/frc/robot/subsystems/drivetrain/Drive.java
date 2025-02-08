@@ -50,6 +50,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
+import frc.robot.subsystems.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
 import frc.robot.util.AllianceFlip;
 import frc.robot.util.LocalADStarAK;

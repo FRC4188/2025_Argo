@@ -48,7 +48,7 @@ public class GyroIOPigeon2 implements GyroIO {
     }
 
     @Override
-    public void updateInputs(GyroIOInputs inputs) {
+    public void updateInputs(GyroIOInputsAutoLogged inputs) {
         inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
         inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
         inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
