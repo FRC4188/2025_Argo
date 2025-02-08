@@ -29,13 +29,21 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.util.AllianceFlip;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -64,6 +72,51 @@ public class DriveCommands {
         .getTranslation();
   }
 
+  public static Command TTTele(Drive drive, DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta){
+    return Commands.run(() -> {
+      Translation2d transInput = getLinearVelocityFromJoysticks(-x.getAsDouble(), -y.getAsDouble());
+      double rotatInput = MathUtil.applyDeadband(Math.copySign(-theta.getAsDouble() * -theta.getAsDouble(), -theta.getAsDouble()), DEADBAND);
+      
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+        transInput.getX(), transInput.getY(), rotatInput, drive.getRotation()));
+    });
+  }
+
+  public static Command TeleDrive(Drive drive, DoubleSupplier xInput, DoubleSupplier yInput, DoubleSupplier thetaInput){
+    return Commands.run(
+      () -> {
+        SlewRateLimiter limitX = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
+        SlewRateLimiter limitY = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
+
+        double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
+        double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
+
+        double totalSpeed = Math.hypot(x, y);
+        double angle = Math.atan2(y, x);
+        double xSpeed = totalSpeed * Math.cos(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
+        double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
+        double rotSpeed = -thetaInput.getAsDouble() * 5 * Math.PI;
+
+        //xSpeed = limitX.calculate(xSpeed);
+        //ySpeed = limitY.calculate(ySpeed);
+
+
+
+        ChassisSpeeds speeds = 
+            ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+              xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio / 4.6,
+              ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio / 4.6, 
+              rotSpeed), 
+              AllianceFlip.apply(drive.getRotation()));
+
+        
+        drive.runVelocity(speeds);
+        
+      },
+      drive
+    );
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -72,11 +125,14 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
+
+    //System.out.println("Command called");
+
     return Commands.run(
         () -> {
           // Get linear velocity
           Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              AllianceFlip.apply(getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble()));
 
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
@@ -86,19 +142,17 @@ public class DriveCommands {
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
-              new ChassisSpeeds(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
-          boolean isFlipped =
-              DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
+                  omega * drive.getMaxAngularSpeedRadPerSec(),
+                  AllianceFlip.apply(drive.getRotation()));
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
-                  isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+                  AllianceFlip.apply(drive.getRotation())));
+          
+          
         },
         drive);
   }

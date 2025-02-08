@@ -1,4 +1,3 @@
-
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Inches;
@@ -6,6 +5,8 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
+
+import org.dyn4j.dynamics.joint.Joint;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,13 +32,15 @@ public class SuperstructureConfig {
 
 
     //TODO: need starting, lowest, highest, point of origin of arm
-    public static final double LOWEST_H = Inches.of(8.990645).magnitude();
-    public static final double HIGHEST_H = Inches.of(8.990645 + 72.0).magnitude();
+    public static final double LOWEST_H = Inches.of(9.13250).magnitude();//0.228362383 meters
+    public static final double HIGHEST_H = Inches.of(9.13250 + 72.0).magnitude();//2.057162383 meters
 
-    public static Pose3d origin = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0,0,0));
+    //config.json has all of these at zero, these are values from the robot's origin -rn
+    public static Pose3d origin = new Pose3d(0.0, 0.0, 0, new Rotation3d(0,0,0));
     public static Pose3d carriageOrigin = new Pose3d(0.000172, -0.00711, 0.23197, new Rotation3d(Units.degreesToRadians(180),0, 0));
     public static Pose3d armOrigin = new Pose3d(-0.004077, 0.000171, 0.231965, new Rotation3d(Units.degreesToRadians(180), 0, 0));
     public static Pose3d wristOrigin = new Pose3d(-0.004077, -0.049069, 0.644627, new Rotation3d(Units.degreesToRadians(180),0, 0));
+
     public record Joint(
         double mass,
         double length,

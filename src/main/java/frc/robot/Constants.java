@@ -55,13 +55,19 @@ public final class Constants {
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
 
+    public static final double ARM_GEAR_RATIO = 5.0625;
+
+    public static enum STATE {
+      EMPTY,
+      ALGAE,
+      CORAL
+    }
+  
+    public static STATE robotstate; //to be set
   }
 
   public static enum Mode {
-    /** Running on a real robot. */
     REAL,
-
-    /** Running a physics simulator. */
     SIM,
 
     /** Replaying from a log file. */
@@ -73,6 +79,7 @@ public final class Constants {
     
   }
 
+  //last year's ids, change as soon as robot is obtained
   public static class ids{
     public static final int INTAKE = 16;
 

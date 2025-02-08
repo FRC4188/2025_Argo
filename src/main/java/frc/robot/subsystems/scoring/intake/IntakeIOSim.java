@@ -16,7 +16,7 @@ public class IntakeIOSim implements IntakeIO {
     public IntakeIOSim() {
         sim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getFalcon500(1), 
+                DCMotor.getNeo550(1), 
                 18.0 / 12.0,
                 0.001), 
             DCMotor.getFalcon500(1));
