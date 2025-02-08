@@ -14,7 +14,7 @@ import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 //https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry/
 public class ArmKinematics {
     //0,0 = x; 0,1 = y
-    private Vector<N2> apply(Pose2d endPos){
+    public static Vector<N2> apply(Pose2d endPos){
         double angle1 = -Math.cos(
             (Math.pow(endPos.getX(), 2) 
             + Math.pow(endPos.getY(), 2) 
