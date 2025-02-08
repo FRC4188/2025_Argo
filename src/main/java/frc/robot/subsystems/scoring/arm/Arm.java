@@ -47,6 +47,7 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
     }
     
+    //TODO: implement arm, wrist, and elevator constraints for real robot here (take from SuperVisualizer update)
     public Command setAngle(double angle) {
      return Commands.run(()->{
         // why is it angle two? becuase thats what makes it stop yelling

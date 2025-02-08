@@ -258,7 +258,7 @@ public class RobotContainer {
         )
       }
     );
-    armSim.update(12, 0, 100);
+    armSim.update(0, 0, 0);
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(

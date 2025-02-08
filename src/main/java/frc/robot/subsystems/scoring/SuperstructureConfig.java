@@ -31,9 +31,6 @@ public class SuperstructureConfig {
         Meters.of(wristRadiusCOG).magnitude());
 
 
-    //TODO: need starting, lowest, highest, point of origin of arm
-    static final double LOWEST_H = Inches.of(9.13250).magnitude();//0.228362383 meters
-    static final double HIGHEST_H = Inches.of(9.13250 + 72.0).magnitude();//2.057162383 meters
 
     //config.json has all of these at zero, these are values from the robot's origin -rn
     public static Pose3d origin = new Pose3d(0.0, 0.0, 0, new Rotation3d(0,0,0));
