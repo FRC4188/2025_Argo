@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class SuperStructureState {
+public class SuperstructureState {
 
     public static enum SuperPreset{
         L4_CORAL(new SuperState(new Pose3d(), true)),
