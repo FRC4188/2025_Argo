@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring.Arm;
+package frc.robot.subsystems.scoring.arm;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;

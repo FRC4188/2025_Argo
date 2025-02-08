@@ -30,7 +30,7 @@ public class IntakeWristIOSim implements IntakeWristIO{//J.C
     }
 
     @Override
-    public void updateInputs(IntakeIOInputs inputs) {
+    public void updateInputs(IntakeWristIOInputs inputs) {
         sim.update(Constants.robot.loopPeriodSecs);
         inputs.appliedVolts = appliedVolts;
         inputs.posRads = sim.getAngularPositionRad();

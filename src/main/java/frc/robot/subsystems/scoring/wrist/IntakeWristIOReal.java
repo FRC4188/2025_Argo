@@ -72,11 +72,10 @@ public class IntakeWristIOReal implements IntakeWristIO {//J.C
     }
 
     @Override
-    public void updateInputs(IntakeIOInputs inputs) {
+    public void updateInputs(IntakeWristIOInputs inputs) {
         inputs.appliedVolts = appliedVolts;
         inputs.tempC = tempC;
         inputs.posRads = posRads;
         inputs.velRadsPerSec = velRadsPerSec;
     }
-
 }

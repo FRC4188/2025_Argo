@@ -15,7 +15,7 @@ public interface IntakeWristIO {//J.C
         public double velRadsPerSec = 0.0;
     }
 
-    default void updateInputs(IntakeIOInputs inputs) {}
+    default void updateInputs(IntakeWristIO inputs) {}
     default void runVolts(double volts) {}
 
 }
