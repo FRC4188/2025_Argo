@@ -47,6 +47,9 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.SuperVisualizer;
+import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIOSim;
+import frc.robot.subsystems.scoring.arm.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -165,8 +168,7 @@ public class RobotContainer {
         Commands.runOnce(drive::stopWithX, drive));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
-
-
+    Trigger Input = new Trigger(() -> (controller2.getLeftTriggerAxis() != 0.0 || controller2.getRightTriggerAxis() != 0.0 || controller2.getRightX() != 0 || (controller2.getLeftY() != 0 && controller2.getLeftY() > 0)));
     // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
     //   () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
     //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
@@ -180,15 +182,17 @@ public class RobotContainer {
     // Reset gyro to 0° when start button is pressed
     final Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
       ? () -> drive.setPose(
-              driveSim
+driveSim
                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-     
-      armSim.update(controller2.getLeftY(), controller2.getRightX(), (controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis()));
+    
+    Input.onTrue(Commands.run(() -> armSim.update(controller2.getLeftY(), controller2.getRightX() * 180, (controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis()) * 180 )));
+
       
+
   }
 
   private void configureDashboard() {

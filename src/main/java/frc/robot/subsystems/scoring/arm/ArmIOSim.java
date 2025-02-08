@@ -39,9 +39,9 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public void updateInputs(ArmIOInputs inputs) {
-        if(DriverStation.isDisabled())
+        if(DriverStation.isDisabled()){
             runVolts(0.0);
-
+        }
         sim.update(Constants.robot.loopPeriodSecs);
         inputs.appliedVolts = appliedVolts;
         inputs.positionRads = sim.getAngularPositionRad();
