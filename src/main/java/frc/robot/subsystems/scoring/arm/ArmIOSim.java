@@ -1,4 +1,3 @@
-
 package frc.robot.subsystems.scoring.Arm;
 
 import edu.wpi.first.math.MathUtil;

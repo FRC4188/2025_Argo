@@ -1,17 +1,23 @@
 package frc.robot.subsystems.scoring.Arm;
 
-import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
@@ -35,6 +41,28 @@ public class ArmIOReal implements ArmIO {
         armEncoder = new CANcoder(0);
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
+        .withStatorCurrentLimit(100)
+        .withSupplyCurrentLimit(60)
+        .withStatorCurrentLimitEnable(true);
+
+         FeedbackConfigs FeedbackConfigs = new FeedbackConfigs()
+        .withSensorToMechanismRatio(5.0625);
+    
+         MotionMagicConfigs MagicConfigs = new MotionMagicConfigs()
+        .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
+        .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
+        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
+
+        Slot0Configs kSlot0Configs = new Slot0Configs()
+        .withGravityType(GravityTypeValue.Arm_Cosine)
+        .withKP(0.0)
+        .withKD(0.0)
+        .withKS(0)
+        .withKV(0.0)
+        .withKA(0.0);
+
         
         OpenLoopRampsConfigs openLoopRampsConfigs = new OpenLoopRampsConfigs();
         openLoopRampsConfigs.VoltageOpenLoopRampPeriod = 0.5;
@@ -43,6 +71,14 @@ public class ArmIOReal implements ArmIO {
         ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
         closedLoopRampsConfigs.VoltageClosedLoopRampPeriod = 0.5;
         armMotor.getConfigurator().apply(closedLoopRampsConfigs);
+
+        TalonFXConfiguration motorConfig = new TalonFXConfiguration()
+        .withCurrentLimits(kCurrentLimitsConfigs)
+        .withFeedback(FeedbackConfigs)
+        .withMotionMagic(MagicConfigs)
+        .withSlot0(kSlot0Configs)
+        .withClosedLoopRamps(closedLoopRampsConfigs)
+        .withOpenLoopRamps(openLoopRampsConfigs);
 
         armMotor.clearStickyFaults();
         armEncoder.clearStickyFaults();
@@ -59,15 +95,9 @@ public class ArmIOReal implements ArmIO {
         appliedVolts = armMotor.getMotorVoltage();
         tempC = armMotor.getDeviceTemp();
         posRads = armMotor.getPosition();
-        velRadsPerSec = armMotor.getVelocity();
+        velRadsPerSec = armEncoder.getVelocity();
         desiredPos = armEncoder.getAbsolutePosition();
         desiredVel = armEncoder.getVelocity();
-
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            Hertz.of(50), 
-            appliedVolts,
-            posRads,
-            velRadsPerSec);
     }
 
     public void runVolts(double volts) {

@@ -46,7 +46,7 @@ public class Elevator extends SubsystemBase{
         Logger.processInputs("Elevator", inputs);   
         
         targetHeight = MathUtil.clamp(targetHeight, SuperstructureConfig.LOWEST_H, SuperstructureConfig.HIGHEST_H);
-        //elevatorHeight = elevatorPID.calculate(inputs.posRads, targetHeight); // TODO: Change PosRads to height
+        elevatorHeight = inputs.posRads; // TODO: Change PosRads to height
         runPosition(targetHeight);
     }
     public Command runVolts(double volts){
@@ -54,6 +54,10 @@ public class Elevator extends SubsystemBase{
     }
     public Command runPosition(double height){
         return run(()-> io.runPosition(height));
+    }
+
+    public double getElevatorHeight(){
+        return elevatorHeight;
     }
 
     public Command setHeight(double height){

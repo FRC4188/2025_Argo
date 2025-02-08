@@ -111,7 +111,7 @@ public final class Constants {
     public static final int kFollowCANID = 0;
     
     
-    public static final double kGearRatio = 0;
+    public static final double kGearRatio = 6;
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)

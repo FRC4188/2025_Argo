@@ -1,22 +1,22 @@
 package frc.robot.subsystems.scoring.Arm;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
     private static Arm instance = null;
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs;
+    private double targetAngle = 0, armAngle = 0;
     // maybe work
     
     // need to be calibrated
     double armZero = 0;
-    PIDController armPID = new PIDController(0.0, 0.0, 0.0);
+    PIDController armPID = new PIDController(0.1, 0.0, 0.0);
     
     private static final double MIN_ANGLE = 0;
     private static final double MAX_ANGLE = 3;
@@ -30,7 +30,7 @@ public class Arm extends SubsystemBase {
 
     public enum ArmPreset{
         MAX,
-        MIN
+        MIN,
         }
     
     private Arm(ArmIO io) {
@@ -45,33 +45,26 @@ public class Arm extends SubsystemBase {
 
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+                
     }
     
     public Command setAngle(double angle) {
-     return Commands.run(()->{
-        // why is it angle two? becuase thats what makes it stop yelling
-        double angle2 = MathUtil.clamp(angle, MIN_ANGLE, MAX_ANGLE);
-        double currentAngle = inputs.positionRads-armZero;
-        double output = armPID.calculate(currentAngle, angle2);
-        io.runVolts(output);});
+        return Commands.run(()->{
+            // why is it angle two? becuase thats what makes it stop yelling
+            targetAngle = angle;
+        });
     }
     
-    public Command setVolt(double percent){
-        return Commands.run(()->{
-            io.runVolts(percent);
-        });
+    public Command setVolt(double volts) {
+        return Commands.run(()->{ io.runVolts(volts);});
     }
 
     
     // Commands need to be reviewed may have implemented them incorrectly
     public Command stopArm(Arm arm) {
-        return Commands.run(()
-            ->{ 
-                io.stop();
-            }
-            );
+        return Commands.run(()->{ io.stop();}, arm);
     }
-    //The following commands will be used for going to 
+    // The following commands will be used for going to 
 
     
     public  double getAngle() {
