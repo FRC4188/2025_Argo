@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Pounds;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 
 public class SuperstructureConfig {
@@ -34,7 +35,9 @@ public class SuperstructureConfig {
     public static final double HIGHEST_H = Inches.of(8.990645 + 72.0).magnitude();
 
     public static Pose3d origin = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0,0,0));
-
+    public static Pose3d carriageOrigin = new Pose3d(0.000172, -0.00711, 0.23197, new Rotation3d(Units.degreesToRadians(180),0, 0));
+    public static Pose3d armOrigin = new Pose3d(-0.004077, 0.000171, 0.231965, new Rotation3d(Units.degreesToRadians(180), 0, 0));
+    public static Pose3d wristOrigin = new Pose3d(-0.004077, -0.049069, 0.644627, new Rotation3d(Units.degreesToRadians(180),0, 0));
     public record Joint(
         double mass,
         double length,
