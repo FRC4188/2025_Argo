@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutsideCageToReef6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6-TopCoralStation"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopCoralStation-2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-TopCoralStation"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopCoralStation-1"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
