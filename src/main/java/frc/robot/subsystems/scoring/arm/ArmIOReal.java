@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -70,14 +71,17 @@ public class ArmIOReal implements ArmIO {
             velRadsPerSec);
     }
 
+    @Override
     public void runVolts(double volts) {
         armMotor.set(volts);
     }
 
+    @Override
     public void stop() {
         armMotor.set(0.0);
     }
 
+    @Override
     public void updateInputs(ArmIOInputs inputs) {
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
@@ -85,5 +89,10 @@ public class ArmIOReal implements ArmIO {
         inputs.velocityRadPerSec = velRadsPerSec.getValueAsDouble();
         inputs.desiredPositionRads = desiredPos.getValueAsDouble();
         inputs.desiredVelocityRadPerSec = desiredVel.getValueAsDouble();
+    }
+
+    @Override
+    public double getAngle(){
+        return posRads.getValueAsDouble() * (Math.PI / 180);
     }
 }
