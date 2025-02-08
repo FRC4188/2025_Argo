@@ -3,46 +3,22 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
-public class SuperstructureState {
-
-    public static enum SuperPreset{
-        L4_CORAL(new SuperState(new Pose3d())),
-        L4_ALGAE(new SuperState(new Pose3d())),
-        L3_CORAL(new SuperState(new Pose3d())),
-        L3_ALGAE(new SuperState(new Pose3d())),
-        L2_CORAL(new SuperState(new Pose3d())),
-        L2_ALGAE(new SuperState(new Pose3d())),
-        PROCESSOR(new SuperState(new Pose3d())),
-        SOURCE(new SuperState(new Pose3d()));
-
-        private final SuperState state;
-    
-        private SuperPreset(SuperState state){
-            this.state = state;
-        }
-    }
-
-    //origin of endeffector pos = arm rest pos + elevator lowest height
-    //up + down = pos.getz, y of kinematics
+public class SuperStructureState {
     public record SuperState(Pose3d endEffectorPos){
+
         public double getWristAngle(){
-            return ArmKinematics.apply(
-                new Pose2d(endEffectorPos.getX(), endEffectorPos.getZ(), new Rotation2d()))
-                .get(1,0);
+            
+            return 0; //TODO: apply kinematics
         }
         public double getArmAngle(){
-            return ArmKinematics.apply(
-                new Pose2d(endEffectorPos.getX(), endEffectorPos.getZ(), new Rotation2d()))
-                .get(0,0);
+            return 0; //TODO: apply kinematics
         }
         public double getHeightInch(){
             return Inches.convertFrom(endEffectorPos.getZ(), Meters);
         }
+
     }
 
     public enum ElevatorPreset{
