@@ -1,9 +1,13 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
-import frc.robot.subsystems.scoring.SuperstructureState.SuperState;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class SuperConstraints {
     /*
@@ -35,7 +39,6 @@ public class SuperConstraints {
     //TODO: make so arm + wrist cannot go past elevator when has algae (EXTREMELY IMPORTANT)
 
     public SuperState getOptimized(SuperState state) {
-        double safeInterpo = (state.getHeightInch() / LOWEST_H_A_180) + 0.05; //TODO: tune 0.05 for a safety margin
         // if (state.getHeightInch() >= 30) {
         //     int armLowBound = -150;
         //     int armHighBound = 150;
@@ -45,8 +48,60 @@ public class SuperConstraints {
         //     int armHighBound = 90;
         //     MathUtil.clamp(state.getArmAngle(), armLowBound, armHighBound);
         // }
-        
-        return state;
+        double elevatorHeight = state.getHeightInch();
+        double armAngle = state.getArmAngle();
+        double wristAngle = state.getWristAngle();
+
+        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, SuperConstraints.HIGHEST_H - SuperConstraints.LOWEST_H);
+        elevatorHeight = Meters.convertFrom(elevatorHeight,Inches);
+        // all of these if and if else statements are just to implement the constraints for wrist and arm 
+        // directly/indirectly based on elevator height
+        if (elevatorHeight >= Meters.convertFrom(25, Inches)) {
+            armAngle = MathUtil.clamp(armAngle, -170, 170);
+        } else if (Meters.convertFrom(5, Inches) <= elevatorHeight && elevatorHeight < Meters.convertFrom(10, Inches)){
+            armAngle = MathUtil.clamp(armAngle, -115, 115);
+        } else if (Meters.convertFrom(10, Inches) <= elevatorHeight && elevatorHeight < Meters.convertFrom(15, Inches)){
+            armAngle = MathUtil.clamp(armAngle, -125, 125);
+        } else if (Meters.convertFrom(15, Inches) <= elevatorHeight && elevatorHeight < Meters.convertFrom(20, Inches)){
+            armAngle = MathUtil.clamp(armAngle, -140, 140);
+        } else if (Meters.convertFrom(20, Inches) <= elevatorHeight && elevatorHeight < Meters.convertFrom(25, Inches)){
+            armAngle = MathUtil.clamp(armAngle, -155, 155);
+        } else {
+            armAngle = MathUtil.clamp(armAngle, -90, 90);
+        }
+
+
+        if (-40 <= armAngle && armAngle <= 40) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, 100);
+        } else if (-90 <= armAngle && armAngle < -40) {
+            wristAngle = MathUtil.clamp(wristAngle, 0, 40);
+        } else if (-115 <= armAngle && armAngle < -90) {
+            wristAngle = MathUtil.clamp (wristAngle, 40, 100);
+        } else if (40 < armAngle && armAngle <= 90) {
+            wristAngle = MathUtil.clamp(wristAngle, -40, 0);
+        } else if (90 < armAngle && armAngle <= 115) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, -40);
+        } else if (-130 <= armAngle && armAngle <-115) {
+            wristAngle = MathUtil.clamp(wristAngle, 55, 100);
+        } else if (115 < armAngle && armAngle <= 130) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, -50);
+        } else if (-145 <= armAngle && armAngle < -125) {
+            wristAngle = MathUtil.clamp(wristAngle, 70, 100);
+        } else if (125 < armAngle && armAngle <= 140) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, -55);
+        } else if (140 < armAngle && armAngle <= 155) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, -65);
+        } else if (-155 <= armAngle && armAngle < -145) {
+            wristAngle = MathUtil.clamp(wristAngle, 65, 100);
+        } else if (-170 <= armAngle && armAngle < -155) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, 100);
+        } else if (155 < armAngle && armAngle <= 170) {
+            wristAngle = MathUtil.clamp(wristAngle, -100, 100);
+        }
+
+        Translation2d xy = ArmKinematics.forward(VecBuilder.fill(armAngle, wristAngle));
+
+        return new SuperState(new Translation3d(xy.getX(), xy.getY(), elevatorHeight));
     
     }
 }
