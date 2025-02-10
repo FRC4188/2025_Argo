@@ -8,20 +8,19 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
+import frc.robot.subsystems.scoring.SuperstructureConfig;
 // This is definetly wrong but work in progress I think I got the wrong concept
 public class ArmIOSim implements ArmIO {
     private final DCMotorSim sim;
     private double appliedVolts = 0.0;
     
-    
-    //random values for moment of inertia and gearing cuz not that important for precision
     public ArmIOSim() {
         
         sim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getFalcon500(1), 
-                18.0 / 12.0,
-                0.001), 
+                SuperstructureConfig.arm.inertiaAbtCoM(),
+                Constants.ArmConstants.kGearRatio), 
             DCMotor.getFalcon500(1));
     }
 
@@ -46,10 +45,6 @@ public class ArmIOSim implements ArmIO {
         inputs.appliedVolts = appliedVolts;
         inputs.positionRads = sim.getAngularPositionRad();
         inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
-    } 
-    
-    public static enum Mode{
-        L1, L2_3, L4;
     }
     
 }

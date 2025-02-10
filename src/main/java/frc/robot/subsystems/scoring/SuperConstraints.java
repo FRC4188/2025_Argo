@@ -29,14 +29,44 @@ public class SuperConstraints {
     // int elevatorDownArmHighBound = 90;
     // int elevatorUpArmLowBound = -175;
     // int elevatorUpArmHighBound = 175;
-    public final static double LOWEST_H = Inches.of(9.13250).magnitude();//0.228362383 meters
-    public final static double HIGHEST_H = Inches.of(9.13250 + 72.0).magnitude();//2.057162383 meters
     public final double LOWEST_H_A_180 = Inches.of(30).magnitude();
 
 
     //make sure arm is always [-80, 90] at height 0, with extension to 180 at min height of lowestha180 
     //make sure arm doesn't rotate continuously beyond 360 or below 0
     //TODO: make so arm + wrist cannot go past elevator when has algae (EXTREMELY IMPORTANT)
+
+    public class ArmConstraints {
+        public final static double GLOBAL_LOWEST_A = -179;
+        public final static double GLOBAL_HIGHEST_A = 179;
+        public static double LOWEST_A = -179;
+        public static double HIGHEST_A = 179;
+
+        //TODO: add math that scale range based on height
+        public void setArmConstraints(double lowestA, double highestA){
+            LOWEST_A = lowestA;
+            HIGHEST_A = highestA;
+        }
+    }
+
+    public class WristConstraints{
+        public final static double GLOBAL_LOWEST_A = -100;
+        public final static double GLOBAL_HIGHEST_A = 100;
+        public static double LOWEST_A = -100;
+        public static double HIGHEST_A = 100;
+
+        public void setArmConstraints(double lowestA, double highestA){
+            LOWEST_A = lowestA;
+            HIGHEST_A = highestA;
+        }
+    }
+
+    public class ElevatorConstraints{
+        public final static double LOWEST_H = Inches.of(9.13250).magnitude();//0.228362383 meters
+        public final static double HIGHEST_H = Inches.of(9.13250 + 72.0).magnitude();//2.057162383 meters
+        public final static double RANGE = HIGHEST_H - LOWEST_H;
+    }
+
 
     public SuperState getOptimized(SuperState state) {
         // if (state.getHeightInch() >= 30) {
@@ -52,7 +82,7 @@ public class SuperConstraints {
         double armAngle = state.getArmAngle();
         double wristAngle = state.getWristAngle();
 
-        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, SuperConstraints.HIGHEST_H - SuperConstraints.LOWEST_H);
+        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, SuperConstraints.ElevatorConstraints.HIGHEST_H - SuperConstraints.ElevatorConstraints.LOWEST_H);
         elevatorHeight = Meters.convertFrom(elevatorHeight,Inches);
         // all of these if and if else statements are just to implement the constraints for wrist and arm 
         // directly/indirectly based on elevator height
