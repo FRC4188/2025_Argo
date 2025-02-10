@@ -19,4 +19,6 @@ public interface IntakeIO {
     public default void runVolts(double volts) {}
 
     public default void stop(){}
+
+    public default boolean isLoaded(){return true;}
 }

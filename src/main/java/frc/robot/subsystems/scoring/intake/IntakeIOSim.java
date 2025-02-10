@@ -35,6 +35,11 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
+    public boolean isLoaded(){
+        return true;
+    }
+
+    @Override
     public void updateInputs(IntakeIOInputs inputs) {
         if(DriverStation.isDisabled())
             runVolts(0.0);
