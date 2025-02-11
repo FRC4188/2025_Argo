@@ -18,7 +18,7 @@ public record SuperState(Translation3d endEffectorPos){
                     0.0,
                     0.0,
                     Meters.convertFrom(ElevatorPreset.L4.heightInch, Inches))), true),
-        L4_CORAL_REVERSE(
+        L4_ALGAE_REVERSE(
             new SuperState(
                 new Translation3d(
                     0.0,
@@ -36,7 +36,13 @@ public record SuperState(Translation3d endEffectorPos){
                     0.0,
                     0.0,
                     Meters.convertFrom(ElevatorPreset.L3.heightInch, Inches))), true),
-        L3_ALGAE(
+        L3_ALGAE_REVERSE(
+            new SuperState(
+                new Translation3d(
+                    0.0,
+                    0.0,
+                    Meters.convertFrom(ElevatorPreset.L3.heightInch, Inches))), true),
+                    L3_ALGAE(
             new SuperState(
                 new Translation3d(
                     0.0,
@@ -54,6 +60,12 @@ public record SuperState(Translation3d endEffectorPos){
                     0.0,
                     0.0,
                     Meters.convertFrom(ElevatorPreset.L2.heightInch, Inches))), false),
+        L2_ALGAE_REVERSE(
+            new SuperState(
+                new Translation3d(
+                    0.0,
+                    0.0,
+                    Meters.convertFrom(ElevatorPreset.L2.heightInch, Inches))), true),
         PROCESSOR(
             new SuperState(
                 new Translation3d()), false),
