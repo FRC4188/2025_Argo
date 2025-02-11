@@ -18,6 +18,12 @@ public record SuperState(Translation3d endEffectorPos){
                     0.0,
                     0.0,
                     Meters.convertFrom(ElevatorPreset.L4.heightInch, Inches))), true),
+        L4_CORAL_REVERSE(
+            new SuperState(
+                new Translation3d(
+                    0.0,
+                    0.0,
+                    Meters.convertFrom(ElevatorPreset.L4.heightInch, Inches))), true),
         L4_ALGAE(
             new SuperState(
                 new Translation3d(

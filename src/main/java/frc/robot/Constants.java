@@ -40,8 +40,7 @@ public final class Constants {
   public static class robot {
     public static final double loopPeriodSecs = 0.02;
 
-    public static final Mode simMode = Mode.SIM;
-    public static final Mode currMode = RobotBase.isReal()? Mode.REAL : simMode;
+    public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;
 
     public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(12.6);
 
@@ -61,53 +60,35 @@ public final class Constants {
       CORAL
     }
   
-    public static STATE robotstate; //to be set
+    public static STATE robotstate = STATE.EMPTY; //to be set
   }
 
   public static enum Mode {
     REAL,
     SIM,
-
     /** Replaying from a log file. */
     REPLAY
   }
 
+  public class Id{
+    //DT ids are 1->12
+    public static final int kElevatorLead = 13;
+    public static final int kElevatorFollow = 14;
+    public static final int kElevatorLeadNcoder = 15;
+    public static final int kElevatorFollowNcoder = 16;
+    public static final int kArm = 17;
+    public static final int kArmNcoder = 18;    
+    public static final int kWrist = 19;
+    public static final int kWristNcoder = 20;    
+    public static final int kIntake = 21;
+  }
+
+  //TODO: wuts dis??
   public class mode{
-    int real = 0;
-    
+    int real = 0; 
   }
 
-  //last year's ids, change as soon as robot is obtained
-  public static class ids{
-    public static final int INTAKE = 16;
-
-    public static final int SHOULDER_LEADER = 17;
-    public static final int SHOULDER_FOLLOWER = 18;
-
-    public static final int LEFT_SHOOTER = 19;
-    public static final int RIGHT_SHOOTER = 20;
-
-    public static final int LEFT_CLIMBER = 21;
-    public static final int RIGHT_CLIMBER = 22;
-
-    public static final int FEEDER = 23;
-
-    public static final int SHOULDER_ENCODER = 24;
-
-    public static final int FEEDER_BEAM_BREAKER = 5; // input = 0
-    
-    public static final int INTAKE_BEAM_BREAKER_1 = 8;
-    public static final int INTAKE_BEAM_BREAKER_2 = 9;
-
-    public static final int CLIMBER_LEFT_LIMIT = 4;
-    public static final int CLIMBER_RIGHT_LIMIT = 1;
-  }
-  public static class ElevatorConstants{
-    public static final int kLeadID = 0;
-    public static final int kFollowID = 0;
-    public static final int kLeadCANID = 0;
-    public static final int kFollowCANID = 0;
-    
+  public static class ElevatorConstants{    
     public static final double kDrumeRadius = 0.0; //TODO: get drum radius
 
     public static final double kGearRatio = 6;
@@ -153,10 +134,7 @@ public final class Constants {
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(0.325, 0.0, 0.02, kConstraints);
     
-    public static final int kWristId = 24;
-    public static final int kWristNcoderId = 10;
-
-    public static final float kSoft_Limit = 0.0f;
+    public static final int kCurrentLimit = 0;
     public static final double kGearRatio = 4.6666666667;
 
     public static final double kDegree_per_rads = (360 / kGearRatio);

@@ -2,37 +2,18 @@ package frc.robot.subsystems.scoring.elevator;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
-import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.scoring.elevator.ElevatorIO.ElevatorIOInputs;;
+import frc.robot.Constants.Id;
 
 public class ElevatorIOReal implements ElevatorIO {
 
@@ -52,12 +33,12 @@ public class ElevatorIOReal implements ElevatorIO {
     public ElevatorIOReal() {
 
         //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
-        leader = new TalonFX(ElevatorConstants.kLeadID);
-        leadNcoder = new CANcoder(ElevatorConstants.kLeadCANID);
-        follower = new TalonFX(ElevatorConstants.kFollowID);
-        followNcoder = new CANcoder(ElevatorConstants.kFollowCANID);
+        leader = new TalonFX(Id.kElevatorLead);
+        leadNcoder = new CANcoder(Id.kElevatorLeadNcoder);
+        follower = new TalonFX(Id.kElevatorFollow);
+        followNcoder = new CANcoder(Id.kElevatorFollowNcoder);
 
-        follower.setControl(new Follower(ElevatorConstants.kLeadID, false));
+        follower.setControl(new Follower(Id.kElevatorLead, false));
 
         leader.setNeutralMode(NeutralModeValue.Brake);
         follower.setNeutralMode(NeutralModeValue.Brake);

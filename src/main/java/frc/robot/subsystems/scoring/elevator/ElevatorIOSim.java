@@ -1,9 +1,6 @@
 
 package frc.robot.subsystems.scoring.elevator;
 
-import org.dyn4j.dynamics.BodyFixture;
-
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -14,13 +11,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.Id;
+
+import static frc.robot.Constants.*;
 
 public class ElevatorIOSim implements ElevatorIO{
     private final DCMotorSim sim;
@@ -33,11 +28,6 @@ public class ElevatorIOSim implements ElevatorIO{
 
     private final CANcoder leadNcoder;
     private final CANcoder followNcoder;
-    private final StatusSignal<Temperature> tempC;
-    private final StatusSignal<Angle> posRads;
-    private final StatusSignal<AngularVelocity> velRadsPerSec;
-    private final StatusSignal<Voltage> appliedVoltsFollow;
-    private final StatusSignal<Temperature> tempCFollow;
 
     public ElevatorIOSim(){
         gearbox = DCMotor.getFalcon500(2);
@@ -51,12 +41,12 @@ public class ElevatorIOSim implements ElevatorIO{
 
         sim.setState(0, 0); //maxlengthmeter / 2 , 0
 
-        leader = new TalonFX(ElevatorConstants.kLeadID);
-        leadNcoder = new CANcoder(ElevatorConstants.kLeadCANID);
-        follower = new TalonFX(ElevatorConstants.kFollowID);
-        followNcoder = new CANcoder(ElevatorConstants.kFollowCANID);
+        leader = new TalonFX(Id.kElevatorLead);
+        leadNcoder = new CANcoder(Id.kElevatorLeadNcoder);
+        follower = new TalonFX(Id.kElevatorFollow);
+        followNcoder = new CANcoder(Id.kElevatorFollowNcoder);
 
-        follower.setControl(new Follower(ElevatorConstants.kLeadID, false));
+        follower.setControl(new Follower(Id.kElevatorLead, false));
 
         leader.setNeutralMode(NeutralModeValue.Brake);
         follower.setNeutralMode(NeutralModeValue.Brake);
@@ -71,17 +61,11 @@ public class ElevatorIOSim implements ElevatorIO{
 
         leader.optimizeBusUtilization();
         follower.optimizeBusUtilization();    
-        
-        posRads = leader.getPosition();
-        tempC = leader.getDeviceTemp();
-        velRadsPerSec = leader.getVelocity();
-        appliedVoltsFollow = follower.getMotorVoltage();
-        tempCFollow = follower.getDeviceTemp();
     }
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs){
-        sim.update(Constants.robot.loopPeriodSecs);
+        sim.update(robot.loopPeriodSecs);
 
         inputs.connected = true;
         inputs.appliedVolts = appliedVolts;

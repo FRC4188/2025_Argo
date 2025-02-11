@@ -4,10 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.SuperConstraints;
-import frc.robot.subsystems.scoring.SuperstructureConfig;
 
 public class WristIOSim implements WristIO{//J.C
     int degreesL1 = 90;
@@ -17,7 +14,6 @@ public class WristIOSim implements WristIO{//J.C
 
     private final DCMotorSim sim;
     private double appliedVolts = 0.0;
-    private SingleJointedArmSim armSim;
 
     public WristIOSim() {
         var plant = LinearSystemId.createDCMotorSystem

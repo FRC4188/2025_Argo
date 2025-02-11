@@ -32,7 +32,6 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public void stop() {
-        // TODO Auto-generated method stub
         runVolts(0.0);
     }
 

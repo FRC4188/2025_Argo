@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring.arm;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -72,11 +73,12 @@ public class Arm extends SubsystemBase {
     }
     // The following commands will be used for going to 
 
-    
+    @AutoLogOutput(key = "Arm/Angle Degrees")
     public  double getAngle() {
         return Rotation2d.fromRadians(inputs.positionRads - armZero).getDegrees();
     }
     
+    @AutoLogOutput(key = "Arm/isAtSetpoint")
     public boolean isAtAngle(double targetAngle) {
         return Math.abs(getAngle() - targetAngle) < tolerance;
     }

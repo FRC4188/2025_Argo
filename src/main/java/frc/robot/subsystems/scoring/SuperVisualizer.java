@@ -14,13 +14,21 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Main;
+import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.subsystems.drivetrain.ModuleIOTalonFXSim;
+import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.subsystems.gyro.GyroIOSim;
+import frc.robot.util.FieldConstant;
 
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+
+import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 
 public class SuperVisualizer {
     Mechanism2d mainMech;
@@ -66,6 +74,8 @@ public class SuperVisualizer {
     public void update(double elevatorHeight, double armAngle, double wristAngle){
         
         //wrist's gear to algae specific gummy wheel is 14.26 inches
+        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, SuperConstraints.ElevatorConstraints.RANGE);
+        elevatorHeight = Meters.convertFrom(elevatorHeight, Inches);
 
         armLig.setAngle(armAngle);
         wristLig.setAngle(wristAngle);
@@ -105,8 +115,17 @@ public class SuperVisualizer {
                 new Rotation3d(0, Units.degreesToRadians(wristAngle +  armAngle), 0)
             )
         );
+        SwerveDriveSimulation driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
 
+        Pose3d endEffectorPos = new Pose3d(
+            driveSim.getSimulatedDriveTrainPose().getX() + wristOrigin.getX(),
+            driveSim.getSimulatedDriveTrainPose().getY() + wristOrigin.getY(),
+            wristPos.getZ(),
+            new Rotation3d(
+                wristPos.getRotation().getX() + 90, 
+                wristPos.getRotation().getY(), 
+                wristPos.getRotation().getZ() + driveSim.getSimulatedDriveTrainPose().getRotation().getDegrees()));
         
-        Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos);
+        Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos, endEffectorPos);
     }
 }

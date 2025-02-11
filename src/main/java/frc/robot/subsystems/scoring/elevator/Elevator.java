@@ -4,6 +4,7 @@ package frc.robot.subsystems.scoring.elevator;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -58,6 +59,8 @@ public class Elevator extends SubsystemBase{
         currentHeight = (inputs.posRads - kZero) / 6 * kDrumeRadius * 2; //TODO: test da math
 
     }
+
+    @AutoLogOutput(key = "Elevator/Height Meters")
     public double getHeight(){
         return currentHeight;
     }
