@@ -7,31 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OutsideCageToReef6"
+            "pathName": "Outside-6C"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "6-TopCoralStation"
+            "pathName": "6-TCS"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TopCoralStation-4"
+            "pathName": "TCS-4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "4-TopCoralStation"
+            "pathName": "4-TCS"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TopCoralStation-1"
+            "pathName": "TCS-1"
           }
         }
       ]
