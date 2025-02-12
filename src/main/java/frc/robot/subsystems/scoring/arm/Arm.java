@@ -1,9 +1,11 @@
 package frc.robot.subsystems.scoring.arm;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,7 +18,8 @@ public class Arm extends SubsystemBase {
     
     // need to be calibrated
     double armZero = 0;
-    PIDController armPID = new PIDController(0.0, 0.0, 0.0);
+    // PIDController armPID = new PIDController(0.0, 0.0, 0.0);
+    double tolerance = 0.05;
     
     private static final double MIN_ANGLE = 0;
     private static final double MAX_ANGLE = 3;
@@ -36,8 +39,8 @@ public class Arm extends SubsystemBase {
     public Arm(ArmIO io) {
         this.io = io;
         inputs = new ArmIOInputsAutoLogged();
-        armPID.enableContinuousInput(0, 360);
-        armPID.setTolerance(2.0);
+        // armPID.enableContinuousInput(0, 360);
+        // armPID.setTolerance(2.0);
     }
     
     @Override
@@ -47,14 +50,15 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
     }
     
-    public Command setAngle(double angle) {
-     return Commands.run(()->{
-        // why is it angle two? becuase thats what makes it stop yelling
-        double angle2 = MathUtil.clamp(angle, MIN_ANGLE, MAX_ANGLE);
-        double currentAngle = inputs.positionRads-armZero;
-        double output = armPID.calculate(currentAngle, angle2);
-        io.runVolts(output);});
-    }
+    //TODO: implement arm, wrist, and elevator constraints for real robot here (take from SuperVisualizer update)
+    // public Command setAngle(double angle) {
+    //  return Commands.run(()->{
+    //     // why is it angle two? becuase thats what makes it stop yelling
+    //     double angle2 = MathUtil.clamp(angle, MIN_ANGLE, MAX_ANGLE);
+    //     double currentAngle = inputs.positionRads-armZero;
+    //     double output = armPID.calculate(currentAngle, angle2);
+    //     io.runVolts(output);});
+    // }
     
     public Command setVolts(double percent){
         return Commands.run(()->{
@@ -71,12 +75,14 @@ public class Arm extends SubsystemBase {
     }
     // The following commands will be used for going to 
 
-    public double getAngle() {
-        return io.getAngle();
+    @AutoLogOutput(key = "Arm/Angle Degrees")
+    public  double getAngle() {
+        return Rotation2d.fromRadians(inputs.positionRads - armZero).getDegrees();
     }
     
+    @AutoLogOutput(key = "Arm/isAtSetpoint")
     public boolean isAtAngle(double targetAngle) {
-        return Math.abs(getAngle() - targetAngle) < armPID.getPositionTolerance();
+        return Math.abs(getAngle() - targetAngle) < tolerance;
     }
     
     public void resetAngleZero() {

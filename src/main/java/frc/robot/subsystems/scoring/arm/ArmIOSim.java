@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 import frc.robot.subsystems.scoring.SuperstructureConfig;
+import frc.robot.subsystems.scoring.SuperstructureConfig;
 // This is definetly wrong but work in progress I think I got the wrong concept
 public class ArmIOSim implements ArmIO {
     private final DCMotorSim sim;
@@ -24,8 +25,8 @@ public class ArmIOSim implements ArmIO {
         sim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getFalcon500(1), 
-                18.0 / 12.0,
-                0.001), 
+                SuperstructureConfig.arm.inertiaAbtCoM(),
+                Constants.ArmConstants.kGearRatio), 
             DCMotor.getFalcon500(1));
         
         armSim = new SingleJointedArmSim(
@@ -50,7 +51,6 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public void stop() {
-        // TODO Auto-generated method stub
         runVolts(0.0);
     }
 
