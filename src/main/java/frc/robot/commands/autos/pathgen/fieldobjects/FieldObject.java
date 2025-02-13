@@ -12,7 +12,7 @@ public abstract class FieldObject {
     public FieldObject(float x, float y) {
         c_x = x;
         c_y = y;
-        FOHandler.getInstance().addFO(this);
+        new FOHandler().addFO(this);
     }
 
     public float from_line(Translation2d l1, Translation2d l2) {

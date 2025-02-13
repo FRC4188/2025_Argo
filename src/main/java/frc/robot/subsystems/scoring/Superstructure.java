@@ -60,7 +60,7 @@ public class Superstructure extends SubsystemBase{
         elevator.runVolts(
             elePID.calculate(elevator.getHeight(), heightInch));
 
-        arm.setVolt(
+        arm.setVolts(
                 armPID.calculate(arm.getAngle(), armAngle));
         wrist.runVolts(
                 wristPID.calculate(wrist.getAngle(), wristAngle));
@@ -69,7 +69,7 @@ public class Superstructure extends SubsystemBase{
     @Override
     public void periodic(){
         var state = target.getState();
-        arm.setVolt(
+        arm.setVolts(
             armPID.calculate(arm.getAngle(), state.getArmAngle())
             + ff.getArmVoltFF(VecBuilder.fill(state.endEffectorPos().getX(), state.endEffectorPos().getZ()))
         );

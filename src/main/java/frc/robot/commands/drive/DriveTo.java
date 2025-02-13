@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.autos.pathgen.PathGen;
+import frc.robot.commands.autos.pathgen.PathGen.Modes;
 import frc.robot.subsystems.drivetrain.Drive;
 
 public class DriveTo extends Command {
@@ -32,7 +33,7 @@ public class DriveTo extends Command {
 
     @Override
     public void initialize() {
-        traj = PathGen.getInstance().generateTrajectory(drive.getPose(), goalPose.get(), config);
+        traj = PathGen.getInstance(Modes.DRIVE_PATH).generateTrajectory(drive.getPose(), goalPose.get(), config);
 
         if (traj.getStates().isEmpty()) {
             goalPose = () -> drive.getPose();
