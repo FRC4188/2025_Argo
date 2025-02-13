@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -271,11 +272,15 @@ driveSim
       }
     );
 <<<<<<< HEAD
+<<<<<<< HEAD
     armSim.update(0, arm.getAngle(), 100);
 
 =======
     armSim.update(12, 0, 0);
 >>>>>>> d627c9969d9b81325c47a7643e95ee1fac86b9cc
+=======
+    armSim.update(Units.metersToInches(FieldConstant.Reef.L4_highest_h) - 30, -30, -15);
+>>>>>>> 84200dff90a0bff1c05fcf7a79546d49f9fce699
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
