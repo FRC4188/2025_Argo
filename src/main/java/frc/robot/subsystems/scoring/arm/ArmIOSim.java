@@ -31,7 +31,7 @@ public class ArmIOSim implements ArmIO {
         
         armSim = new SingleJointedArmSim(
             DCMotor.getFalcon500(1), 
-            Constants.robot.ARM_GEAR_RATIO, 
+            Constants.ArmConstants.kGearRatio,
             SuperstructureConfig.arm.inertiaAbtCoM(), 
             SuperstructureConfig.arm.length(), 
             Rotation2d.fromDegrees(0.0).getRadians(), 

@@ -196,7 +196,7 @@ driveSim
       
     
     // Input.onTrue(Commands.run(() -> armSim.update(controller2.getLeftY(), controller2.getRightX() * 180, (controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis()) * 180 )));
-    Input.onTrue(Commands.run(() -> armSim.setArmVolts(12 * controller2.getRightX() / VOLTAGE_CALC))); // Add voltage calcuations
+    //Input.onTrue(Commands.run(() -> armSim.setArmVolts(12 * controller2.getRightX() / VOLTAGE_CALC))); // Add voltage calcuations
       
 
   }
@@ -271,16 +271,9 @@ driveSim
         )
       }
     );
-<<<<<<< HEAD
-<<<<<<< HEAD
-    armSim.update(0, arm.getAngle(), 100);
 
-=======
-    armSim.update(12, 0, 0);
->>>>>>> d627c9969d9b81325c47a7643e95ee1fac86b9cc
-=======
     armSim.update(Units.metersToInches(FieldConstant.Reef.L4_highest_h) - 30, -30, -15);
->>>>>>> 84200dff90a0bff1c05fcf7a79546d49f9fce699
+
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(
