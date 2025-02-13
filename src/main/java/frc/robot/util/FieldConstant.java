@@ -104,7 +104,7 @@ public class FieldConstant {
 
         public class CoralGoal {
             //robot perpendicular distance from the wall
-            public static double score_perp = Constants.robot.A_CROSSLENGTH;
+            public static double score_perp = Constants.robot.A_CROSSLENGTH / 2;
             //robot parallel distance from the center of the wall
             public static double score_parallel = Units.inchesToMeters(6.472);
 

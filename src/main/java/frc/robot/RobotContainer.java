@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,6 +48,11 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.SuperVisualizer;
+import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIO;
+import frc.robot.subsystems.scoring.arm.ArmIOReal;
+import frc.robot.subsystems.scoring.arm.ArmIOSim;
+import frc.robot.subsystems.scoring.arm.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -74,9 +80,11 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private Arm arm;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
   private SuperVisualizer armSim;
+  private ArmIOSim armIOSim;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -102,7 +110,7 @@ public class RobotContainer {
         vis = new Limelight(drive, 
             new VisionIOLL("limelight-back", drive::getRotation),
             new VisionIOLL("limelight-front", drive::getRotation));
-
+      arm = new Arm(new ArmIOReal());
         break;
 
       case SIM:
@@ -127,7 +135,7 @@ public class RobotContainer {
                 driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
-
+        armIOSim = new ArmIOSim();
         armSim = new SuperVisualizer("Superstructure");
         break;
 
@@ -160,14 +168,13 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {
+  public void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         Commands.runOnce(drive::stopWithX, drive));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
-
-
+    Trigger Input = new Trigger(() -> (controller2.getLeftTriggerAxis() != 0.0 || controller2.getRightTriggerAxis() != 0.0 || controller2.getRightX() != 0 || (controller2.getLeftY() != 0 && controller2.getLeftY() > 0)));
     // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
     //   () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
     //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
@@ -179,15 +186,19 @@ public class RobotContainer {
       () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
     // Reset gyro to 0° when start button is pressed
-    final Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
+    Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
       ? () -> drive.setPose(
-              driveSim
+driveSim
                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
+    
+    // Input.onTrue(Commands.run(() -> armSim.update(controller2.getLeftY(), controller2.getRightX() * 180, (controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis()) * 180 )));
+    Input.onTrue(Commands.run(() -> armSim.setArmVolts(12 * controller2.getRightX() / VOLTAGE_CALC))); // Add voltage calcuations
       
+
   }
 
   private void configureDashboard() {
@@ -260,7 +271,16 @@ public class RobotContainer {
         )
       }
     );
+<<<<<<< HEAD
+<<<<<<< HEAD
+    armSim.update(0, arm.getAngle(), 100);
+
+=======
     armSim.update(12, 0, 0);
+>>>>>>> d627c9969d9b81325c47a7643e95ee1fac86b9cc
+=======
+    armSim.update(Units.metersToInches(FieldConstant.Reef.L4_highest_h) - 30, -30, -15);
+>>>>>>> 84200dff90a0bff1c05fcf7a79546d49f9fce699
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     Logger.recordOutput(

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.scoring.arm;
 
+import static frc.robot.subsystems.scoring.SuperstructureConfig.arm;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
@@ -16,5 +18,6 @@ public interface ArmIO {
 
     public default void updateInputs(ArmIOInputs inputs) {}
     public default void runVolts(double volts) {}
+    public default double getAngle(){ return  0;}
     public default void stop() {}
 }

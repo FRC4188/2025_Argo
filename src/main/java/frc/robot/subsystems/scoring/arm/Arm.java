@@ -36,7 +36,7 @@ public class Arm extends SubsystemBase {
         MIN
         }
     
-    private Arm(ArmIO io) {
+    public Arm(ArmIO io) {
         this.io = io;
         inputs = new ArmIOInputsAutoLogged();
         // armPID.enableContinuousInput(0, 360);
@@ -60,11 +60,13 @@ public class Arm extends SubsystemBase {
     //     io.runVolts(output);});
     // }
     
-    public Command setVolt(double percent){
+    public Command setVolts(double percent){
         return Commands.run(()->{
             io.runVolts(percent);
         });
     }
+
+   
 
     
     // Commands need to be reviewed may have implemented them incorrectly
