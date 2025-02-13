@@ -48,6 +48,7 @@ import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.SuperVisualizer;
 import frc.robot.subsystems.vision.Limelight;
+import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
@@ -218,6 +219,13 @@ public class RobotContainer {
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
+
+    controller2
+    .getAButton()
+    .onTrue(
+      Limelight.setPipe("limelight-front", VisConstants.algaeDetect) //make this to wtv it is
+    );
+
   }
 
   /**

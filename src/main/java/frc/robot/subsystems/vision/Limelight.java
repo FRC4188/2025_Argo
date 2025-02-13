@@ -34,6 +34,8 @@ import frc.robot.util.LimelightHelpers;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
@@ -185,8 +187,23 @@ public class Limelight extends SubsystemBase {
     
   }
 
+  @AutoLogOutput(key = "Limelight/Pipeline_Index")
+  public double getPipeLine(String llName){ //no clue why its double
+    return LimelightHelpers.getCurrentPipelineIndex(llName);
+  }
+  
   public void setPipeline(String llName, int index){
     LimelightHelpers.setPipelineIndex(llName, index);
+  }
+
+  public static Command setPipe(String llName, int index){
+    return Commands.run(() -> {
+      LimelightHelpers.setPipelineIndex(llName, index);
+    });
+  }
+
+  public double getTX(String llName){
+    return LimelightHelpers.getTX(llName);
   }
 
   @FunctionalInterface

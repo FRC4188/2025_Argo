@@ -57,6 +57,10 @@ public class VisConstants {
 
   public static int coralDetect = 0; //placeholder
   public static int algaeDetect = 0; //placeholder
-  public static int aprilTagDetect = 0; //placeholder 
+  public static int aprilTagDetect = 0; //placeholder
+  
+  public static double left_region = -10.0; //left region of cam (left side reef)
+  public static double right_region = 10.0; //right region of cam (right side reef)
+
   //TODO: WORK ON PIPELINES AND FIND THESE VALUES
 }
