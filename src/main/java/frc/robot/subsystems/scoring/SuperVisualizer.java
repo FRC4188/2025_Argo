@@ -118,13 +118,19 @@ public class SuperVisualizer {
         SwerveDriveSimulation driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
 
         Pose3d endEffectorPos = new Pose3d(
-            driveSim.getSimulatedDriveTrainPose().getX() + wristOrigin.getX(),
-            driveSim.getSimulatedDriveTrainPose().getY() + wristOrigin.getY(),
-            wristPos.getZ(),
+            new Translation3d(
+                driveSim.getSimulatedDriveTrainPose().getX() 
+                    + wristOrigin.getX()
+                    + wrist.length() * Math.sin(-wristAngle),
+                driveSim.getSimulatedDriveTrainPose().getY() 
+                    + wristOrigin.getY(),
+                    // + wrist.length()/2 * Math.cos(wristAngle),
+                wristPos.getZ() + wrist.length() + (wrist.length() - Math.abs((wrist.length() * Math.tan(wristAngle))))),
             new Rotation3d(
-                wristPos.getRotation().getX() + 90, 
-                wristPos.getRotation().getY(), 
+                wristPos.getRotation().getX(), 
+                wristPos.getRotation().getY() - Math.toRadians(-90), 
                 wristPos.getRotation().getZ() + driveSim.getSimulatedDriveTrainPose().getRotation().getDegrees()));
+
         
         Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos, endEffectorPos);
     }
