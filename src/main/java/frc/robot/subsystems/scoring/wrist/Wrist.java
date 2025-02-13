@@ -38,7 +38,7 @@ public class Wrist extends SubsystemBase {//J.C
 
     // wristAngle = pid.calculate(inputs.posRads, targetAngle);
     wristAngle = inputs.posRads * Math.PI / 180;
-    io.runVolts(targetAngle * Math.PI / 180);
+    // io.runVolts(targetAngle * Math.PI / 180);
   }
 
   public Command setAngle(double angle) {
@@ -65,6 +65,11 @@ public class Wrist extends SubsystemBase {//J.C
   @AutoLogOutput(key = "Wrist/Setpoint")
   public double getSetpoint() {
     return targetAngle;
+  }
+
+  @AutoLogOutput(key = "Wrist/Angle Degrees")
+  public double getAngle(){
+    return wristAngle;
   }
 
   @AutoLogOutput(key = "Wrist/isAtGoal")
