@@ -6,9 +6,15 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class FOHandler {
+    private static FOHandler instance;
+    public static synchronized FOHandler getInstance() {
+        if (instance == null) instance = new FOHandler();
+        return instance;
+    }
+
     public List<FieldObject> fobjs;
     
-    public FOHandler() {
+    private FOHandler() {
         fobjs = new ArrayList<FieldObject>();
     }
 

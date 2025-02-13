@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -13,6 +14,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.util.Units;
@@ -21,6 +23,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.commands.autos.pathgen.PathGen;
 import frc.robot.commands.autos.pathgen.fieldobjects.*;
 import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.subsystems.scoring.SuperState;
+import frc.robot.subsystems.scoring.anglegen.AngleGen;
 import frc.robot.util.FieldConstant;
 
 public final class Main {
@@ -29,6 +33,23 @@ public final class Main {
 
   public static void main(String... args) {
     
-    RobotBase.startRobot(Robot::new);
+    SuperState start = new SuperState(new Translation3d(0, 0, 0));
+
+    SuperState end = new SuperState(new Translation3d(5, 0, 50));
+
+    ArrayList<Translation3d> pivots = AngleGen.getInstance().gen_pivots(
+      new Translation3d(start.getWristAngle(), start.getArmAngle(), start.getHeightInch()),
+      new Translation3d(end.getWristAngle(), end.getArmAngle(), end.getHeightInch()));
+
+    //System.out.println(uhh);
+
+    
+    for (Translation3d t : pivots) {
+      System.out.println("(" + t.getX() + ", " + t.getY() + "," + t.getZ() + ")");
+    }
+    
+    
+
+    //RobotBase.startRobot(Robot::new);
   }
 }
