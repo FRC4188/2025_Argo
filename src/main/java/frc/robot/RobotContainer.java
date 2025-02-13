@@ -23,7 +23,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -52,6 +51,8 @@ import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.arm.ArmIO;
 import frc.robot.subsystems.scoring.arm.ArmIOReal;
 import frc.robot.subsystems.scoring.arm.ArmIOSim;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.wrist.WristIOSim;
 import frc.robot.subsystems.scoring.arm.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
@@ -85,6 +86,8 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSim = null;
   private SuperVisualizer armSim;
   private ArmIOSim armIOSim;
+  private ElevatorIOSim eleSim;
+  private WristIOSim wristSim;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -195,9 +198,10 @@ driveSim
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
     
-    // Input.onTrue(Commands.run(() -> armSim.update(controller2.getLeftY(), controller2.getRightX() * 180, (controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis()) * 180 )));
-    //Input.onTrue(Commands.run(() -> armSim.setArmVolts(12 * controller2.getRightX() / VOLTAGE_CALC))); // Add voltage calcuations
-      
+    // Sim inputs for controller 2 (copilot)
+    Input.onTrue(Commands.run(() -> armIOSim.runVolts(controller2.getRightX())));
+    Input.onTrue(Commands.run(() -> eleSim.runVolts(controller2.getLeftY())));
+    Input.onTrue(Commands.run(() -> wristSim.runVolts(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis())));
 
   }
 
@@ -272,7 +276,7 @@ driveSim
       }
     );
 
-    armSim.update(Units.metersToInches(FieldConstant.Reef.L4_highest_h) - 30, -30, -15);
+    armSim.update(12, 0, 0);
 
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));

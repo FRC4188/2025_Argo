@@ -74,6 +74,9 @@ public record SuperState(Translation3d endEffectorPos){
                 new Translation3d()), true),
         ALGAE_GROUND(
             new SuperState(
+                new Translation3d()), false),
+        START(
+            new SuperState(
                 new Translation3d()), false);
 
         private final SuperState state;

@@ -32,24 +32,7 @@ public final class Main {
 
 
   public static void main(String... args) {
-    
-    SuperState start = new SuperState(new Translation3d(0, 0, 0));
 
-    SuperState end = new SuperState(new Translation3d(5, 0, 50));
-
-    ArrayList<Translation3d> pivots = AngleGen.getInstance().gen_pivots(
-      new Translation3d(start.getWristAngle(), start.getArmAngle(), start.getHeightInch()),
-      new Translation3d(end.getWristAngle(), end.getArmAngle(), end.getHeightInch()));
-
-    //System.out.println(uhh);
-
-    
-    for (Translation3d t : pivots) {
-      System.out.println("(" + t.getX() + ", " + t.getY() + "," + t.getZ() + ")");
-    }
-    
-    
-
-    //RobotBase.startRobot(Robot::new);
+    RobotBase.startRobot(Robot::new);
   }
 }
