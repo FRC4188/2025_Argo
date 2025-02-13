@@ -36,7 +36,7 @@ public class Superstructure extends SubsystemBase{
             constraints);
         
     private SuperPreset state =  SuperPreset.L4_CORAL;
-    public Superstructure(Arm arm, Elevator elevator, IntakeWrist wrist){
+    public SuperStructure(Arm arm, Elevator elevator, IntakeWrist wrist){
         this.arm = arm;
         this.elevator = elevator;
         this.wrist = wrist;
@@ -48,6 +48,15 @@ public class Superstructure extends SubsystemBase{
         arm.setVolt(
             armPID.calculate(arm.getAngle(), state.getArmAngle())
             + ArmFF.getArmVoltFF(VecBuilder.fill(arm.getAngle(), wrist.getMotorAngle()))
+        );
+        // didnt know i had to finish this class mb ig
+        elevator.runVolts(
+            elePID.calculate(elevator.getElevatorHeight(), state.getHeightInch())
+        );
+        wrist.setAngle(
+            wristPID.calculate(wrist.getMotorAngle(), state.getWristAngle())+
+            // Hopefully this is the right FF arguemnts for the wrist
+            ArmFF.getWristVoltFF(VecBuilder.fill(arm.getAngle(), wrist.getMotorAngle()))
         );
    }
 
