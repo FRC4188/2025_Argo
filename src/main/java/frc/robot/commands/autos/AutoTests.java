@@ -119,56 +119,7 @@ public final class AutoTests {
             );
     }
 
-    public static void pathgeninit() {
-        new PolygonFO(true,
-            FieldConstant.Reef.Base.left_brg_corner,
-            FieldConstant.Reef.Base.right_brg_corner,
-            FieldConstant.Reef.Base.right_field_corner,
-            FieldConstant.Reef.Base.right_src_corner,
-            FieldConstant.Reef.Base.left_src_corner,
-            FieldConstant.Reef.Base.left_field_corner);
-        
-        new PolygonFO(true,
-            FieldConstant.Field.all_wall_left_corner,
-            FieldConstant.Field.alliance_left_corner,
-            FieldConstant.Field.alliance_right_corner,
-            FieldConstant.Field.all_wall_right_corner,
-            FieldConstant.Field.opp_wall_right_corner,
-            FieldConstant.Field.opposing_right_corner,
-            FieldConstant.Field.opposing_left_corner,
-            FieldConstant.Field.opp_wall_left_corner
-        );
-
-        new RectFO(
-            (float) FieldConstant.field_center_x,
-            (float) FieldConstant.field_center_y,
-            (float) FieldConstant.Field.brg_length,
-            (float) FieldConstant.Field.brg_width
-        );
-
-        new CircleFO(
-            (float) FieldConstant.Elem_Locations.corals_locations[0].getX(),
-            (float) FieldConstant.Elem_Locations.corals_locations[0].getY(),
-            (float) FieldConstant.algae_radius
-        );
-
-        new CircleFO(
-            (float) FieldConstant.Elem_Locations.corals_locations[1].getX(),
-            (float) FieldConstant.Elem_Locations.corals_locations[1].getY(),
-            (float) FieldConstant.algae_radius
-        );
-
-        new CircleFO(
-            (float) FieldConstant.Elem_Locations.corals_locations[2].getX(),
-            (float) FieldConstant.Elem_Locations.corals_locations[2].getY(),
-            (float) FieldConstant.algae_radius
-        );
-
-        PathGen.getInstance().update_grid_fo();
-    }
-
     public static Command AG2Coral(Drive drive){
-        pathgeninit();
         
         System.out.println(FieldConstant.Processor.processor_wall);
         System.out.println(FieldConstant.Processor.processor_goal);
