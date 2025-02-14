@@ -166,6 +166,7 @@ public class RobotContainer {
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
+        // For SysID
         arm = Arm.getInstance(new ArmIO() {});
         wrist = Wrist.getInstance(new WristIO() {});
         elevator = Elevator.getInstance(new ElevatorIO() {});
