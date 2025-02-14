@@ -47,6 +47,18 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.SuperVisualizer;
+import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIO;
+import frc.robot.subsystems.scoring.arm.ArmIOReal;
+import frc.robot.subsystems.scoring.arm.ArmIOSim;
+import frc.robot.subsystems.scoring.elevator.Elevator;
+import frc.robot.subsystems.scoring.elevator.ElevatorIO;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.wrist.Wrist;
+import frc.robot.subsystems.scoring.wrist.WristIO;
+import frc.robot.subsystems.scoring.wrist.WristIOReal;
+import frc.robot.subsystems.scoring.wrist.WristIOSim;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -74,6 +86,9 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Wrist wrist;
+  private final Arm arm;
+  private final Elevator elevator;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
   private SuperVisualizer armSim;
@@ -103,6 +118,10 @@ public class RobotContainer {
             new VisionIOLL("limelight-back", drive::getRotation),
             new VisionIOLL("limelight-front", drive::getRotation));
 
+          arm = Arm.getInstance(new ArmIOReal() {});
+          wrist = Wrist.getInstance(new WristIOReal() {});
+          elevator = Elevator.getInstance(new ElevatorIOReal() {});
+
         break;
 
       case SIM:
@@ -127,6 +146,10 @@ public class RobotContainer {
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
+        arm = Arm.getInstance(new ArmIOSim() {});
+        wrist = Wrist.getInstance(new WristIOSim() {});
+        elevator = Elevator.getInstance(new ElevatorIOSim() {});
+
         armSim = new SuperVisualizer("Superstructure");
         break;
 
@@ -142,6 +165,11 @@ public class RobotContainer {
                 (pose) -> {});
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
+
+        arm = Arm.getInstance(new ArmIO() {});
+        wrist = Wrist.getInstance(new WristIO() {});
+        elevator = Elevator.getInstance(new ElevatorIO() {});
+
         break;
     }
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -176,6 +204,18 @@ public class RobotContainer {
       () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
       () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
       () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
+
+    controller.getAButton().onTrue(
+      arm.runSysId()
+    );
+
+    controller.getXButton().onTrue(
+      wrist.runSysId()
+    );
+
+    controller.getYButton().onTrue(
+      elevator.runSysId()
+    );
 
     // Reset gyro to 0° when start button is pressed
     final Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM

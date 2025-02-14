@@ -2,6 +2,8 @@
 package frc.robot.subsystems.scoring.wrist;
 
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -15,6 +17,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.subsystems.scoring.SuperConstraints;
+import frc.robot.subsystems.scoring.elevator.Elevator;
+import frc.robot.subsystems.scoring.elevator.ElevatorIO;
 
 import com.revrobotics.spark.SparkMax;
 
@@ -24,6 +28,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 
 
@@ -42,6 +48,13 @@ public class Wrist extends SubsystemBase {//J.C
     private final double tempC = 0.0;
     private final double posRads = 0.0;
     private final double velRadsPerSec = 0.0;
+
+    public static Wrist getInstance(WristIO io){
+        if(instance == null){
+            instance = new Wrist(io);
+        }
+        return instance;
+    }
 
     private Wrist(WristIO io){
       this.io = io;
@@ -108,4 +121,28 @@ public class Wrist extends SubsystemBase {//J.C
   public double getMotorTemperature() {
     return inputs.tempC;
   }
+
+  public Command runSysId(){
+        SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(4).per(Seconds),
+                Volts.of(8),
+                Seconds.of(6)
+            ),new SysIdRoutine.Mechanism(
+                voltage -> runVolts(voltage.magnitude()),
+                null,
+                this));
+        
+        return Commands.sequence(
+            routine.quasistatic(Direction.kForward)
+                .until(() -> getPosition() >= SuperConstraints.WristConstraints.RANGE),
+            routine.quasistatic(Direction.kReverse)
+                .until(() -> getPosition() <= 0.0),
+                
+            routine.dynamic(Direction.kForward)
+                .until(() -> getPosition() >= SuperConstraints.WristConstraints.RANGE),
+            routine.dynamic(Direction.kReverse)
+                .until(() -> getPosition() <= 0.0)
+        );
+    }
 }

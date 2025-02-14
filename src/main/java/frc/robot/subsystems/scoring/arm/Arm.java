@@ -1,5 +1,7 @@
 package frc.robot.subsystems.scoring.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -8,6 +10,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.subsystems.scoring.SuperConstraints;
 
 public class Arm extends SubsystemBase {
     private static Arm instance = null;
@@ -83,5 +88,29 @@ public class Arm extends SubsystemBase {
     
     public void resetAngleZero() {
         armZero = inputs.positionRads;
+    }
+
+    public Command runSysId(){
+        SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(4).per(Seconds),
+                Volts.of(8),
+                Seconds.of(6)
+            ),new SysIdRoutine.Mechanism(
+                voltage -> setVolt(voltage.magnitude()),
+                null,
+                this));
+        
+        return Commands.sequence(
+            routine.quasistatic(Direction.kForward)
+                .until(() -> getAngle() >= SuperConstraints.ArmConstraints.RANGE),
+            routine.quasistatic(Direction.kReverse)
+                .until(() -> getAngle() <= 0.0),
+                
+            routine.dynamic(Direction.kForward)
+                .until(() -> getAngle() >= SuperConstraints.ArmConstraints.RANGE),
+            routine.dynamic(Direction.kReverse)
+                .until(() -> getAngle() <= 0.0)
+        );
     }
 }

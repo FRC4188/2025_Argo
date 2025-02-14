@@ -8,6 +8,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.subsystems.scoring.SuperState;
 
 public class SuperConstraints {
     /*
@@ -42,6 +43,8 @@ public class SuperConstraints {
         public static double LOWEST_A = -179;
         public static double HIGHEST_A = 179;
 
+        public static double RANGE = HIGHEST_A - LOWEST_A;
+
         //TODO: add math that scale range based on height
         public void setArmConstraints(double lowestA, double highestA){
             LOWEST_A = lowestA;
@@ -54,6 +57,8 @@ public class SuperConstraints {
         public final static double GLOBAL_HIGHEST_A = 100;
         public static double LOWEST_A = -100;
         public static double HIGHEST_A = 100;
+
+        public static double RANGE = HIGHEST_A - LOWEST_A;
 
         public void setArmConstraints(double lowestA, double highestA){
             LOWEST_A = lowestA;
