@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import frc.robot.Constants;
@@ -101,10 +102,29 @@ public class AngleGen {
 
     }
 
-    public Trajectory generateTrajectory(SuperState start, SuperState end, TrajectoryConfig config) {
-        //fill in later
+    public SuperTraj generateTrajectory(SuperState start, SuperState end, TrajectoryConfig config) {
+        Translation3d t_start = new Translation3d(
+            Math.toDegrees(start.getWristAngle()),
+            Math.toDegrees(start.getArmAngle()),
+            start.getHeightInch());
+
+        Translation3d t_end = new Translation3d(
+            Math.toDegrees(end.getWristAngle()),
+            Math.toDegrees(end.getArmAngle()),
+            end.getHeightInch());
         
-        return new Trajectory();
+
+        ArrayList<Translation3d> imperial = gen_pivots(t_start, t_end);
+        ArrayList<Translation3d> metric = new ArrayList<>();
+
+        for (Translation3d t : imperial) {
+            metric.add(new Translation3d(
+                Units.degreesToRadians(t.getX()),
+                Units.degreesToRadians(t.getY()),
+                Units.inchesToMeters(t.getZ())));
+        }
+
+        return SuperTraj.generateSuperTraj(metric, Units.inchesToMeters(Math.min(a_star.x_scale, a_star.y_scale)), config);
     }
 
 	public ArrayList<Translation3d> gen_pivots(Translation3d start, Translation3d end) {

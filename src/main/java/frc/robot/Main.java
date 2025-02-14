@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.flatbuffers.Table;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
@@ -25,6 +26,8 @@ import frc.robot.commands.autos.pathgen.fieldobjects.*;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.scoring.SuperState;
 import frc.robot.subsystems.scoring.anglegen.AngleGen;
+import frc.robot.subsystems.scoring.anglegen.SuperTraj;
+import frc.robot.subsystems.scoring.anglegen.SuperTraj.SuperTrajState;
 import frc.robot.util.FieldConstant;
 
 public final class Main {
@@ -33,6 +36,12 @@ public final class Main {
 
   public static void main(String... args) {
 
-    RobotBase.startRobot(Robot::new);
+    SuperState start = new SuperState(new Translation3d(0, 0, 0));
+    SuperState end = new SuperState(new Translation3d(5, 0, 50));
+
+    SuperTraj trajectory = AngleGen.getInstance().generateTrajectory(start, end, new TrajectoryConfig(1, 0.5));
+
+    //System.out.println(trajectory);
+    //RobotBase.startRobot(Robot::new);
   }
 }

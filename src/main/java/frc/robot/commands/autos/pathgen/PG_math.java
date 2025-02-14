@@ -97,4 +97,7 @@ public class PG_math {
 		}
 	}
 
+	public static interface PG_lambda {
+		public double function(double x);
+	}
 }
