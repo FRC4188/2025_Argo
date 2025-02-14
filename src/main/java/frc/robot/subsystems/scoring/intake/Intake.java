@@ -2,14 +2,18 @@ package frc.robot.subsystems.scoring.intake;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+// import com.revrobotics.spark.SparkBase.PersistMode;
+// import com.revrobotics.spark.SparkBase.ResetMode;
+// import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.REVLibError;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
+// import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.config.SparkBaseConfig;
+// import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -23,9 +27,12 @@ public class Intake extends SubsystemBase{
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
 
-    private SparkMax motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
-    SparkMaxConfig sparkconfig = new SparkMaxConfig();
-    
+    // private SparkMax motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
+    // SparkMaxConfig sparkconfig = new SparkMaxConfig();
+    private WPI_TalonSRX motor = new WPI_TalonSRX(Constants.ids.INTAKE);
+    TalonSRXConfiguration talonConfig = new TalonSRXConfiguration();
+    //TODO: remove motor instances from this file unless we need it to check for intake voltage spikes
+
     public static Intake getInstance(IntakeIO io){
         if(instance == null){
             instance = new Intake(io);
@@ -36,6 +43,7 @@ public class Intake extends SubsystemBase{
     private Intake(IntakeIO io){
         this.io = io;
         inputs = new IntakeIOInputsAutoLogged();
+
     }
 
     public static enum GamePieceType {
@@ -52,7 +60,7 @@ public class Intake extends SubsystemBase{
     }
 
     public boolean intakeVoltageSpike() {
-        if (motor.getAppliedOutput() > 5) {
+        if (motor.getMotorOutputVoltage() > 5) {
             return true;
         } else {
             return false;
@@ -77,10 +85,10 @@ public class Intake extends SubsystemBase{
                 GamePieceType type = GamePieceType.CORAL;
                 switch (type) {
                     case CORAL:
-                        sparkconfig.inverted(false);
+                        motor.setInverted(false);
                         break;
                     case ALGAE:
-                        sparkconfig.inverted(true);
+                        motor.setInverted(true);
                         break;
                 }
                 runVolts(1);
@@ -93,13 +101,12 @@ public class Intake extends SubsystemBase{
                 GamePieceType type = GamePieceType.CORAL;
                 switch (type) {
                     case CORAL:
-                        sparkconfig.inverted(true);
+                        motor.setInverted(true);
                         break;
                     case ALGAE:
-                        sparkconfig.inverted(false);
+                        motor.setInverted(false);
                         break;
                 }
-                sparkconfig.inverted(true);
                 runVolts(1);
             }, intake);
     }

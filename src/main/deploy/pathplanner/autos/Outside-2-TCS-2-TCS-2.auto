@@ -33,6 +33,18 @@
           "data": {
             "pathName": "TCS-2"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-TCS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TCS-2"
+          }
         }
       ]
     }
