@@ -36,12 +36,6 @@ public final class Main {
 
   public static void main(String... args) {
 
-    SuperState start = new SuperState(new Translation3d(0, 0, 0));
-    SuperState end = new SuperState(new Translation3d(5, 0, 50));
-
-    SuperTraj trajectory = AngleGen.getInstance().generateTrajectory(start, end, new TrajectoryConfig(1, 0.5));
-
-    //System.out.println(trajectory);
-    //RobotBase.startRobot(Robot::new);
+    RobotBase.startRobot(Robot::new);
   }
 }
