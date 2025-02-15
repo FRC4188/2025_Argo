@@ -71,7 +71,7 @@ public class Superstructure extends SubsystemBase{
         var state = target.getState();
         arm.setVolts(
             armPID.calculate(arm.getAngle(), state.getArmAngle())
-            + ff.getArmVoltFF(VecBuilder.fill(state.endEffectorPos().getX(), state.endEffectorPos().getZ()))
+            + ff.getArmVoltFF(VecBuilder.fill(state.getEndEffectorPos().getX(), state.getEndEffectorPos().getZ()))
         );
         // didnt know i had to finish this class mb ig
         elevator.runVolts(
@@ -79,7 +79,7 @@ public class Superstructure extends SubsystemBase{
         );
         wrist.setAngle(
             wristPID.calculate(wrist.getAngle(), state.getWristAngle() + target.getWristOffset())
-            + ff.getWristVoltFF(VecBuilder.fill(state.endEffectorPos().getX(), state.endEffectorPos().getZ()))
+            + ff.getWristVoltFF(VecBuilder.fill(state.getEndEffectorPos().getX(), state.getEndEffectorPos().getZ()))
             // Hopefully this is the right FF arguemnts for the wrist
         );
     }

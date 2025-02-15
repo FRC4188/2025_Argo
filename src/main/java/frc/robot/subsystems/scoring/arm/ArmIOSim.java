@@ -37,7 +37,6 @@ public class ArmIOSim implements ArmIO {
             Rotation2d.fromDegrees(0.0).getRadians(), 
             Rotation2d.fromDegrees(0.0).getRadians(),
             true,
-             0.0, 
              0.0
             );
     }

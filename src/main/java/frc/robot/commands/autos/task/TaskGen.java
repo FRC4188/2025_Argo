@@ -57,6 +57,7 @@ public class TaskGen {
 
     Graph graph = new Graph(0);
     
+    
      
      public class Task{
         static int CORAL_IN ;
