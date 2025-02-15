@@ -6,11 +6,14 @@ import static edu.wpi.first.units.Units.Meters;
 import java.util.ArrayList;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.robot.STATE;
 import frc.robot.commands.autos.pathgen.PG_math;
@@ -58,10 +61,11 @@ public class SuperState {
     }
 
     public SuperState(double ele, double arm, double wrist, boolean isCoral) {
-        wrist_angle = wrist;
-        arm_angle = arm;
-        elevator_height = ele;
-        this.isCoral = isCoral;
+        Translation2d pos = ArmKinematics.fromValues(Units.degreesToRadians(wrist), Units.degreesToRadians(arm), ele, isCoral);
+        Translation3d guh = ArmKinematics.fromPose(pos, isCoral);
+        wrist_angle = guh.getX();
+        arm_angle = guh.getY();
+        elevator_height = guh.getZ();
     }
 
     public double getWristAngle() {
@@ -82,6 +86,10 @@ public class SuperState {
 
     public Translation2d getCartesian() {
         return ArmKinematics.fromValues(wrist_angle, arm_angle, elevator_height, false);
+    }
+
+    public Translation2d getEndPos(){
+        return ArmKinematics.forward(VecBuilder.fill(arm_angle, wrist_angle));
     }
 
     public boolean isCoral(){

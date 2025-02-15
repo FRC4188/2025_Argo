@@ -84,9 +84,9 @@ public final class Constants {
   }
 
   //TODO: wuts dis??
-  public class mode{
-    int real = 0; 
-  }
+  // public class mode{
+  //   int real = 0; 
+  // }
 
   public static class ElevatorConstants{    
     public static final double kDrumeRadius = Units.inchesToMeters(0.75000 / 2); //TODO: get drum radius

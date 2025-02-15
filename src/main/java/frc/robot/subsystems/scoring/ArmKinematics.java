@@ -75,11 +75,7 @@ public class ArmKinematics {
                 if (w_val <= 5/9.0 * Math.PI && w_val >= -5/9.0 * Math.PI) {
 
                     possible_vals.add(new Translation2d(w_val, a));
-                } else {
-
                 }
-            } else {
-
             }
         }
 

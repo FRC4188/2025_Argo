@@ -20,6 +20,7 @@ public class Arm extends SubsystemBase {
     double armZero = 0;
     // PIDController armPID = new PIDController(0.0, 0.0, 0.0);
     double tolerance = 0.05;
+    double target = 0;
     
     private static final double MIN_ANGLE = 0;
     private static final double MAX_ANGLE = 3;
@@ -62,12 +63,14 @@ public class Arm extends SubsystemBase {
     
     public Command setVolts(double percent){
         return Commands.run(()->{
+            target = percent;
             io.runVolts(percent);
         });
     }
 
    public void runVolt(double volt){
         io.runVolts(volt);
+        target = volt;
    }
 
    public double getVel(){
@@ -88,6 +91,11 @@ public class Arm extends SubsystemBase {
     public  double getAngle() {
         return Rotation2d.fromRadians(inputs.positionRads - armZero).getDegrees();
     }
+
+    // @AutoLogOutput(key = "Arm/setpoint volt")
+    // public  double getSetpoint() {
+    //     return target;
+    // }
     
     @AutoLogOutput(key = "Arm/isAtSetpoint")
     public boolean isAtAngle(double targetAngle) {

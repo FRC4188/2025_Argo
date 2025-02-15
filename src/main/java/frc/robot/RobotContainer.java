@@ -207,7 +207,7 @@ public class RobotContainer {
       controller2.x().onTrue(
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.SOURCE.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
 
   }
 
