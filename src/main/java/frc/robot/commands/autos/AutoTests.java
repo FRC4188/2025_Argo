@@ -73,7 +73,7 @@ public final class AutoTests {
     
         Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_brg_corner, new Rotation2d(Degrees.of(0)));
         Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_brg_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d source = FieldConstant.Source.right_srcs[4];
+        Pose2d source = FieldConstant.Source.right_srcs[0];
     
         List<Waypoint> pts  = PathPlannerPath.waypointsFromPoses(currPose,targetPose2d, source, targetPose2d1);
             
@@ -127,9 +127,9 @@ public final class AutoTests {
         return Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src, config),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config),
-            new DriveTo(drive, FieldConstant.Source.left_srcs[6], config),
+            new DriveTo(drive, FieldConstant.Source.left_srcs[0], config),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right, config),
-            new DriveTo(drive, FieldConstant.Source.right_srcs[7], config),
+            new DriveTo(drive, FieldConstant.Source.right_srcs[0], config),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config),
             new DriveTo(drive, FieldConstant.Processor.processor_goal, config)
         );

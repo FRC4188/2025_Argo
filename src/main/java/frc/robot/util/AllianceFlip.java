@@ -31,6 +31,14 @@ public class AllianceFlip {
         }
     }
 
+    public static Pose2d flipDS(Pose2d pos){
+        if (canFlip()) {
+            return new Pose2d(flip(pos.getX()), flipY(pos.getY()), apply(pos.getRotation()));
+        } else {
+            return pos;
+        }
+    }
+
     /** Flips a translation to the correct side of the field based on the current alliance color. */
     public static Translation2d apply(Translation2d translation) {
         if (canFlip()) {
@@ -68,6 +76,6 @@ public class AllianceFlip {
     }
 
     public static boolean canFlip(){
-        return false;//DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+        return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
     }
 }

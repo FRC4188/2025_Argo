@@ -108,7 +108,7 @@ public class FieldConstant {
 
         public class CoralGoal {
             //robot perpendicular distance from the wall
-            public static double score_perp = Constants.robot.A_CROSSLENGTH / 2;
+            public static double score_perp = Constants.robot.A_CROSSLENGTH;
             //robot parallel distance from the center of the wall
             public static double score_parallel = Units.inchesToMeters(6.472);
 
@@ -323,7 +323,7 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH, 0);
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3 *2, 0);
 
         public static Pose2d processor_wall = new Pose2d(
             field_center_x - Units.inchesToMeters(109.712),
@@ -342,7 +342,7 @@ public class FieldConstant {
         public static double src_length = Units.inchesToMeters(79.268);
 
         //order from closets to ds to farthest
-        public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH, 0);
+        public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3*2, 0);
 
         public static Translation2d right_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(54.0112 - 90));
         public static Translation2d left_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(-54.0112 + 90));
@@ -386,41 +386,41 @@ public class FieldConstant {
         };
         
         public static Pose2d[] left_srcs = {
-            new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(4))
-            .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
-            Rotation2d.fromDegrees(-54.0112 + 180)),
+            // new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(4))
+            // .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
+            // Rotation2d.fromDegrees(-54.0112 + 180)),
 
             new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(3))
             .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
             Rotation2d.fromDegrees(-54.0112 + 180)),
 
-            new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(2))
-            .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
-            Rotation2d.fromDegrees(-54.0112 + 180)),
+            // new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(2))
+            // .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
+            // Rotation2d.fromDegrees(-54.0112 + 180)),
 
-            new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(1))
-            .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
-            Rotation2d.fromDegrees(-54.0112 + 180)),
+            // new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(1))
+            // .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
+            // Rotation2d.fromDegrees(-54.0112 + 180)),
 
             new Pose2d(left_src_wall.getTranslation().minus(left_src_off.times(0))
             .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
             Rotation2d.fromDegrees(-54.0112 + 180)),
 
-            new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(1))
-            .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
-            Rotation2d.fromDegrees(-54.0112 + 180)),
+            // new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(1))
+            // .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
+            // Rotation2d.fromDegrees(-54.0112 + 180)),
 
-            new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(2))
-            .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
-            Rotation2d.fromDegrees(-54.0112 + 180)),
+            // new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(2))
+            // .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
+            // Rotation2d.fromDegrees(-54.0112 + 180)),
 
             new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(3))
             .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
             Rotation2d.fromDegrees(-54.0112 + 180)),
 
-            new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(4))
-            .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
-            Rotation2d.fromDegrees(-54.0112 + 180))
+            // new Pose2d(left_src_wall.getTranslation().plus(left_src_off.times(4))
+            // .plus(src_pos.rotateBy(Rotation2d.fromDegrees(-54.0112 + 180))), 
+            // Rotation2d.fromDegrees(-54.0112 + 180))
         };
     }
 

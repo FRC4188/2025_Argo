@@ -19,6 +19,7 @@ import frc.robot.Constants.robot.STATE;
 import frc.robot.commands.autos.pathgen.PG_math;
 import frc.robot.subsystems.scoring.anglegen.SuperTraj.SuperTrajState;
 import frc.robot.util.FieldConstant.Reef;
+import frc.robot.util.FieldConstant.Reef;
 
 
 public class SuperState {
@@ -27,6 +28,7 @@ public class SuperState {
     private double arm_angle;
     private double elevator_height;
     private boolean isCoral;
+
     
     public SuperState() {}
 
@@ -163,7 +165,7 @@ public class SuperState {
                 0,0,0, false));
 
         private final SuperState state;
-    
+
         private SuperPreset(SuperState state){
             this.state = state;
         }

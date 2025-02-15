@@ -23,7 +23,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -125,7 +128,7 @@ public class RobotContainer {
         
         // Sim robot, instantiate physics sim IO implementations
         // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
+        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.AlgaeSource.left_src_src);
         // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
@@ -255,7 +258,7 @@ public class RobotContainer {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     // drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-    drive.setPose(FieldConstant.Reef.CoralGoal.alliance_left);
+    drive.setPose(FieldConstant.Source.left_srcs[1].transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg))); //0(clip in wall), 2 3 awk in mid n left
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
