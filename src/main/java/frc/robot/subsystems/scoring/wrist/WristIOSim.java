@@ -26,7 +26,7 @@ public class WristIOSim implements WristIO{//J.C
 
     @Override
     public void runVolts(double volts) {
-        appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+        appliedVolts = volts;
         sim.setInputVoltage(appliedVolts);
     }
 

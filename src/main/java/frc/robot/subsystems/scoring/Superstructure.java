@@ -7,6 +7,7 @@ import org.opencv.video.KalmanFilter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -44,10 +45,9 @@ public class Superstructure extends SubsystemBase{
             0.2, 0.0, 0.0, 
             constraints);
 
-    private ProfiledPIDController wristPID = 
-        new ProfiledPIDController(
-            10.0, 0.0, 0.0, 
-            constraints);
+    private PIDController wristPID = 
+        new PIDController(
+            10, 0, 0);
 
     private ProfiledPIDController elePID = 
         new ProfiledPIDController(
@@ -100,7 +100,7 @@ public class Superstructure extends SubsystemBase{
         );
         wrist.runVoltsNC(
             wristPID.calculate(Units.degreesToRadians(wrist.getAngle()), target.getWristAngle() + target.getWristOffset())
-            //  - ff.getWristVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
+            //   + ff.getWristVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
             // Hopefully this is the right FF arguemnts for the wrist
         );
 
