@@ -11,10 +11,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.Id;
+import frc.robot.Constants.robot;
 
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Pounds;
 import static frc.robot.Constants.*;
 
 public class ElevatorIOSim implements ElevatorIO{
@@ -34,9 +38,9 @@ public class ElevatorIOSim implements ElevatorIO{
         sim = new DCMotorSim(
             LinearSystemId.createElevatorSystem(
                 gearbox,
-                0, 
-                0, 
-                0), 
+                Kilograms.convertFrom(23.37, Pounds), 
+                ElevatorConstants.kDrumeRadius, 
+                ElevatorConstants.kGearRatio), 
             gearbox);
 
         sim.setState(0, 0); //maxlengthmeter / 2 , 0
@@ -65,7 +69,7 @@ public class ElevatorIOSim implements ElevatorIO{
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs){
-        sim.update(robot.loopPeriodSecs);
+        
 
         inputs.connected = true;
         inputs.appliedVolts = appliedVolts;
@@ -73,6 +77,7 @@ public class ElevatorIOSim implements ElevatorIO{
         inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
         
         inputs.followerAppliedVolts = appliedVolts;
+        sim.update(robot.loopPeriodSecs);
     }
 
     @Override

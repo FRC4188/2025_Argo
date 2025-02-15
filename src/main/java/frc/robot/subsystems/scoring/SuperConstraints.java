@@ -36,6 +36,6 @@ public class SuperConstraints {
         armAngle = MathUtil.clamp(armAngle, -Math.PI, Math.PI);
         wristAngle = MathUtil.clamp(armAngle, -5/9.0 * Math.PI, 5/9.0 * Math.PI);
 
-        return new SuperState(wristAngle, armAngle, wristAngle);
+        return new SuperState(elevatorHeight, armAngle, wristAngle, true);
     }
 }

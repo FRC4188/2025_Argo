@@ -89,7 +89,7 @@ public final class Constants {
   }
 
   public static class ElevatorConstants{    
-    public static final double kDrumeRadius = 0.0; //TODO: get drum radius
+    public static final double kDrumeRadius = Units.inchesToMeters(0.75000 / 2); //TODO: get drum radius
 
     public static final double kGearRatio = 6;
     public static final double kZero = 0; //TODO: get zero

@@ -23,7 +23,7 @@ public class Wrist extends SubsystemBase {//J.C
     
     private double targetAngle = 0, wristAngle = 0;
 
-    private Wrist(WristIO io){
+    public Wrist(WristIO io){
       this.io = io;
 
     //   pid.reset(Constants.wrist.UPPER_LIMIT);
@@ -54,6 +54,10 @@ public class Wrist extends SubsystemBase {//J.C
     });
   }
 
+  public void runVoltsNC(double volts) {
+    io.runVolts(volts);
+  }
+
 //   public void setPID(double kP, double kI, double kD) {
 //     pid.setPID(kP, kI, kD);
 //   }
@@ -70,6 +74,14 @@ public class Wrist extends SubsystemBase {//J.C
   @AutoLogOutput(key = "Wrist/Angle Degrees")
   public double getAngle(){
     return wristAngle;
+  }
+
+  public double getVel(){
+    return inputs.velRadsPerSec;
+  }
+
+  public double getVolt(){
+    return inputs.appliedVolts;
   }
 
   @AutoLogOutput(key = "Wrist/isAtGoal")

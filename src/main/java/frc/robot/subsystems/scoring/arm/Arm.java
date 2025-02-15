@@ -66,8 +66,17 @@ public class Arm extends SubsystemBase {
         });
     }
 
-   
+   public void runVolt(double volt){
+        io.runVolts(volt);
+   }
 
+   public double getVel(){
+    return inputs.velocityRadPerSec;
+   }
+
+   public double getVolt(){
+    return inputs.appliedVolts;
+   }
     
     // Commands need to be reviewed may have implemented them incorrectly
     public Command stopArm(Arm arm) {

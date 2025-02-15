@@ -109,7 +109,7 @@ public final class AutoTests {
                 drive.getPose(), 
                 List.of(
                     Reef.Base.left_brg_corner,
-                    Source.left_srcs[4].getTranslation(),
+                    Source.left_srcs[0].getTranslation(),
                     Reef.Base.right_field_corner),
                 new Pose2d(Reef.Base.right_field_corner, drive.getRotation()),
                 config),

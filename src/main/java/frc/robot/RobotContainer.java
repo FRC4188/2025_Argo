@@ -18,6 +18,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -46,12 +47,17 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
+import frc.robot.subsystems.scoring.SuperState;
 import frc.robot.subsystems.scoring.SuperVisualizer;
+import frc.robot.subsystems.scoring.Superstructure;
+import frc.robot.subsystems.scoring.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.arm.ArmIO;
 import frc.robot.subsystems.scoring.arm.ArmIOReal;
 import frc.robot.subsystems.scoring.arm.ArmIOSim;
+import frc.robot.subsystems.scoring.elevator.Elevator;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.wrist.Wrist;
 import frc.robot.subsystems.scoring.wrist.WristIOSim;
 import frc.robot.subsystems.scoring.arm.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.vision.Limelight;
@@ -85,9 +91,7 @@ public class RobotContainer {
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
   private SuperVisualizer armSim;
-  private ArmIOSim armIOSim;
-  private ElevatorIOSim eleSim;
-  private WristIOSim wristSim;
+  private Superstructure superstructure;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -138,8 +142,7 @@ public class RobotContainer {
                 driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
-        armIOSim = new ArmIOSim();
-        armSim = new SuperVisualizer("Superstructure");
+        superstructure = new Superstructure(new Arm(new ArmIOSim()), Elevator.getInstance(new ElevatorIOSim()), new Wrist(new WristIOSim()));
         break;
 
       default:
@@ -177,7 +180,6 @@ public class RobotContainer {
         Commands.runOnce(drive::stopWithX, drive));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
-    Trigger Input = new Trigger(() -> (controller2.getLeftTriggerAxis() != 0.0 || controller2.getRightTriggerAxis() != 0.0 || controller2.getRightX() != 0 || (controller2.getLeftY() != 0 && controller2.getLeftY() > 0)));
     // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
     //   () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
     //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
@@ -191,17 +193,21 @@ public class RobotContainer {
     // Reset gyro to 0° when start button is pressed
     Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
       ? () -> drive.setPose(
-driveSim
-                      .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
+                driveSim
+                  .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-    
-    // Sim inputs for controller 2 (copilot)
-    Input.onTrue(Commands.run(() -> armIOSim.runVolts(controller2.getRightX())));
-    Input.onTrue(Commands.run(() -> eleSim.runVolts(controller2.getLeftY())));
-    Input.onTrue(Commands.run(() -> wristSim.runVolts(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis())));
+      controller2.a().onTrue(
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L2_CORAL.getState())));
+
+      controller2.b().onTrue(
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L3_CORAL.getState())));
+      controller2.x().onTrue(
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
+      controller2.y().onTrue(
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.SOURCE.getState())));
 
   }
 
@@ -276,7 +282,7 @@ driveSim
       }
     );
 
-    armSim.update(12, 0, 0);
+    // armSim.update(12, 0, 0);
 
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));

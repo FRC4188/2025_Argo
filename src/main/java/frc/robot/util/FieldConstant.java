@@ -35,6 +35,10 @@ public class FieldConstant {
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
     public class Field {
+        public Pose2d innerCageStart = new Pose2d(new Translation2d(8.007, 5.047), new Rotation2d(0.0));
+        public Pose2d middleCageStart = new Pose2d(new Translation2d(8.007, 6.164), new Rotation2d(0.0));
+        public Pose2d outterCageStart = new Pose2d(new Translation2d(8.007, 7.261), new Rotation2d(0.0));
+
         public static double brg_length = Units.inchesToMeters(23);
         public static double brg_width = Units.inchesToMeters(23);
 

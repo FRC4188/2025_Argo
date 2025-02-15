@@ -104,8 +104,8 @@ public class DriveCommands {
 
         ChassisSpeeds speeds = 
             ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-              xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio / 4.6,
-              ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio / 4.6, 
+              xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio,
+              ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio, 
               rotSpeed), 
               AllianceFlip.apply(drive.getRotation()));
 
