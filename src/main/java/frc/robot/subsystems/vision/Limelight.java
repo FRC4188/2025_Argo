@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveTo;
@@ -206,11 +207,11 @@ public class Limelight extends SubsystemBase {
     });
   }
 
-  public double getTX(String llName){
+  public static double getTX(String llName){
     return LimelightHelpers.getTX(llName);
   }
 
-  public Pose2d targetID(Drive drive){
+  public static Pose2d targetID(Drive drive){
     ArrayList<Pose2d> tags = new ArrayList<Pose2d>();
     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
       tags.add(VisConstants.AprilTagPose.tag6.toPose2d());
@@ -235,11 +236,12 @@ public class Limelight extends SubsystemBase {
     }
   }
 
-  public Command goToTag(Drive drive){
-    return Commands.run(()-> {
-      new DriveTo(drive, targetID(drive), AutoTests.config);
-    });
-  }
+  // public SequentialCommandGroup goToTag(Drive drive){
+  //   return Commands.run(()-> {
+  //     new DriveTo(drive, targetID(drive), AutoTests.config)
+  //     .andThen(null);
+  //   });
+  // }
 
   public boolean isLeftReef(String llName){
     if (getPipeLine(llName) == VisConstants.coralDetect && getTX(llName) <= VisConstants.coralDetect){
