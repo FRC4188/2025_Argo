@@ -106,12 +106,12 @@ public class AngleGen {
         Translation3d t_start = new Translation3d(
             Math.toDegrees(start.getWristAngle()),
             Math.toDegrees(start.getArmAngle()),
-            start.getHeightInch());
+            start.getHeight());
 
         Translation3d t_end = new Translation3d(
             Math.toDegrees(end.getWristAngle()),
             Math.toDegrees(end.getArmAngle()),
-            end.getHeightInch());
+            end.getHeight());
         
 
         ArrayList<Translation3d> imperial = gen_pivots(t_start, t_end);

@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import frc.robot.commands.autos.pathgen.PG_math.PG_lambda;
 import frc.robot.subsystems.scoring.anglegen.SuperTraj.SuperTrajState;
 
 public class SuperTraj {
