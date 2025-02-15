@@ -21,7 +21,6 @@ public class Superstructure extends SubsystemBase{
     private final Wrist wrist;
 
     ArmFF ff;
-    ArmKinematics kinematics;
 
     private final Constraints constraints = new Constraints(960.0, 720.0);
 
@@ -49,7 +48,6 @@ public class Superstructure extends SubsystemBase{
         this.wrist = wrist;
 
         ff = new ArmFF();
-        kinematics = new ArmKinematics();
     }
 
     public void setgoal(SuperPreset goal){
@@ -69,17 +67,18 @@ public class Superstructure extends SubsystemBase{
     @Override
     public void periodic(){
         var state = target.getState();
+        var endPos = target.getState().getCartesian();
         arm.setVolts(
             armPID.calculate(arm.getAngle(), state.getArmAngle())
-            + ff.getArmVoltFF(VecBuilder.fill(state.endEffectorPos().getX(), state.endEffectorPos().getZ()))
+            + ff.getArmVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
         );
         // didnt know i had to finish this class mb ig
         elevator.runVolts(
-            elePID.calculate(elevator.getHeight(), state.getHeightInch())
+            elePID.calculate(elevator.getHeight(), state.getHeight())
         );
         wrist.setAngle(
             wristPID.calculate(wrist.getAngle(), state.getWristAngle() + target.getWristOffset())
-            + ff.getWristVoltFF(VecBuilder.fill(state.endEffectorPos().getX(), state.endEffectorPos().getZ()))
+            + ff.getWristVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
             // Hopefully this is the right FF arguemnts for the wrist
         );
     }
