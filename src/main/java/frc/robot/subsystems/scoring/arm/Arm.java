@@ -89,7 +89,7 @@ public class Arm extends SubsystemBase {
 
     @AutoLogOutput(key = "Arm/Angle Degrees")
     public  double getAngle() {
-        return Rotation2d.fromRadians(inputs.positionRads - armZero).getDegrees();
+        return io.getAngle();
     }
 
     // @AutoLogOutput(key = "Arm/setpoint volt")

@@ -24,7 +24,6 @@ import static frc.robot.Constants.*;
 public class ElevatorIOSim implements ElevatorIO{
     private final DCMotorSim sim;
     private final DCMotor gearbox;
-    private final PIDController controller = new PIDController((12.0 / 483.0) * 3, 0, 0);
     private double appliedVolts = 0.0;
 
     private final TalonFX leader;
@@ -82,7 +81,7 @@ public class ElevatorIOSim implements ElevatorIO{
 
     @Override
     public void runVolts(double volts){
-        appliedVolts = MathUtil.clamp(controller.calculate(sim.getInputVoltage(), volts), -12.0, 12.0);
+        appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
         sim.setInputVoltage(appliedVolts);
     }
 

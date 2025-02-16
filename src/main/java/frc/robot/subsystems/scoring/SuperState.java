@@ -50,9 +50,9 @@ public class SuperState {
     }
 
     public SuperState(Translation3d pose, boolean isCoral){
-        wrist_angle = pose.getX();
-        arm_angle = pose.getY();
-        elevator_height = pose.getZ();
+        wrist_angle = Units.degreesToRadians(pose.getY());
+        arm_angle = Units.degreesToRadians(pose.getX());
+        elevator_height = (pose.getZ());
         this.isCoral = isCoral;
     } 
     
@@ -126,10 +126,10 @@ public class SuperState {
     public static enum SuperPreset{
         L4_CORAL(
             new SuperState(
-                Reef.L4_highest_h - Units.inchesToMeters(20), -25, -30, true)),
+                new Translation3d(Reef.L4_highest_h - Units.inchesToMeters(20), -25, -30), true)),
         L3_CORAL(
             new SuperState(
-                Reef.L3_highest_h - Units.inchesToMeters(20), -30, -25, true)),
+                new Translation3d(Reef.L3_highest_h - Units.inchesToMeters(20), -30, -25), true)),
         L3_ALGAE_REVERSE(
             new SuperState(
                 Reef.L2_highest_h - Units.inchesToMeters(20), -30, -60, true)),
@@ -138,7 +138,7 @@ public class SuperState {
                 Reef.L3_highest_h - Units.inchesToMeters(20), 45, 30, false)),
         L2_CORAL(
             new SuperState(
-                Reef.L2_highest_h - Units.inchesToMeters(20), -30, -25, true)),
+                new Translation3d(Reef.L2_highest_h - Units.inchesToMeters(20), -30, -25), true)),
         L2_ALGAE(
             new SuperState(
                 Reef.L2_highest_h - Units.inchesToMeters(20), 45, 30, false)),
@@ -162,7 +162,7 @@ public class SuperState {
         //         new Translation3d(), false)),
         START(
             new SuperState(
-                0,0,0, false));
+                new Translation3d(0,0,0), false));
 
         private final SuperState state;
 

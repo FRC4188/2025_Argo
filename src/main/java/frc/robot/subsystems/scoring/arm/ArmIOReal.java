@@ -13,10 +13,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Constants.ArmConstants;
 
 public class ArmIOReal implements ArmIO {
     TalonFX armMotor;
@@ -37,23 +39,7 @@ public class ArmIOReal implements ArmIO {
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
         
-        OpenLoopRampsConfigs openLoopRampsConfigs = new OpenLoopRampsConfigs();
-        openLoopRampsConfigs.VoltageOpenLoopRampPeriod = 0.5;
-        armMotor.getConfigurator().apply(openLoopRampsConfigs);
-        
-        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
-        closedLoopRampsConfigs.VoltageClosedLoopRampPeriod = 0.5;
-        armMotor.getConfigurator().apply(closedLoopRampsConfigs);
-
-        armMotor.clearStickyFaults();
-        armEncoder.clearStickyFaults();
-
-        MagnetSensorConfigs sensorConfigs = new MagnetSensorConfigs();
-        sensorConfigs.MagnetOffset = -(armZero / 360.0);
-        sensorConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
-        armEncoder.getConfigurator().apply(sensorConfigs);
-        armMotor.getConfigurator().setPosition(armEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
+        armMotor.getConfigurator().apply(ArmConstants.kMotorConfig);
 
         armMotor.optimizeBusUtilization();
 
@@ -73,6 +59,7 @@ public class ArmIOReal implements ArmIO {
 
     @Override
     public void runVolts(double volts) {
+        volts = MathUtil.clamp(volts,-12, 12);
         armMotor.set(volts);
     }
 

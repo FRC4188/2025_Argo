@@ -6,11 +6,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 import frc.robot.subsystems.scoring.SuperstructureConfig;
+import frc.robot.subsystems.scoring.SuperConstraints.ArmConstraints;
 import frc.robot.subsystems.scoring.SuperstructureConfig;
 // This is definetly wrong but work in progress I think I got the wrong concept
 public class ArmIOSim implements ArmIO {
@@ -34,8 +36,8 @@ public class ArmIOSim implements ArmIO {
             Constants.ArmConstants.kGearRatio,
             SuperstructureConfig.arm.inertiaAbtCoM(), 
             SuperstructureConfig.arm.length(), 
-            Rotation2d.fromDegrees(0.0).getRadians(), 
-            Rotation2d.fromDegrees(0.0).getRadians(),
+            Units.degreesToRadians(ArmConstraints.LOWEST_A), 
+            Units.degreesToRadians(ArmConstraints.HIGHEST_A),
             true,
              0.0
             );
@@ -60,13 +62,13 @@ public class ArmIOSim implements ArmIO {
         }
         sim.update(Constants.robot.loopPeriodSecs);
         inputs.appliedVolts = appliedVolts;
-        inputs.positionRads = sim.getAngularPositionRad();
+        inputs.positionRads = armSim.getAngleRads();
         inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
     } 
 
-    
-    public double getArmAngle(){
-        return armSim.getAngleRads() * (Math.PI / 180);
+    @Override
+    public double getAngle(){
+        return Units.radiansToDegrees(armSim.getAngleRads());
     }
     
     public static enum Mode{

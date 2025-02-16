@@ -8,10 +8,12 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.subsystems.scoring.SuperConstraints;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 
 
 public class Wrist extends SubsystemBase {//J.C
@@ -37,7 +39,7 @@ public class Wrist extends SubsystemBase {//J.C
     Logger.processInputs("Wrist", inputs);    
 
     // wristAngle = pid.calculate(inputs.posRads, targetAngle);
-    wristAngle = inputs.posRads * Math.PI / 180;
+    wristAngle = Rotation2d.fromRadians(inputs.posRads - WristConstants.kZero).getDegrees();
     // io.runVolts(targetAngle * Math.PI / 180);
   }
 
@@ -66,10 +68,10 @@ public class Wrist extends SubsystemBase {//J.C
   //   return encoder.getAbsolutePosition();
   // }
 
-  @AutoLogOutput(key = "Wrist/Setpoint")
-  public double getSetpoint() {
-    return targetAngle;
-  }
+  // @AutoLogOutput(key = "Wrist/Setpoint")
+  // public double getSetpoint() {
+  //   return targetAngle;
+  // }
 
   @AutoLogOutput(key = "Wrist/Angle Degrees")
   public double getAngle(){

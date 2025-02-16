@@ -100,7 +100,8 @@ public final class Constants {
       .withStatorCurrentLimitEnable(true);
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
-      .withSensorToMechanismRatio(kGearRatio);
+      .withSensorToMechanismRatio(kGearRatio)
+      .withFeedbackRotorOffset(kZero);
     
     private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
       .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
@@ -154,6 +155,49 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final double kGearRatio = 5.0625;
+
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kF = 0.0;
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+
+    public static final double kZero = 0; //TODO: get zero
+
+    private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(100)
+      .withSupplyCurrentLimit(60)
+      .withStatorCurrentLimitEnable(true);
+
+    private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
+      .withSensorToMechanismRatio(kGearRatio)
+      .withFeedbackRotorOffset(kZero);
+    
+    private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
+      .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
+      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
+      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
+
+    private static final Slot0Configs kSlot0Configs = new Slot0Configs()
+      .withGravityType(GravityTypeValue.Arm_Cosine)
+      .withKP(kP)
+      .withKD(kI)
+      .withKS(kS)
+      .withKV(kV)
+      .withKA(kA);
+
+    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
+    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
+
+    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
+      .withCurrentLimits(kCurrentLimitsConfigs)
+      .withFeedback(kFeedbackConfigs)
+      .withMotionMagic(kMagicConfigs)
+      .withSlot0(kSlot0Configs)
+      .withClosedLoopRamps(kClosedLoopRampsConfigs)
+      .withOpenLoopRamps(kOpenLoopRampsConfigs);
   }
   
 

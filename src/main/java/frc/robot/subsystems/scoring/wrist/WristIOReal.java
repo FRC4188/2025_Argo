@@ -9,7 +9,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants;
 
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.MathUtil;
 
 import com.revrobotics.RelativeEncoder;
 
@@ -31,10 +34,10 @@ public class WristIOReal implements WristIO {//J.C
 
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true).idleMode(IdleMode.kBrake);
-        config.encoder.positionConversionFactor(1000).velocityConversionFactor(1000);
         config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
         config.idleMode(IdleMode.kBrake);
         config.smartCurrentLimit(kCurrentLimit);
+        config.absoluteEncoder.apply(new AbsoluteEncoderConfig().zeroOffset(kZero));
 
 
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -56,6 +59,7 @@ public class WristIOReal implements WristIO {//J.C
 
     @Override
     public void runVolts(double volts){
+        volts = MathUtil.clamp(volts,-12, 12);
         max.setVoltage(volts);
     }
 }

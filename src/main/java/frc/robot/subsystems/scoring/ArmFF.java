@@ -10,6 +10,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
+import frc.robot.subsystems.scoring.SuperConstraints.ArmConstraints;
+import frc.robot.subsystems.scoring.SuperConstraints.WristConstraints;
 import frc.robot.subsystems.scoring.SuperstructureConfig.Joint;
 
 //https://www.chiefdelphi.com/t/whitepaper-two-jointed-arm-dynamics/423060
@@ -83,6 +85,43 @@ public class ArmFF {
                         arm.getTorque(arm.getCurrent(state.get(2), volt.get(0))),
                         wrist.getTorque(wrist.getCurrent(state.get(3), volt.get(1)))
                     );
+
+                    if (pos.get(0, 0) < ArmConstraints.LOWEST_A) {
+                        pos.set(0, 0, ArmConstraints.LOWEST_A);
+                        if (vel.get(0, 0) < 0.0) {
+                        vel.set(0, 0, 0.0);
+                        }
+                        if (torque.get(0, 0) < 0.0) {
+                        torque.set(0, 0, 0.0);
+                        }
+                    }
+                    if (pos.get(0, 0) > ArmConstraints.HIGHEST_A) {
+                        pos.set(0, 0, ArmConstraints.LOWEST_A);
+                        if (vel.get(0, 0) > 0.0) {
+                        vel.set(0, 0, 0.0);
+                        }
+                        if (torque.get(0, 0) > 0.0) {
+                        torque.set(0, 0, 0.0);
+                        }
+                    }
+                    if (pos.get(1, 0) < WristConstraints.LOWEST_A) {
+                        pos.set(1, 0, WristConstraints.LOWEST_A);
+                        if (vel.get(1, 0) < 0.0) {
+                        vel.set(1, 0, 0.0);
+                        }
+                        if (torque.get(1, 0) < 0.0) {
+                        torque.set(1, 0, 0.0);
+                        }
+                    }
+                    if (pos.get(1, 0) >WristConstraints.HIGHEST_A) {
+                        pos.set(1, 0, WristConstraints.HIGHEST_A);
+                        if (vel.get(1, 0) > 0.0) {
+                        vel.set(1, 0, 0.0);
+                        }
+                        if (torque.get(1, 0) > 0.0) {
+                        torque.set(1, 0, 0.0);
+                        }
+                    }
                     var accel = M(pos).inv()
                         .times(
                             torque.minus(C(vel, pos).times(vel).plus(T(pos)))

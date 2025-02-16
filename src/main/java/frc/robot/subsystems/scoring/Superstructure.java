@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.WristConstants;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.superstructure.SuperToTest;
@@ -42,12 +44,12 @@ public class Superstructure extends SubsystemBase{
 
     private ProfiledPIDController armPID = 
         new ProfiledPIDController(
-            0.2, 0.0, 0.0, 
+            0.1, 0.0, 0.0, 
             constraints);
 
     private PIDController wristPID = 
         new PIDController(
-            10, 0, 0);
+            0.1, 0, 0);
 
     private ProfiledPIDController elePID = 
         new ProfiledPIDController(
@@ -82,68 +84,55 @@ public class Superstructure extends SubsystemBase{
 
     @Override
     public void periodic(){
-        var endPos = target.getEndPos();
+        // var endPos = target.getEndPos();
         //var start = target;
-        current = new SuperState(
-            wrist.getAngle(),
-            arm.getAngle(),
-            elevator.getHeight(), current.isCoral());
+        // current = new SuperState(
+        //     wrist.getAngle(),
+        //     arm.getAngle(),
+        //     elevator.getHeight(), current.isCoral());
+        var ffVolt = ff.calculate(
+            VecBuilder.fill(target.getArmAngle(), target.getWristAngle())
+        );
 
         arm.runVolt(
-            armPID.calculate(Units.degreesToRadians(arm.getAngle()), target.getArmAngle()
-            // + ff.getArmVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
-        ));
+            armPID.calculate(arm.getAngle(), target.getArmAngle())
+            + ffVolt.get(0, 0)
+        );
 
         // didnt know i had to finish this class mb ig
         elevator.runVoltsNC(
             elePID.calculate(elevator.getHeight(), target.getHeight())
         );
         wrist.runVoltsNC(
-            wristPID.calculate(Units.degreesToRadians(wrist.getAngle()), target.getWristAngle() + target.getWristOffset())
-            //   + ff.getWristVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
+            wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
+            + ffVolt.get(1,0)
             // Hopefully this is the right FF arguemnts for the wrist
         );
 
-        
-        // if(current != target){
-        //     Commands.parallel(
-        //     // new SuperToTest(sim, target, AutoTests.config),
-        //     arm.setVolts(
-        //         armPID.calculate(current.getArmAngle(), target.getArmAngle())
-        //         // + ff.getArmVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
-        //     ),
-        //     // didnt know i had to finish this class mb ig
-        //     elevator.runVolts(
-        //         elePID.calculate(elevator.getHeight(), target.getHeight())
-        //     ),
-        //     wrist.runVolts(
-        //         wristPID.calculate(wrist.getAngle(), target.getWristAngle() + target.getWristOffset())
-        //         // + ff.getWristVoltFF(VecBuilder.fill(endPos.getX(), endPos.getY()))
-        //         // Hopefully this is the right FF arguemnts for the wrist
-        //     ));
-        // }
-        
-        if(Constants.robot.currMode == Mode.SIM){
-            // Vector<N4> simstate = ff.simState(VecBuilder.fill(
-            //     endPos.getX(), endPos.getY(), arm.getVel(), wrist.getVel()),
-            // VecBuilder.fill(arm.getVolt(), wrist.getVolt()), Constants.robot.loopPeriodSecs);
+            Vector<N4> simstate = ff.simState(VecBuilder.fill(
+                arm.getAngle(), wrist.getAngle(), arm.getVel(), wrist.getVel()),
+            VecBuilder.fill(arm.getVolt(), wrist.getVolt()), Constants.robot.loopPeriodSecs);
 
-            // Translation3d simState = ArmKinematics.fromPose(new Translation2d(simstate.get(0,0), simstate.get(1,0)), target.isCoral());
-            // SuperState eh = new SuperState(simState, target.isCoral());
+            SuperState eh = new SuperState(new Translation3d( simstate.get(0,0), simstate.get(1,0), target.getHeight()), target.isCoral());
 
-            // sim.update(eh.getHeight(), eh.getArmAngle(), eh.getWristAngle());
-            sim.update(elevator.getHeight(), arm.getAngle(), wrist.getAngle());
-        }
+            sim.update(eh.getHeight(), eh.getArmAngle(), eh.getWristAngle());
+            // sim.update(elevator.getHeight(), arm.getAngle(), wrist.getAngle());
+        
         wrist.periodic();
         arm.periodic();
         elevator.periodic();
-        Logger.recordOutput("Arm setpoint", Units.radiansToDegrees(target.getArmAngle()));
-        Logger.recordOutput("wrist setpoint", Units.radiansToDegrees(target.getWristAngle()));
+        Logger.recordOutput("Arm setpoint", target.getArmAngle());
+        Logger.recordOutput("wrist setpoint", target.getWristAngle());
         Logger.recordOutput("ele setpoint", target.getHeight());
 
     }
 
-
+    private static double applyKs(double volts, double kS, double kSDeadband) {
+        if (Math.abs(volts) < kSDeadband) {
+          return volts;
+        }
+        return volts + Math.copySign(kS, volts);
+      }
     
     
 }//change

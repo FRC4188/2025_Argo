@@ -3,8 +3,14 @@ package frc.robot.subsystems.scoring.wrist;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
+import frc.robot.subsystems.scoring.SuperConstraints;
+import frc.robot.subsystems.scoring.SuperConstraints.ArmConstraints;
+import frc.robot.subsystems.scoring.SuperConstraints.WristConstraints;
+import frc.robot.subsystems.scoring.SuperstructureConfig;
 
 public class WristIOSim implements WristIO{//J.C
     int degreesL1 = 90;
@@ -14,6 +20,7 @@ public class WristIOSim implements WristIO{//J.C
 
     private final DCMotorSim sim;
     private double appliedVolts = 0.0;
+    private SingleJointedArmSim wSim;
 
     public WristIOSim() {
         var plant = LinearSystemId.createDCMotorSystem
@@ -21,12 +28,22 @@ public class WristIOSim implements WristIO{//J.C
         var gearbox = DCMotor.getNeo550(1);
 
         sim = new DCMotorSim(plant, gearbox);
-            //i don't know the SparkMax motor so i just looked one up 
+
+        wSim = new SingleJointedArmSim(
+            DCMotor.getFalcon500(1), 
+            Constants.WristConstants.kGearRatio,
+            SuperstructureConfig.wrist.inertiaAbtCoM(), 
+            SuperstructureConfig.wrist.length(), 
+            Units.degreesToRadians(WristConstraints.LOWEST_A), 
+            Units.degreesToRadians(WristConstraints.HIGHEST_A),
+            true,
+             0.0
+            );
     }
 
     @Override
     public void runVolts(double volts) {
-        appliedVolts = volts;
+        appliedVolts = MathUtil.clamp(volts,-12, 12);
         sim.setInputVoltage(appliedVolts);
     }
 
@@ -34,7 +51,7 @@ public class WristIOSim implements WristIO{//J.C
     public void updateInputs(WristIOInputs inputs) {
         sim.update(Constants.robot.loopPeriodSecs);
         inputs.appliedVolts = appliedVolts;
-        inputs.posRads = sim.getAngularPositionRad();
+        inputs.posRads = wSim.getAngleRads();
         inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
     }
 }
