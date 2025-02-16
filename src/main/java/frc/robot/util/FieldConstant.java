@@ -341,6 +341,16 @@ public class FieldConstant {
         public static Pose2d left_src_wall = new Pose2d(Units.inchesToMeters(31.863), field_width - Units.inchesToMeters(23.8725), Rotation2d.fromDegrees(-54.0112));
         public static double src_length = Units.inchesToMeters(79.268);
 
+        // already in meters, okay?
+        // thanks - def leo
+        public static Pose2d right_approach_bottom_src = new Pose2d(0.650, 1.410, Rotation2d.fromDegrees(-125));
+        public static Pose2d left_approach_bottom_src = new Pose2d(1.700, 0.650, Rotation2d.fromDegrees(-125));
+        public static Pose2d middle_approach_bottom_src = new Pose2d(1.175, 1.030, Rotation2d.fromDegrees(-125));
+
+        public static Pose2d right_approach_top_src = new Pose2d(1.700, 7.370, Rotation2d.fromDegrees(125));
+        public static Pose2d left_approach_top_src = new Pose2d(0.650, 6.600, Rotation2d.fromDegrees(125));
+        public static Pose2d middle_approach_top_src = new Pose2d(1.175, 6.985, Rotation2d.fromDegrees(125));
+
         //order from closets to ds to farthest
         public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3*2, 0);
 
