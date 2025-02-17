@@ -17,13 +17,13 @@ import frc.robot.Constants.WristConstants;
 
 
 public class Wrist extends SubsystemBase {//J.C
+
     private WristIO io;
     private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-
     // private ProfiledPIDController pid = new ProfiledPIDController(Constants.WristConstants.kP, Constants.WristConstants.kI, Constants.WristConstants.kD, Constants.WristConstants.kConstraints);
-    
-    private double targetAngle = 0, wristAngle = 0;
+  
+    private double targetAngle = 0;
 
     public Wrist(WristIO io){
       this.io = io;
@@ -35,28 +35,19 @@ public class Wrist extends SubsystemBase {//J.C
   @Override
   public void periodic(){
     io.updateInputs(inputs);
-    //TODO: fix conversion error ^
     Logger.processInputs("Wrist", inputs);    
-
-    // wristAngle = pid.calculate(inputs.posRads, targetAngle);
-    wristAngle = Rotation2d.fromRadians(inputs.posRads - WristConstants.kZero).getDegrees();
-    // io.runVolts(targetAngle * Math.PI / 180);
   }
 
+  /* 
   public Command setAngle(double angle) {
     return Commands.run(()->{
         targetAngle = angle;
         targetAngle = MathUtil.clamp(targetAngle, SuperConstraints.ArmConstraints.LOWEST_A, SuperConstraints.ArmConstraints.HIGHEST_A);
     });
   }
+  */
 
-  public Command runVolts(double volts) {
-    return Commands.run(()->{
-        io.runVolts(volts);
-    });
-  }
-
-  public void runVoltsNC(double volts) {
+  public void runVolts(double volts) {
     io.runVolts(volts);
   }
 
@@ -73,9 +64,9 @@ public class Wrist extends SubsystemBase {//J.C
   //   return targetAngle;
   // }
 
-  @AutoLogOutput(key = "Wrist/Angle Degrees")
+  @AutoLogOutput(key = "Wrist/Angle Radians")
   public double getAngle(){
-    return wristAngle;
+    return io.getAngle();
   }
 
   public double getVel(){
@@ -88,6 +79,6 @@ public class Wrist extends SubsystemBase {//J.C
 
   @AutoLogOutput(key = "Wrist/isAtGoal")
   public boolean atGoal() {
-    return Math.abs(wristAngle - targetAngle) < Constants.WristConstants.kTolerance;
+    return Math.abs(getAngle() - targetAngle) < Constants.WristConstants.kTolerance;
   }
 }

@@ -36,8 +36,8 @@ public class ArmIOSim implements ArmIO {
             Constants.ArmConstants.kGearRatio,
             SuperstructureConfig.arm.inertiaAbtCoM(), 
             SuperstructureConfig.arm.length(), 
-            Units.degreesToRadians(ArmConstraints.LOWEST_A), 
-            Units.degreesToRadians(ArmConstraints.HIGHEST_A),
+            ArmConstraints.LOWEST_A, 
+            ArmConstraints.HIGHEST_A,
             true,
              0.0
             );
@@ -68,7 +68,7 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public double getAngle(){
-        return Units.radiansToDegrees(armSim.getAngleRads());
+        return sim.getAngularPositionRad();
     }
     
     public static enum Mode{

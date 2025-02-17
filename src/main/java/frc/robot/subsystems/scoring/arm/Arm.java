@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-    private static Arm instance = null;
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs;
     // maybe work
@@ -22,15 +21,6 @@ public class Arm extends SubsystemBase {
     double tolerance = 0.05;
     double target = 0;
     
-    private static final double MIN_ANGLE = 0;
-    private static final double MAX_ANGLE = 3;
-    
-    public static Arm getInstance(ArmIO io) {
-        if (instance == null) {
-            instance = new Arm(io);
-        }
-        return instance;
-    }
 
     public enum ArmPreset{
         MAX,
@@ -40,8 +30,7 @@ public class Arm extends SubsystemBase {
     public Arm(ArmIO io) {
         this.io = io;
         inputs = new ArmIOInputsAutoLogged();
-        // armPID.enableContinuousInput(0, 360);
-        // armPID.setTolerance(2.0);
+
     }
     
     @Override
@@ -87,7 +76,7 @@ public class Arm extends SubsystemBase {
     }
     // The following commands will be used for going to 
 
-    @AutoLogOutput(key = "Arm/Angle Degrees")
+    @AutoLogOutput(key = "Arm/Angle Radians")
     public  double getAngle() {
         return io.getAngle();
     }

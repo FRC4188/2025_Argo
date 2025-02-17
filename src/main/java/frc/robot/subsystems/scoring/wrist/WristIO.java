@@ -12,9 +12,13 @@ public interface WristIO {//J.C
         public double tempC = 0.0;
         public double posRads = 0.0;
         public double velRadsPerSec = 0.0;
+        public double desiredPositionRads = 0.0;
+        public double desiredVelocityRadPerSec = 0.0;
     }
 
     default void updateInputs(WristIOInputs inputs) {}
     default void runVolts(double volts) {}
+    default double getAngle() {return 0;}
+    default void stop() {}
 
 }

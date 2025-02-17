@@ -13,12 +13,14 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants;
 import frc.robot.commands.autos.pathgen.PG_math;
 import frc.robot.commands.autos.pathgen.fieldobjects.CircleFO;
 import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
 import frc.robot.commands.autos.pathgen.fieldobjects.PolygonFO;
 import frc.robot.commands.autos.pathgen.fieldobjects.RectFO;
+import frc.robot.subsystems.scoring.SuperConstraints;
 import frc.robot.subsystems.scoring.SuperState;
 import frc.robot.util.FieldConstant;
 
@@ -36,7 +38,15 @@ public class AngleGen {
 	public AngleGen(float sample, float clearance) {
         this.clearance = clearance;
 
-        a_star = new Grid(-100, 100, -180, 180, 0, 70, 10);
+        a_star = new Grid(
+            (float)SuperConstraints.WristConstraints.LOWEST_A,
+            (float)SuperConstraints.WristConstraints.HIGHEST_A,
+            (float)SuperConstraints.ArmConstraints.LOWEST_A,
+            (float)SuperConstraints.ArmConstraints.HIGHEST_A,
+            0,
+            (float)SuperConstraints.ElevatorConstraints.RANGE,
+            sample
+        );
 
         update_obstacles();
     }
@@ -47,6 +57,7 @@ public class AngleGen {
 
 
     public void update_obstacles() {
+        //inches because i pilled this from desmos and cad
         Translation2d b_tl = new Translation2d(-5.195177165, 18.24324);
         Translation2d b_tr = new Translation2d(-5.195177165, -18.24324);
         Translation2d b_br = new Translation2d(-9.132677165, -18.24324);
@@ -63,20 +74,20 @@ public class AngleGen {
         for (short x = 0; x < a_star.length; x++) {
             for (short y = 0; y < a_star.width; y++) {
                 for (short z = 0; z < a_star.height; z++) {
-                Translation3d pos = a_star.node_to_t3d(a_star.nodes[x][y][z]);
+                SuperState pos = a_star.node_to_state(a_star.nodes[x][y][z]);
 
-                Translation2d worigin = new Translation2d(pos.getZ(), 0).plus(
-                    new Translation2d(16.1378264837, 0).rotateBy(Rotation2d.fromDegrees(pos.getY())));
+                Translation2d worigin = new Translation2d(Units.metersToInches(pos.getEleHeight()), 0).plus(
+                    new Translation2d(16.1378264837, 0).rotateBy(Rotation2d.fromRadians(pos.getArmAngle())));
                 
-                Translation2d w_tr = worigin.plus(new Translation2d(13.1989, -9.443734).rotateBy(Rotation2d.fromDegrees(pos.getY() + pos.getX())));
-                Translation2d w_br = worigin.plus(new Translation2d(2.619168, -9.443734).rotateBy(Rotation2d.fromDegrees(pos.getY() + pos.getX())));
-                Translation2d w_tl = worigin.plus(new Translation2d(13.1989, 9.443734).rotateBy(Rotation2d.fromDegrees(pos.getY() + pos.getX())));
-                Translation2d w_bl = worigin.plus(new Translation2d(2.619168, 9.443734).rotateBy(Rotation2d.fromDegrees(pos.getY() + pos.getX())));
+                Translation2d w_tr = worigin.plus(new Translation2d(13.1989, -9.443734).rotateBy(Rotation2d.fromRadians(pos.getGlobalAngle())));
+                Translation2d w_br = worigin.plus(new Translation2d(2.619168, -9.443734).rotateBy(Rotation2d.fromRadians(pos.getGlobalAngle())));
+                Translation2d w_tl = worigin.plus(new Translation2d(13.1989, 9.443734).rotateBy(Rotation2d.fromRadians(pos.getGlobalAngle())));
+                Translation2d w_bl = worigin.plus(new Translation2d(2.619168, 9.443734).rotateBy(Rotation2d.fromRadians(pos.getGlobalAngle())));
 
-                Translation2d ec_tr = c_tr.plus(new Translation2d(pos.getZ(), 0));
-                Translation2d ec_tl = c_tl.plus(new Translation2d(pos.getZ(), 0));
-                Translation2d ec_br = c_br.plus(new Translation2d(pos.getZ(), 0));
-                Translation2d ec_bl = c_bl.plus(new Translation2d(pos.getZ(), 0));
+                Translation2d ec_tr = c_tr.plus(new Translation2d(Units.metersToInches(pos.getEleHeight()), 0));
+                Translation2d ec_tl = c_tl.plus(new Translation2d(Units.metersToInches(pos.getEleHeight()), 0));
+                Translation2d ec_br = c_br.plus(new Translation2d(Units.metersToInches(pos.getEleHeight()), 0));
+                Translation2d ec_bl = c_bl.plus(new Translation2d(Units.metersToInches(pos.getEleHeight()), 0));
                 
                 a_star.nodes[x][y][z].obstacle = 
                     a_star.nodes[x][y][z].obstacle ||
@@ -102,37 +113,19 @@ public class AngleGen {
 
     }
 
-    public SuperTraj generateTrajectory(SuperState start, SuperState end, TrajectoryConfig config) {
-        Translation3d t_start = new Translation3d(
-            Math.toDegrees(start.getWristAngle()),
-            Math.toDegrees(start.getArmAngle()),
-            start.getHeight());
+    public SuperTraj generateTrajectory(SuperState start, SuperState end, TrapezoidProfile tp) {
+        ArrayList<SuperState> result = gen_pivots(start, end);
 
-        Translation3d t_end = new Translation3d(
-            Math.toDegrees(end.getWristAngle()),
-            Math.toDegrees(end.getArmAngle()),
-            end.getHeight());
-        
-
-        ArrayList<Translation3d> imperial = gen_pivots(t_start, t_end);
-        ArrayList<Translation3d> metric = new ArrayList<>();
-
-        for (Translation3d t : imperial) {
-            metric.add(new Translation3d(
-                Units.degreesToRadians(t.getX()),
-                Units.degreesToRadians(t.getY()),
-                Units.inchesToMeters(t.getZ())));
-        }
-
-        return SuperTraj.generateSuperTraj(metric, Units.inchesToMeters(Math.min(a_star.x_scale, a_star.y_scale)), config);
+        return new SuperTraj(result, (result.size() - 1), tp);
     }
 
-	public ArrayList<Translation3d> gen_pivots(Translation3d start, Translation3d end) {
-        ArrayList<Translation3d> pivots = new ArrayList<Translation3d>();
+    //TODO: reduce pivots to reduce awkward movement
+	public ArrayList<SuperState> gen_pivots(SuperState start, SuperState end) {
+        ArrayList<SuperState> pivots = new ArrayList<SuperState>();
 
         ArrayList<Node> backward_nodes = new ArrayList<Node>();
 
-        if(!a_star.pathFind(a_star.t3d_to_node(start), a_star.t3d_to_node(end))) return pivots;
+        if(!a_star.pathFind(a_star.state_to_node(start), a_star.state_to_node(end))) return pivots;
 
 	    Node curNode = a_star.endNode;
 
@@ -142,32 +135,11 @@ public class AngleGen {
         }
 
         for (int i = backward_nodes.size() - 1; i >= 0; i--) {
-		    pivots.add(a_star.node_to_t3d(backward_nodes.get(i)));
-	    }
-
-	    if (pivots.size() < 2) return pivots;
-
-        //these two conditions are technically bound checkers, will manipulate more with later
-        /* 
-	    if (a_star.t3d_to_node(start) == backward_nodes.get(backward_nodes.size() - 1)) {
-            pivots.remove(0);
-        }
-
-	    if (a_star.t3d_to_node(end) == backward_nodes.get(0)) {
-            pivots.remove(pivots.size() - 1);
-        }
-        */
-        
-        //interpolation
-	    if (pivots.size() == 0) {
-		    pivots.add(end.plus(start.minus(end).times(0.5)));
+		    pivots.add(a_star.node_to_state(backward_nodes.get(i)));
 	    }
         
 	    return pivots;
     }
-
-    
-
 
     private static class Node {
         public short x = -1, y = -1, z = -1;
@@ -344,18 +316,18 @@ public class AngleGen {
             return (float)Math.hypot(a.z - b.z, Math.hypot(a.x - b.x, a.y - b.y));
         }
         
-        Translation3d node_to_t3d(Node node) {
-            return new Translation3d(
+        SuperState node_to_state(Node node) {
+            return new SuperState(
                 x_scale * (node.x - 0.5) + x_offset, 
                 y_scale * (node.y - 0.5) + y_offset, 
                 z_scale * (node.z - 0.5) + z_offset);
         }
 
-        Node t3d_to_node(Translation3d pose) {
+        Node state_to_node(SuperState pose) {
             return getNode(
-                (short)((pose.getX() - x_offset) / x_scale + 1), 
-                (short)((pose.getY() - y_offset) / y_scale + 1), 
-                (short)((pose.getZ() - z_offset) / z_scale + 1));
+                (short)((pose.getWristAngle() - x_offset) / x_scale + 1), 
+                (short)((pose.getArmAngle() - y_offset) / y_scale + 1), 
+                (short)((pose.getEleHeight() - z_offset) / z_scale + 1));
         }
     };
 }

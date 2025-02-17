@@ -13,10 +13,6 @@ import frc.robot.subsystems.scoring.SuperConstraints.WristConstraints;
 import frc.robot.subsystems.scoring.SuperstructureConfig;
 
 public class WristIOSim implements WristIO{//J.C
-    int degreesL1 = 90;
-    int degreesL2 = 110;
-    int degreesL3 = 130;
-    int degreesL4 = 150;//none of these are actual numbers
 
     private final DCMotorSim sim;
     private double appliedVolts = 0.0;
@@ -34,8 +30,8 @@ public class WristIOSim implements WristIO{//J.C
             Constants.WristConstants.kGearRatio,
             SuperstructureConfig.wrist.inertiaAbtCoM(), 
             SuperstructureConfig.wrist.length(), 
-            Units.degreesToRadians(WristConstraints.LOWEST_A), 
-            Units.degreesToRadians(WristConstraints.HIGHEST_A),
+            WristConstraints.LOWEST_A, 
+            WristConstraints.HIGHEST_A,
             true,
              0.0
             );

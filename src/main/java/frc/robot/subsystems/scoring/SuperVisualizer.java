@@ -72,30 +72,25 @@ public class SuperVisualizer {
     }
 
 
-    public void update(double elevatorHeight, double armAngle, double wristAngle){
-        
-        //wrist's gear to algae specific gummy wheel is 14.26 inches
-        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, SuperConstraints.ElevatorConstraints.RANGE);
-        elevatorHeight = Meters.convertFrom(elevatorHeight, Inches);
+    public void update(SuperState state){
 
-        armLig.setAngle(armAngle);
-        wristLig.setAngle(wristAngle);
-        elevatorLig.setLength(elevatorHeight);
+        armLig.setAngle(state.getArmAngle());
+        wristLig.setAngle(state.getWristAngle());
+        elevatorLig.setLength(state.getEleHeight());
         //Logger.recordOutput("Mechanism2d", mainMech);
 
         //update pose3d for 3d simulation (ligaments alone are 2d)
         Pose3d carriage = carriageOrigin.transformBy(
             new Transform3d(
-                new Translation3d(0, 0, -elevatorHeight),
+                new Translation3d(0, 0, -state.getEleHeight()),
                 new Rotation3d(0, 0, 0)
             )
         );
 
-        //Pose3d armPos = new Pose3d(-0.231965, 0, 0.231965, new Rotation3d(0, Units.degreesToRadians(90), 0));
         Pose3d armPos = armOrigin.transformBy(
             new Transform3d(
-                new Translation3d(0, 0, -elevatorHeight),
-                new Rotation3d(0, Units.degreesToRadians(armAngle), 0)
+                new Translation3d(0, 0, -state.getEleHeight()),
+                new Rotation3d(0, state.getArmAngle(), 0)
             )
         );
         
@@ -105,32 +100,27 @@ public class SuperVisualizer {
         ).rotateAround(new Translation2d(
             armOrigin.getX(),
             armOrigin.getZ()
-        ), Rotation2d.fromDegrees(armAngle));
+        ), Rotation2d.fromRadians(state.getArmAngle()));
 
         Pose3d wristPos = new Pose3d(
                 new Translation3d(wrist_rotate.getX(), wristOrigin.getY(), wrist_rotate.getY()),
                 wristOrigin.getRotation()
         ).transformBy(
             new Transform3d(
-                new Translation3d(0, 0, -elevatorHeight),
-                new Rotation3d(0, Units.degreesToRadians(wristAngle +  armAngle), 0)
+                new Translation3d(0, 0, -state.getEleHeight()),
+                new Rotation3d(0,state.getGlobalAngle(), 0)
             )
         );
         SwerveDriveSimulation driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
 
-        Pose3d endEffectorPos = new Pose3d(
-            new Translation3d(
-                driveSim.getSimulatedDriveTrainPose().getX() 
-                    + wristOrigin.getX()
-                    + wrist.length() * Math.sin(-wristAngle),
-                driveSim.getSimulatedDriveTrainPose().getY() 
-                    + wristOrigin.getY(),
-                    // + wrist.length()/2 * Math.cos(wristAngle),
-                wristPos.getZ() + wrist.length() + (wrist.length() - Math.abs((wrist.length() * Math.tan(wristAngle))))),
-            new Rotation3d(
-                wristPos.getRotation().getX(), 
-                wristPos.getRotation().getY() - Math.toRadians(-90), 
-                wristPos.getRotation().getZ() + driveSim.getSimulatedDriveTrainPose().getRotation().getDegrees()));
+        Pose3d endEffectorPos = wristPos.transformBy(
+            new Transform3d(
+                new Translation3d(
+                    driveSim.getSimulatedDriveTrainPose().getTranslation().getX(),
+                    driveSim.getSimulatedDriveTrainPose().getTranslation().getY(),
+                    0),
+                new Rotation3d(0, 0, driveSim.getSimulatedDriveTrainPose().getRotation().getRadians())
+            ));
 
         
         Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos, endEffectorPos);

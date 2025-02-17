@@ -25,7 +25,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -39,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.FollowPath;
+import frc.robot.commands.superstructure.SuperToTest;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -93,7 +97,6 @@ public class RobotContainer {
   private Arm arm;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
-  private SuperVisualizer armSim;
   private Superstructure superstructure;
 
   // Controller
@@ -145,6 +148,7 @@ public class RobotContainer {
                 driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
+
         superstructure = new Superstructure(new Arm(new ArmIOSim()), Elevator.getInstance(new ElevatorIOSim()), new Wrist(new WristIOSim()));
         break;
 
@@ -201,7 +205,7 @@ public class RobotContainer {
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
-      
+      /* 
       controller2.a().onTrue(
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L2_CORAL.getState())));
 
@@ -210,7 +214,7 @@ public class RobotContainer {
       controller2.x().onTrue(
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));*/
 
   }
 
@@ -251,7 +255,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoTests.AG2Coral(drive);
+
+     return new InstantCommand(() -> superstructure.setgoal(new SuperState(new Translation2d(Units.inchesToMeters(-20), Units.inchesToMeters(50)), -Math.PI/4, true)));
   }
 
   public void resetSimulation(){
@@ -284,8 +289,6 @@ public class RobotContainer {
         )
       }
     );
-
-    // armSim.update(12, 0, 0);
 
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));

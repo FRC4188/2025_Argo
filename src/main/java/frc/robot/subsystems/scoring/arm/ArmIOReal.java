@@ -80,6 +80,6 @@ public class ArmIOReal implements ArmIO {
 
     @Override
     public double getAngle(){
-        return posRads.getValueAsDouble() * (Math.PI / 180);
+        return posRads.getValueAsDouble();
     }
 }

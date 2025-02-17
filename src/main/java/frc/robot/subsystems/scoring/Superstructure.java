@@ -36,6 +36,7 @@ public class Superstructure extends SubsystemBase{
     private final Arm arm;
     private final Elevator elevator;
     private final Wrist wrist;
+
     private final SuperVisualizer sim;
 
     ArmFF ff;
@@ -64,16 +65,20 @@ public class Superstructure extends SubsystemBase{
         this.arm = arm;
         this.elevator = elevator;
         this.wrist = wrist;
-        sim = new SuperVisualizer("Superstructure Sim");
+        sim = new SuperVisualizer("Superstructure");
         ff = new ArmFF();
         this.current = new SuperState(
             wrist.getAngle(),
             arm.getAngle(),
-            elevator.getHeight(), false);
+            elevator.getHeight());
+
+        current = new SuperState(0, 0, 0);
     }
 
     public void setgoal(SuperState goal){
         target = goal;
+
+        System.out.println("target updated to: " + goal);
     }
 
     // public void setSystem(double wristvolt, double armvolt, double elevolt){
@@ -84,28 +89,31 @@ public class Superstructure extends SubsystemBase{
 
     @Override
     public void periodic(){
-        // var endPos = target.getEndPos();
-        //var start = target;
-        // current = new SuperState(
-        //     wrist.getAngle(),
-        //     arm.getAngle(),
-        //     elevator.getHeight(), current.isCoral());
+
+        current = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
+
+        sim.update(current);
+
         var ffVolt = ff.calculate(
             VecBuilder.fill(target.getArmAngle(), target.getWristAngle())
         );
 
         arm.runVolt(
             armPID.calculate(arm.getAngle(), target.getArmAngle())
-            + ffVolt.get(0, 0)
+            //+ ffVolt.get(0, 0)
+            //^- until singlejointedarmsim gets workin, using for other stuff like autos
         );
 
         // didnt know i had to finish this class mb ig
         elevator.runVoltsNC(
-            elePID.calculate(elevator.getHeight(), target.getHeight())
+            elePID.calculate(elevator.getHeight(), target.getEleHeight())
         );
-        wrist.runVoltsNC(
+        wrist.runVolts(
             wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
-            + ffVolt.get(1,0)
+            //+ ffVolt.get(1,0)
             // Hopefully this is the right FF arguemnts for the wrist
         );
 
@@ -113,17 +121,17 @@ public class Superstructure extends SubsystemBase{
                 arm.getAngle(), wrist.getAngle(), arm.getVel(), wrist.getVel()),
             VecBuilder.fill(arm.getVolt(), wrist.getVolt()), Constants.robot.loopPeriodSecs);
 
-            SuperState eh = new SuperState(new Translation3d( simstate.get(0,0), simstate.get(1,0), target.getHeight()), target.isCoral());
+            //SuperState eh = new SuperState(new ( simstate.get(0,0), simstate.get(1,0), target.getEleHeight()), 0.5, true);
 
-            sim.update(eh.getHeight(), eh.getArmAngle(), eh.getWristAngle());
-            // sim.update(elevator.getHeight(), arm.getAngle(), wrist.getAngle());
+            //sim.update(eh.getEleHeight(), eh.getArmAngle(), eh.getWristAngle());
+        
         
         wrist.periodic();
         arm.periodic();
         elevator.periodic();
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
         Logger.recordOutput("wrist setpoint", target.getWristAngle());
-        Logger.recordOutput("ele setpoint", target.getHeight());
+        Logger.recordOutput("ele setpoint", target.getEleHeight());
 
     }
 
