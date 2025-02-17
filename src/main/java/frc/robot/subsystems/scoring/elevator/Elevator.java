@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.SuperConstraints;
-import frc.robot.subsystems.scoring.SuperstructureConfig;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 

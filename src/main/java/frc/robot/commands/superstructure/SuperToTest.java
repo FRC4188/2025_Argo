@@ -5,10 +5,10 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.scoring.SuperState;
-import frc.robot.subsystems.scoring.SuperVisualizer;
-import frc.robot.subsystems.scoring.anglegen.AngleGen;
-import frc.robot.subsystems.scoring.anglegen.SuperTraj;
+import frc.robot.commands.superstructure.anglegen.AngleGen;
+import frc.robot.commands.superstructure.anglegen.SuperTraj;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 
 public class SuperToTest extends Command {
     

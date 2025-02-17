@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.Matrix;
-import frc.robot.subsystems.scoring.SuperState;
-import frc.robot.subsystems.scoring.SuperState.SuperPreset;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 
 public class TaskGen {
     

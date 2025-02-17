@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring.anglegen;
+package frc.robot.commands.superstructure.anglegen;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +20,8 @@ import frc.robot.commands.autos.pathgen.fieldobjects.CircleFO;
 import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
 import frc.robot.commands.autos.pathgen.fieldobjects.PolygonFO;
 import frc.robot.commands.autos.pathgen.fieldobjects.RectFO;
-import frc.robot.subsystems.scoring.SuperConstraints;
-import frc.robot.subsystems.scoring.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.util.FieldConstant;
 
 public class AngleGen {

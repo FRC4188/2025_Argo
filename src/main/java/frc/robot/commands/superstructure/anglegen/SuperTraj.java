@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring.anglegen;
+package frc.robot.commands.superstructure.anglegen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import frc.robot.subsystems.scoring.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
 
 public class SuperTraj {
     private final double m_totalTimeSeconds;

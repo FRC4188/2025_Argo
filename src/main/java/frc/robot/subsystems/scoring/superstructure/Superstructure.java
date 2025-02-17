@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring;
+package frc.robot.subsystems.scoring.superstructure;
 import java.time.LocalDate;
 
 import org.littletonrobotics.junction.Logger;
@@ -24,33 +24,45 @@ import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.WristConstants;
+import frc.robot.Constants.robot;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.superstructure.SuperToTest;
-import frc.robot.subsystems.scoring.SuperState.*;
 import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIOReal;
+import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOInputsAutoLogged;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.wrist.Wrist;
+import frc.robot.subsystems.scoring.wrist.WristIO;
+import frc.robot.subsystems.scoring.wrist.WristIOReal;
+import frc.robot.subsystems.scoring.wrist.WristIOSim;
 
 public class Superstructure extends SubsystemBase{
     private final Arm arm;
     private final Elevator elevator;
     private final Wrist wrist;
 
-    private final SuperVisualizer sim;
+    private SuperVisualizer sim;
 
     ArmFF ff;
 
-    private final Constraints constraints = new Constraints(960.0, 720.0);
+    private final Constraints constraints = new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0));
 
     private ProfiledPIDController armPID = 
         new ProfiledPIDController(
             0.1, 0.0, 0.0, 
             constraints);
 
-    private PIDController wristPID = 
-        new PIDController(
-            0.1, 0, 0);
+    private ProfiledPIDController wristPID = 
+        new ProfiledPIDController(
+            0.1, 0, 0,
+            constraints);
+
+    
 
     private ProfiledPIDController elePID = 
         new ProfiledPIDController(
@@ -60,32 +72,40 @@ public class Superstructure extends SubsystemBase{
     private SuperState target;
     private SuperState current;
     
-    public Superstructure(Arm arm, Elevator elevator, Wrist wrist){
-        target = SuperPreset.START.getState();
-        this.arm = arm;
-        this.elevator = elevator;
-        this.wrist = wrist;
+    public Superstructure(Mode mode){
+        switch (mode) {
+            case REAL:
+                this.arm = new Arm(new ArmIOReal());
+                this.wrist = new Wrist(new WristIOReal());
+                this.elevator = Elevator.getInstance(new ElevatorIOReal());
+                break;
+            case SIM: 
+                this.arm = new Arm(new ArmIOSim());
+                this.wrist = new Wrist(new WristIOSim());
+                this.elevator = Elevator.getInstance(new ElevatorIOSim());
+                break;
+            default: 
+                this.arm = new Arm(new ArmIOSim());
+                this.wrist = new Wrist(new WristIOSim());
+                this.elevator = Elevator.getInstance(new ElevatorIOSim());
+        }
         sim = new SuperVisualizer("Superstructure");
+
+        target = SuperPreset.START.getState();
+
         ff = new ArmFF();
+
         this.current = new SuperState(
             wrist.getAngle(),
             arm.getAngle(),
             elevator.getHeight());
-
-        current = new SuperState(0, 0, 0);
     }
 
     public void setgoal(SuperState goal){
         target = goal;
 
-        System.out.println("target updated to: " + goal);
     }
 
-    // public void setSystem(double wristvolt, double armvolt, double elevolt){
-    //     wrist.runVolts(wristvolt);
-    //     arm.runVolt(armvolt);
-    //     elevator.runVolts(elevolt);
-    // }
 
     @Override
     public void periodic(){
@@ -107,24 +127,15 @@ public class Superstructure extends SubsystemBase{
             //^- until singlejointedarmsim gets workin, using for other stuff like autos
         );
 
-        // didnt know i had to finish this class mb ig
         elevator.runVoltsNC(
             elePID.calculate(elevator.getHeight(), target.getEleHeight())
         );
+
         wrist.runVolts(
             wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
-            //+ ffVolt.get(1,0)
-            // Hopefully this is the right FF arguemnts for the wrist
+            
         );
 
-            Vector<N4> simstate = ff.simState(VecBuilder.fill(
-                arm.getAngle(), wrist.getAngle(), arm.getVel(), wrist.getVel()),
-            VecBuilder.fill(arm.getVolt(), wrist.getVolt()), Constants.robot.loopPeriodSecs);
-
-            //SuperState eh = new SuperState(new ( simstate.get(0,0), simstate.get(1,0), target.getEleHeight()), 0.5, true);
-
-            //sim.update(eh.getEleHeight(), eh.getArmAngle(), eh.getWristAngle());
-        
         
         wrist.periodic();
         arm.periodic();
@@ -143,4 +154,4 @@ public class Superstructure extends SubsystemBase{
       }
     
     
-}//change
+}

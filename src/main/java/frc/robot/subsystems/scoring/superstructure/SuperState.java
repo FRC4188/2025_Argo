@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring;
+package frc.robot.subsystems.scoring.superstructure;
 
 import java.util.ArrayList;
 

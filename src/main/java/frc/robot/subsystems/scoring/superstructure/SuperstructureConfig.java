@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring;
+package frc.robot.subsystems.scoring.superstructure;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;

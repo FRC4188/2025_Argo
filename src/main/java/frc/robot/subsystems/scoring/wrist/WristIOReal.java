@@ -18,20 +18,15 @@ import com.revrobotics.RelativeEncoder;
 
 import static frc.robot.Constants.WristConstants.*;
 
-public class WristIOReal implements WristIO {//J.C
-    private SparkMax max = new SparkMax(1, MotorType.kBrushless);
-    private RelativeEncoder encoder;
+public class WristIOReal implements WristIO {
+    private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
+    private final RelativeEncoder encoder;
 
-    private final double appliedVolts;
-    private final double tempC;
-    private final double posRads;
-    private final double velRadsPerSec;
+    private double appliedVolts;
+    private double tempC;
+    private double posRads;
 
     public WristIOReal(){
-
-
-        max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
-
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true).idleMode(IdleMode.kBrake);
         config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
@@ -39,22 +34,8 @@ public class WristIOReal implements WristIO {//J.C
         config.smartCurrentLimit(kCurrentLimit);
         config.absoluteEncoder.apply(new AbsoluteEncoderConfig().zeroOffset(kZero));
 
-
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
-        tempC = max.getMotorTemperature();
         encoder = max.getEncoder();
-
-        posRads = encoder.getPosition();
-        velRadsPerSec = encoder.getVelocity();
-    }
-
-    @Override
-    public void updateInputs(WristIOInputs inputs) {
-        inputs.appliedVolts = appliedVolts;
-        inputs.tempC = tempC;
-        inputs.posRads = posRads;
-        inputs.velRadsPerSec = velRadsPerSec;
     }
 
     @Override
@@ -62,4 +43,27 @@ public class WristIOReal implements WristIO {//J.C
         volts = MathUtil.clamp(volts,-12, 12);
         max.setVoltage(volts);
     }
+
+    @Override  
+    public void stop() {
+        runVolts(0);
+    }
+
+    @Override
+    public void updateInputs(WristIOInputs inputs) {
+        appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
+        tempC = max.getMotorTemperature();        
+        posRads = encoder.getPosition() / (2*Math.PI);
+
+        inputs.appliedVolts = appliedVolts;
+        inputs.tempC = tempC;
+        inputs.posRads = posRads;
+    }
+
+    @Override
+    public double getAngle() {
+        return posRads;
+    }
+
+    
 }

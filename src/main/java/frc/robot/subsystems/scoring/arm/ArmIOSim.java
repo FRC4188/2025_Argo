@@ -11,15 +11,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.SuperstructureConfig;
-import frc.robot.subsystems.scoring.SuperConstraints.ArmConstraints;
-import frc.robot.subsystems.scoring.SuperstructureConfig;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ArmConstraints;
 // This is definetly wrong but work in progress I think I got the wrong concept
 public class ArmIOSim implements ArmIO {
     private final DCMotorSim sim;
     private double appliedVolts = 0.0;
     private SingleJointedArmSim armSim;
-    
     
     //random values for moment of inertia and gearing cuz not that important for precision
     public ArmIOSim() {
@@ -46,6 +44,7 @@ public class ArmIOSim implements ArmIO {
     @Override
     public void runVolts(double volts) {
         appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+
         sim.setInputVoltage(appliedVolts);
         armSim.setInputVoltage(appliedVolts);
     }
@@ -63,16 +62,11 @@ public class ArmIOSim implements ArmIO {
         sim.update(Constants.robot.loopPeriodSecs);
         inputs.appliedVolts = appliedVolts;
         inputs.positionRads = armSim.getAngleRads();
-        inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
     } 
 
     @Override
     public double getAngle(){
         return sim.getAngularPositionRad();
-    }
-    
-    public static enum Mode{
-        L1, L2_3, L4;
     }
     
 }

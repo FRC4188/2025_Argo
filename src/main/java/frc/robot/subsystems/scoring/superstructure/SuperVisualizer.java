@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring;
+package frc.robot.subsystems.scoring.superstructure;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -24,12 +24,10 @@ import frc.robot.util.FieldConstant;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
+import static frc.robot.subsystems.scoring.superstructure.SuperstructureConfig.*;
 
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
-
-import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
 
 public class SuperVisualizer {
     Mechanism2d mainMech;

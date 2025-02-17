@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.FollowPath;
@@ -54,16 +55,16 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
-import frc.robot.subsystems.scoring.SuperState;
-import frc.robot.subsystems.scoring.SuperVisualizer;
-import frc.robot.subsystems.scoring.Superstructure;
-import frc.robot.subsystems.scoring.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.arm.ArmIO;
 import frc.robot.subsystems.scoring.arm.ArmIOReal;
 import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
+import frc.robot.subsystems.scoring.superstructure.Superstructure;
+import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.wrist.Wrist;
 import frc.robot.subsystems.scoring.wrist.WristIOSim;
 import frc.robot.subsystems.scoring.arm.ArmIO.ArmIOInputs;
@@ -123,7 +124,7 @@ public class RobotContainer {
         vis = new Limelight(drive, 
             new VisionIOLL("limelight-back", drive::getRotation),
             new VisionIOLL("limelight-front", drive::getRotation));
-      arm = new Arm(new ArmIOReal());
+            superstructure = new Superstructure(Mode.REAL);
         break;
 
       case SIM:
@@ -149,7 +150,7 @@ public class RobotContainer {
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
-        superstructure = new Superstructure(new Arm(new ArmIOSim()), Elevator.getInstance(new ElevatorIOSim()), new Wrist(new WristIOSim()));
+        superstructure = new Superstructure(Mode.SIM);
         break;
 
       default:
@@ -256,7 +257,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-     return new InstantCommand(() -> superstructure.setgoal(new SuperState(new Translation2d(Units.inchesToMeters(-20), Units.inchesToMeters(50)), -Math.PI/4, true)));
+     return new InstantCommand(() -> superstructure.setgoal(new SuperState(Math.PI / 4, -Math.PI/4, 0.5)));
   }
 
   public void resetSimulation(){

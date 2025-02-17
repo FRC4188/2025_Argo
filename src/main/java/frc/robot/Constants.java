@@ -83,11 +83,6 @@ public final class Constants {
     public static final int kIntake = 21;
   }
 
-  //TODO: wuts dis??
-  // public class mode{
-  //   int real = 0; 
-  // }
-
   public static class ElevatorConstants{    
     public static final double kDrumeRadius = Units.inchesToMeters(0.75000 / 2); //TODO: get drum radius
 
@@ -129,8 +124,8 @@ public final class Constants {
   }
   public static class WristConstants {
 
-    public static final double kMax_Vel = 960.0;
-    public static final double kMax_Accel = 720.0;
+    public static final double kMax_Vel = Units.degreesToRadians(960.0);
+    public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(0.325, 0.0, 0.02, kConstraints);
@@ -164,6 +159,7 @@ public final class Constants {
     public static final double kV = 0.0;
     public static final double kA = 0.0;
 
+    public static final double kTolerance = 0.75;
     public static final double kZero = 0; //TODO: get zero
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
