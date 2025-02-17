@@ -23,4 +23,6 @@ public interface ElevatorIO {
     public default void runVolts(double volts) {}
 
     public default void runPosition(double height, double ff){}
+
+    public default double getHeight(){return 0;}
 }

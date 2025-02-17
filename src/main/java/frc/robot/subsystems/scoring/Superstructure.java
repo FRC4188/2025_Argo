@@ -7,6 +7,7 @@ import org.opencv.video.KalmanFilter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -54,8 +55,12 @@ public class Superstructure extends SubsystemBase{
 
     private ProfiledPIDController elePID = 
         new ProfiledPIDController(
-            0.1, 0.0, 0.0, 
+            1, 0.0, 0.0, 
             constraints);
+
+    private ElevatorFeedforward eleff =
+        new ElevatorFeedforward(
+            0.1, 0, 0);
         
     private SuperState target;
     private SuperState current;
@@ -67,12 +72,8 @@ public class Superstructure extends SubsystemBase{
         this.wrist = wrist;
         sim = new SuperVisualizer("Superstructure");
         ff = new ArmFF();
-        this.current = new SuperState(
-            wrist.getAngle(),
-            arm.getAngle(),
-            elevator.getHeight());
 
-        current = new SuperState(0, 0, 0);
+        this.current = new SuperState(0, 0, 0);
     }
 
     public void setgoal(SuperState goal){
@@ -107,19 +108,17 @@ public class Superstructure extends SubsystemBase{
             //^- until singlejointedarmsim gets workin, using for other stuff like autos
         );
 
-        // didnt know i had to finish this class mb ig
         elevator.runVoltsNC(
-            elePID.calculate(elevator.getHeight(), target.getEleHeight())
+            elePID.calculate(Units.metersToInches(elevator.getHeight()), Units.metersToInches(target.getEleHeight())) + eleff.calculate(20)
         );
         wrist.runVolts(
             wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
             //+ ffVolt.get(1,0)
-            // Hopefully this is the right FF arguemnts for the wrist
         );
 
-            Vector<N4> simstate = ff.simState(VecBuilder.fill(
-                arm.getAngle(), wrist.getAngle(), arm.getVel(), wrist.getVel()),
-            VecBuilder.fill(arm.getVolt(), wrist.getVolt()), Constants.robot.loopPeriodSecs);
+            // Vector<N4> simstate = ff.simState(VecBuilder.fill(
+            //     arm.getAngle(), wrist.getAngle(), arm.getVel(), wrist.getInputs().velRadsPerSec),
+            // VecBuilder.fill(arm.getVolt(), wrist.getInputs().appliedVolts), Constants.robot.loopPeriodSecs);
 
             //SuperState eh = new SuperState(new ( simstate.get(0,0), simstate.get(1,0), target.getEleHeight()), 0.5, true);
 

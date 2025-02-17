@@ -21,7 +21,7 @@ public class WristIOSim implements WristIO{//J.C
     public WristIOSim() {
         var plant = LinearSystemId.createDCMotorSystem
             (DCMotor.getNeo550(1), 1, 1);
-        var gearbox = DCMotor.getNeo550(1);
+        var gearbox = DCMotor.getFalcon500(1);
 
         sim = new DCMotorSim(plant, gearbox);
 
@@ -49,5 +49,10 @@ public class WristIOSim implements WristIO{//J.C
         inputs.appliedVolts = appliedVolts;
         inputs.posRads = wSim.getAngleRads();
         inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
+    }
+
+    @Override
+    public double getAngle(){
+        return wSim.getAngleRads();
     }
 }

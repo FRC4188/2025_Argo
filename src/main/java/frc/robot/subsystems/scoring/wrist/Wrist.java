@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import frc.robot.subsystems.scoring.SuperConstraints;
-
+import frc.robot.subsystems.scoring.wrist.WristIO.WristIOInputs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,6 +51,11 @@ public class Wrist extends SubsystemBase {//J.C
     io.runVolts(volts);
   }
 
+  @AutoLogOutput(key = "Wrist/Angle Radians")
+  public double getAngle(){
+    return io.getAngle();
+  }
+
 //   public void setPID(double kP, double kI, double kD) {
 //     pid.setPID(kP, kI, kD);
 //   }
@@ -64,21 +69,8 @@ public class Wrist extends SubsystemBase {//J.C
   //   return targetAngle;
   // }
 
-  @AutoLogOutput(key = "Wrist/Angle Radians")
-  public double getAngle(){
-    return io.getAngle();
-  }
-
-  public double getVel(){
-    return inputs.velRadsPerSec;
-  }
-
-  public double getVolt(){
-    return inputs.appliedVolts;
-  }
-
   @AutoLogOutput(key = "Wrist/isAtGoal")
   public boolean atGoal() {
-    return Math.abs(getAngle() - targetAngle) < Constants.WristConstants.kTolerance;
+    return Math.abs(inputs.posRads - targetAngle) < Constants.WristConstants.kTolerance;
   }
 }

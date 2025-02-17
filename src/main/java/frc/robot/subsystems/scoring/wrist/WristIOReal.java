@@ -62,4 +62,9 @@ public class WristIOReal implements WristIO {//J.C
         volts = MathUtil.clamp(volts,-12, 12);
         max.setVoltage(volts);
     }
+
+    @Override
+    public double getAngle(){
+        return posRads;
+    }
 }

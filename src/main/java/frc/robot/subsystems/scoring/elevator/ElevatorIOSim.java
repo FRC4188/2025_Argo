@@ -13,57 +13,40 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.Id;
 import frc.robot.Constants.robot;
+import frc.robot.subsystems.scoring.SuperConstraints.ElevatorConstraints;
 
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
 import static frc.robot.Constants.*;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ElevatorIOSim implements ElevatorIO{
     private final DCMotorSim sim;
     private final DCMotor gearbox;
     private double appliedVolts = 0.0;
 
-    private final TalonFX leader;
-    private final TalonFX follower;
-
-    private final CANcoder leadNcoder;
-    private final CANcoder followNcoder;
+    private final ElevatorSim physSim;
 
     public ElevatorIOSim(){
         gearbox = DCMotor.getFalcon500(2);
+        var plant =  LinearSystemId.createElevatorSystem(
+            gearbox,
+            Kilograms.convertFrom(23.37, Pounds), 
+            ElevatorConstants.kDrumeRadius, 
+            ElevatorConstants.kGearRatio);
         sim = new DCMotorSim(
-            LinearSystemId.createElevatorSystem(
-                gearbox,
-                Kilograms.convertFrom(23.37, Pounds), 
-                ElevatorConstants.kDrumeRadius, 
-                ElevatorConstants.kGearRatio), 
+            plant, 
             gearbox);
 
         sim.setState(0, 0); //maxlengthmeter / 2 , 0
 
-        leader = new TalonFX(Id.kElevatorLead);
-        leadNcoder = new CANcoder(Id.kElevatorLeadNcoder);
-        follower = new TalonFX(Id.kElevatorFollow);
-        followNcoder = new CANcoder(Id.kElevatorFollowNcoder);
-
-        follower.setControl(new Follower(Id.kElevatorLead, false));
-
-        leader.setNeutralMode(NeutralModeValue.Brake);
-        follower.setNeutralMode(NeutralModeValue.Brake);
-
-        leadNcoder.clearStickyFaults();
-        leader.clearStickyFaults();
-        follower.clearStickyFaults();
-        followNcoder.clearStickyFaults();
-
-        leader.getConfigurator().apply(ElevatorConstants.kMotorConfig);
-        follower.getConfigurator().apply(ElevatorConstants.kMotorConfig);
-
-        leader.optimizeBusUtilization();
-        follower.optimizeBusUtilization();    
+        physSim = new ElevatorSim(
+            plant, gearbox, 0, ElevatorConstraints.RANGE, true, 0);
     }
 
     @Override
@@ -77,18 +60,24 @@ public class ElevatorIOSim implements ElevatorIO{
         
         inputs.followerAppliedVolts = appliedVolts;
         sim.update(robot.loopPeriodSecs);
+        physSim.update(robot.loopPeriodSecs);
     }
 
     @Override
     public void runVolts(double volts){
         appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
         sim.setInputVoltage(appliedVolts);
+        physSim.setInputVoltage(volts);
     }
 
     @Override
     public void runPosition(double height, double ff){
-        leader.setControl(new PositionVoltage(height).withFeedForward(ff));
-        sim.setInputVoltage(leader.getSimState().getMotorVoltage());
+        physSim.setState(height, 1);
+    }
+
+    @Override
+    public double getHeight(){
+        return physSim.getPositionMeters();
     }
     
     

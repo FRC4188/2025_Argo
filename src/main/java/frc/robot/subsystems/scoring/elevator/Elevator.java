@@ -56,13 +56,12 @@ public class Elevator extends SubsystemBase{
     public void periodic(){
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);   
-        currentHeight = (inputs.posRads - kZero) / 6 * kDrumeRadius * 2; //TODO: test da math
 
     }
 
     @AutoLogOutput(key = "Elevator/Height Meters")
     public double getHeight(){
-        return currentHeight;
+        return io.getHeight();
     }
     // public double convertToPos(double inches){
     //     return inches*Constants.ElevatorConstants.ticksToInches;
