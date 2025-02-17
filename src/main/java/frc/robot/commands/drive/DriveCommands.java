@@ -90,22 +90,23 @@ public class DriveCommands {
 
         double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
         double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
+        double theta = MathUtil.applyDeadband(thetaInput.getAsDouble(), DEADBAND);
 
         double totalSpeed = Math.hypot(x, y);
         double angle = Math.atan2(y, x);
         double xSpeed = totalSpeed * Math.cos(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
-        double rotSpeed = -thetaInput.getAsDouble() * 5 * Math.PI;
+        double rotSpeed = -theta * 5 * Math.PI;
 
-        //xSpeed = limitX.calculate(xSpeed);
-        //ySpeed = limitY.calculate(ySpeed);
+        xSpeed = limitX.calculate(xSpeed);
+        ySpeed = limitY.calculate(ySpeed);
 
 
 
         ChassisSpeeds speeds = 
             ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-              xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio / 4.6,
-              ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio / 4.6, 
+              xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio,
+              ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio, 
               rotSpeed), 
               AllianceFlip.apply(drive.getRotation()));
 

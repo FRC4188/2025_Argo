@@ -24,9 +24,9 @@ import frc.robot.subsystems.drivetrain.Drive;
  */
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            Constants.robot.DRIVE_PID.getP(), 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            Constants.robot.TURN_PID.getP(), 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
     private Drive driveSubsystem;
     private Supplier<Pose2d> poseSupplier;
     private Translation2d lastSetpointTranslation;

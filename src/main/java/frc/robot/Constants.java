@@ -51,8 +51,8 @@ public final class Constants {
     public static final double A_WIDTH = Units.inchesToMeters(29); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
-    public static final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDController DRIVE_PID = new PIDController(5.0, 0.0, 0.0);
+    public static final PIDController TURN_PID = new PIDController(5.0, 0.0, 0.0);
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
@@ -76,10 +76,6 @@ public final class Constants {
     REPLAY
   }
 
-  public class mode{
-    int real = 0;
-    
-  }
 
   public static class ids{
     public static final int INTAKE = 16;

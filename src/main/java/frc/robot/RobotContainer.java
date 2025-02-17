@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.FollowPath;
+import frc.robot.commands.drive.TagTracking;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -173,9 +174,10 @@ public class RobotContainer {
     //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
     //   () -> (controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
-    drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+    drivingInput.onTrue(
+      DriveCommands.TeleDrive(drive,
+      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.125 : 1.0),
+      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.125 : 1.0),
       () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
     // Reset gyro to 0° when start button is pressed
@@ -187,7 +189,11 @@ public class RobotContainer {
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-      
+      controller2
+        .getAButton()
+        .onTrue(
+          Limelight.setPipe("limelight-front", VisConstants.algaeDetect) //make this to wtv it is
+      );
   }
 
   private void configureDashboard() {
@@ -220,12 +226,6 @@ public class RobotContainer {
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
-    controller2
-    .getAButton()
-    .onTrue(
-      Limelight.setPipe("limelight-front", VisConstants.algaeDetect) //make this to wtv it is
-    );
-
   }
 
   /**
@@ -240,8 +240,8 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    //drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-    drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
+    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
