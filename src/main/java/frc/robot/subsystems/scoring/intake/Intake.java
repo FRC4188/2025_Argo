@@ -2,16 +2,10 @@ package frc.robot.subsystems.scoring.intake;
 
 import org.littletonrobotics.junction.Logger;
 
-// import com.revrobotics.spark.SparkBase.PersistMode;
-// import com.revrobotics.spark.SparkBase.ResetMode;
-// import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.REVLibError;
-// import com.revrobotics.spark.SparkMax;
-// import com.revrobotics.spark.config.SparkBaseConfig;
-// import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,14 +21,8 @@ public class Intake extends SubsystemBase{
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
 
-    // private SparkMax motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
-    // SparkMaxConfig sparkconfig = new SparkMaxConfig();
-    private WPI_TalonSRX motor = new WPI_TalonSRX(Constants.ids.INTAKE);
-    TalonSRXConfiguration talonConfig = new TalonSRXConfiguration();
-    //TODO: remove motor instances from this file unless we need it to check for intake voltage spikes
-
     public static Intake getInstance(IntakeIO io){
-        if(instance == null){
+        if (instance == null){
             instance = new Intake(io);
         }
         return instance;
@@ -43,12 +31,16 @@ public class Intake extends SubsystemBase{
     private Intake(IntakeIO io){
         this.io = io;
         inputs = new IntakeIOInputsAutoLogged();
-
     }
+
 
     public static enum GamePieceType {
         CORAL,
         ALGAE
+    }
+
+    public void isSafetyOn(boolean isSafe) {
+        io.isSafetyOn(isSafe);
     }
 
     public void runVolts(double volts){
@@ -59,25 +51,6 @@ public class Intake extends SubsystemBase{
         io.stop();
     }
 
-    public boolean intakeVoltageSpike() {
-        if (motor.getMotorOutputVoltage() > 5) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // public ResetMode disableSafeParameters(ResetMode safeParams) {
-    //     safeParams = ResetMode.kNoResetSafeParameters;
-    //     return safeParams;
-    // }
-
-    // public ResetMode activateSafeParameters(ResetMode safeParams) {
-    //     safeParams = ResetMode.kResetSafeParameters;
-    //     return safeParams;
-    // }
-
-
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest(Intake intake) {
         return Commands.run(
@@ -85,10 +58,10 @@ public class Intake extends SubsystemBase{
                 GamePieceType type = GamePieceType.CORAL;
                 switch (type) {
                     case CORAL:
-                        motor.setInverted(false);
+                        io.invertMotor(false);
                         break;
                     case ALGAE:
-                        motor.setInverted(true);
+                        io.invertMotor(true);
                         break;
                 }
                 runVolts(1);
@@ -101,10 +74,10 @@ public class Intake extends SubsystemBase{
                 GamePieceType type = GamePieceType.CORAL;
                 switch (type) {
                     case CORAL:
-                        motor.setInverted(true);
+                        io.invertMotor(true);
                         break;
                     case ALGAE:
-                        motor.setInverted(false);
+                        io.invertMotor(false);
                         break;
                 }
                 runVolts(1);
@@ -118,20 +91,13 @@ public class Intake extends SubsystemBase{
             }, intake);
     }
 
-    public Command detectIntakeSpike(Intake intake) {
-        return Commands.run(
-            () -> {
-                intakeVoltageSpike();
-            }, intake);
-    }
-
-    public ConditionalCommand stopOrIngest(Command halt, Command ingest, boolean intakeVoltageSpike) {
-        return stopOrIngest(halt, ingest, intakeVoltageSpike);
+    public ConditionalCommand stopOrIngest(Command halt, Command ingest, boolean isSafe) {
+        return stopOrIngest(halt, ingest, isSafe);
     }
 
     // idk if we need to check for voltagespike while ejecting
-    public ConditionalCommand stopOrEject(Command halt, Command eject, boolean intakeVoltageSpike) {
-        return stopOrEject(halt, eject, intakeVoltageSpike);
+    public ConditionalCommand stopOrEject(Command halt, Command eject, boolean isSafe) {
+        return stopOrEject(halt, eject, isSafe);
     }
 
     @Override

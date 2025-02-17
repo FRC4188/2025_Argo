@@ -4,12 +4,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkMax;
 
 import frc.robot.Constants;
 
@@ -25,20 +19,33 @@ public class IntakeIOReal implements IntakeIO {
     private final NeutralOut neutralOut = new NeutralOut();
 
     public IntakeIOReal(){
-        // motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
         motor = new WPI_TalonSRX(Constants.ids.INTAKE);
         TalonSRXConfiguration talonConfig = new TalonSRXConfiguration();
-        motor.setSafetyEnabled(true);
-        //TODO: when do we need to check if safety is enabled???????????
+        motor.setSafetyEnabled(false);
+
         appliedVolts = motor.getMotorOutputVoltage();
         tempC = motor.getTemperature();
         // posRads = encoder.getPosition();
         // velRadsPerSec = encoder.getVelocity();
-
-        
-        // motor.optimizeBusUtilization();
     }
 
+    // might keep intake permanently stopped 
+    // since safety will make it impossible to outtake
+    public void stopIfSafety() {
+        if (motor.isSafetyEnabled() == true) {
+            stop();
+        }        
+    }
+
+    public boolean isSafetyOn(boolean isSafe) {
+        if (motor.isSafetyEnabled() == true) {
+            isSafe = true;
+            return isSafe;
+        } else {
+            isSafe = false;
+            return isSafe;
+        }
+    }
 
     @Override
     public void runVolts(double volts) {
