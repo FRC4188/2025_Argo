@@ -64,6 +64,4 @@ public class WristIOReal implements WristIO {
     public double getAngle() {
         return posRads;
     }
-
-    
 }

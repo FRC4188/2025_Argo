@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.commands.autos.pathgen.PG_math;
+import frc.robot.util.FieldConstant.Reef;
 
 
 public class SuperState {
@@ -159,44 +160,44 @@ public class SuperState {
     }
 
     public static enum SuperPreset{
-        /* 
+        
         L4_CORAL(
             new SuperState(
-                new Translation3d(Reef.L4_highest_h - Units.inchesToMeters(20), -25, -30), true)),
+                Units.degreesToRadians(-30), Units.degreesToRadians(-25), Reef.L4_highest_h - Units.inchesToMeters(20))),
         L3_CORAL(
             new SuperState(
-                new Translation3d(Reef.L3_highest_h - Units.inchesToMeters(20), -30, -25), true)),
+                Units.degreesToRadians(-25), Units.degreesToRadians(-30), Reef.L3_highest_h - Units.inchesToMeters(20))),
         L3_ALGAE_REVERSE(
             new SuperState(
-                Reef.L2_highest_h - Units.inchesToMeters(20), -30, -60, true)),
+                Units.degreesToRadians( -60), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
         L3_ALGAE(
             new SuperState(
-                Reef.L3_highest_h - Units.inchesToMeters(20), 45, 30, false)),
+                Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L3_highest_h - Units.inchesToMeters(20))),
         L2_CORAL(
             new SuperState(
-                new Translation3d(Reef.L2_highest_h - Units.inchesToMeters(20), -30, -25), true)),
+                Units.degreesToRadians(-25), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
         L2_ALGAE(
             new SuperState(
-                Reef.L2_highest_h - Units.inchesToMeters(20), 45, 30, false)),
+                Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L2_highest_h - Units.inchesToMeters(20))),
         L2_ALGAE_REVERSE(
             new SuperState(
-                Reef.L2_highest_h - Units.inchesToMeters(20), -30, -60, true)),
+                Units.degreesToRadians(-60), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
         PROCESSOR(
             new SuperState(
-                0, 65, 15, false)),
+                Units.degreesToRadians(15), Units.degreesToRadians(65), 0)),
         PROCESSOR_REVERSE(
             new SuperState(
-                0, -65, -30, false)),
+                Units.degreesToRadians(-30), Units.degreesToRadians(-65),0 )),
         SOURCE(
             new SuperState(
-                Units.inchesToMeters(14), 45, 70, true)),
+                Units.degreesToRadians(70), Units.degreesToRadians(45), Units.inchesToMeters(14))),
         SOURCE_REVERSE(
             new SuperState(
-                Units.inchesToMeters(7), -30, 25, true)),
+                Units.degreesToRadians(25),Units.degreesToRadians( -30), Units.inchesToMeters(7))),
         // ALGAE_GROUND(
         //     new SuperState(
         //         new Translation3d(), false)),
-        */
+        
         START(
             new SuperState(0, 0, 0));
         

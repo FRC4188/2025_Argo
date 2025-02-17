@@ -5,8 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
-import frc.robot.subsystems.scoring.superstructure.SuperState;
 
 public final class Main {
   private Main() {}

@@ -1,7 +1,5 @@
 package frc.robot.subsystems.scoring.arm;
 
-import static frc.robot.subsystems.scoring.superstructure.SuperstructureConfig.arm;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {

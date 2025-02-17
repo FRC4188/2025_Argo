@@ -17,15 +17,12 @@ import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.MomentOfInertiaUnit;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {

@@ -1,9 +1,12 @@
 package frc.robot.subsystems.scoring.elevator;
 
+import static frc.robot.Constants.ElevatorConstants.kDrumeRadius;
+import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
+import static frc.robot.Constants.ElevatorConstants.kZero;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -12,7 +15,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.Id;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -62,8 +64,8 @@ public class ElevatorIOReal implements ElevatorIO {
         // RightEncoder.getConfigurator().apply(rightSensorConfigs);
         // RightMotor.getConfigurator().setPosition(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
 
-        leader.getConfigurator().apply(ElevatorConstants.kMotorConfig);
-        follower.getConfigurator().apply(ElevatorConstants.kMotorConfig);
+        leader.getConfigurator().apply(kMotorConfig);
+        follower.getConfigurator().apply(kMotorConfig);
 
         leader.optimizeBusUtilization();
         follower.optimizeBusUtilization();    
@@ -87,7 +89,6 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
         inputs.posRads = posRads.getValueAsDouble();
-        inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
         
         inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
         inputs.followerTempC = tempCFollow.getValueAsDouble();
@@ -99,9 +100,12 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     @Override
-    public void runPosition(double height, double ff){
-        leader.setControl(new PositionVoltage(height).withFeedForward(ff));
+    public void stop() {
+        runVolts(0);
     }
     
-    
+    @Override
+    public double getHeight(){
+        return posRads.getValueAsDouble() - kZero / 6 * kDrumeRadius * 2; //TODO: test da math
+    }
 }

@@ -13,78 +13,49 @@
 
 package frc.robot;
 
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import choreo.trajectory.Trajectory;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.drive.FollowPath;
-import frc.robot.commands.superstructure.SuperToTest;
+import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
-import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.drivetrain.ModuleIO;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXSim;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFX;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXReal;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.arm.Arm;
-import frc.robot.subsystems.scoring.arm.ArmIO;
-import frc.robot.subsystems.scoring.arm.ArmIOReal;
-import frc.robot.subsystems.scoring.arm.ArmIOSim;
-import frc.robot.subsystems.scoring.elevator.Elevator;
-import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
-import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
-import frc.robot.subsystems.scoring.wrist.Wrist;
-import frc.robot.subsystems.scoring.wrist.WristIOSim;
-import frc.robot.subsystems.scoring.arm.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
-import frc.robot.util.FieldConstant.Reef;
-import frc.robot.util.FieldConstant.Source;
-import frc.robot.util.FieldConstant.Reef.Base.*;
-
-import static edu.wpi.first.units.Units.Degrees;
-
-import java.util.List;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -95,7 +66,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private Arm arm;
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
   private Superstructure superstructure;
@@ -206,7 +176,7 @@ public class RobotContainer {
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
-      /* 
+      
       controller2.a().onTrue(
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L2_CORAL.getState())));
 
@@ -215,7 +185,7 @@ public class RobotContainer {
       controller2.x().onTrue(
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));*/
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
 
   }
 
@@ -256,8 +226,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-
-     return new InstantCommand(() -> superstructure.setgoal(new SuperState(Math.PI / 4, -Math.PI/4, 0.5)));
+     return new SuperToState(superstructure, SuperPreset.SOURCE.getState(), new TrapezoidProfile(new Constraints(10, 10)));
   }
 
   public void resetSimulation(){

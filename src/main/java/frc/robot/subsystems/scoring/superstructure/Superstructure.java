@@ -1,43 +1,24 @@
 package frc.robot.subsystems.scoring.superstructure;
-import java.time.LocalDate;
+
 
 import org.littletonrobotics.junction.Logger;
-import org.opencv.video.KalmanFilter;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Mode;
-import frc.robot.Constants.WristConstants;
-import frc.robot.Constants.robot;
-import frc.robot.commands.autos.AutoTests;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.superstructure.SuperToTest;
 import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.arm.ArmIOReal;
 import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
-import frc.robot.subsystems.scoring.elevator.ElevatorIOInputsAutoLogged;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
 import frc.robot.subsystems.scoring.superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.wrist.Wrist;
-import frc.robot.subsystems.scoring.wrist.WristIO;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
 import frc.robot.subsystems.scoring.wrist.WristIOSim;
 
@@ -59,15 +40,21 @@ public class Superstructure extends SubsystemBase{
 
     private ProfiledPIDController wristPID = 
         new ProfiledPIDController(
-            0.1, 0, 0,
+            2, 0, 3,
             constraints);
 
-    
 
     private ProfiledPIDController elePID = 
         new ProfiledPIDController(
-            0.1, 0.0, 0.0, 
+            1, 0.0, 0.0, 
             constraints);
+
+    private ElevatorFeedforward eleff =
+        new ElevatorFeedforward(
+            0.1, 0, 0);
+
+    private ArmFeedforward wristff = 
+        new ArmFeedforward(0.1, 0, 0);
         
     private SuperState target;
     private SuperState current;
@@ -77,17 +64,17 @@ public class Superstructure extends SubsystemBase{
             case REAL:
                 this.arm = new Arm(new ArmIOReal());
                 this.wrist = new Wrist(new WristIOReal());
-                this.elevator = Elevator.getInstance(new ElevatorIOReal());
+                this.elevator = new Elevator(new ElevatorIOReal());
                 break;
             case SIM: 
                 this.arm = new Arm(new ArmIOSim());
                 this.wrist = new Wrist(new WristIOSim());
-                this.elevator = Elevator.getInstance(new ElevatorIOSim());
+                this.elevator = new Elevator(new ElevatorIOSim());
                 break;
             default: 
                 this.arm = new Arm(new ArmIOSim());
                 this.wrist = new Wrist(new WristIOSim());
-                this.elevator = Elevator.getInstance(new ElevatorIOSim());
+                this.elevator = new Elevator(new ElevatorIOSim());
         }
         sim = new SuperVisualizer("Superstructure");
 
@@ -127,15 +114,14 @@ public class Superstructure extends SubsystemBase{
             //^- until singlejointedarmsim gets workin, using for other stuff like autos
         );
 
-        elevator.runVoltsNC(
-            elePID.calculate(elevator.getHeight(), target.getEleHeight())
+        elevator.runVolts(
+            elePID.calculate(Units.metersToInches(elevator.getHeight()), Units.metersToInches(target.getEleHeight())) + eleff.calculate(20)
         );
 
         wrist.runVolts(
             wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
-            
+            + wristff.calculate(target.getGlobalAngle() + Math.PI/2, 0)
         );
-
         
         wrist.periodic();
         arm.periodic();
@@ -145,6 +131,14 @@ public class Superstructure extends SubsystemBase{
         Logger.recordOutput("ele setpoint", target.getEleHeight());
 
     }
+
+    public SuperState getState() {
+        return current;
+    }
+
+    public void setTarget(SuperState goal) {
+        target = goal;
+    } 
 
     private static double applyKs(double volts, double kS, double kSDeadband) {
         if (Math.abs(volts) < kSDeadband) {

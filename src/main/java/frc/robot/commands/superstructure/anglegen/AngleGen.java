@@ -1,28 +1,16 @@
 package frc.robot.commands.superstructure.anglegen;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import frc.robot.Constants;
 import frc.robot.commands.autos.pathgen.PG_math;
-import frc.robot.commands.autos.pathgen.fieldobjects.CircleFO;
-import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
-import frc.robot.commands.autos.pathgen.fieldobjects.PolygonFO;
-import frc.robot.commands.autos.pathgen.fieldobjects.RectFO;
+
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
-import frc.robot.util.FieldConstant;
 
 public class AngleGen {
     private static AngleGen instance;
