@@ -72,7 +72,7 @@ package frc.robot.subsystems.scoring.intake;
             IntakeSide intakeside,
             int capacity
         ) {
-            return new IntakeSimulation(
+            return new IntakeSimulation (
                 targetedGamePieceType,
                 driveTrainSim,
                 getIntakeRectangle(driveTrainSim, width.in(Meters), extendyLength.in(Meters), intakeside),
@@ -151,11 +151,15 @@ package frc.robot.subsystems.scoring.intake;
                 gamePiecesInsideIntake--;
                 return true;
             }
-    
+
             @Override
             public void runVolts(double volts) {
-                appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
-                sim.setInputVoltage(appliedVolts);
+                if (gamePiecesInsideIntake > 0) {
+                    appliedVolts = 0.0;
+                } else {
+                    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+                    sim.setInputVoltage(appliedVolts);
+                }
             }
     
             @Override

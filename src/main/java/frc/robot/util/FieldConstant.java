@@ -31,6 +31,12 @@ public class FieldConstant {
     public static double algae_radius = Units.inchesToMeters(8.125);
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
+    public static boolean isClose = false;
+
+    public static void setClose(boolean close){
+        isClose = close;
+    }
+
     public class Field {
         public Pose2d innerCageStart = new Pose2d(new Translation2d(8.007, 5.047), new Rotation2d(0.0));
         public Pose2d middleCageStart = new Pose2d(new Translation2d(8.007, 6.164), new Rotation2d(0.0));
@@ -105,7 +111,7 @@ public class FieldConstant {
 
         public class CoralGoal {
             //robot perpendicular distance from the wall
-            public static double score_perp = Constants.robot.A_CROSSLENGTH;
+            public static double score_perp = isClose? 0: Constants.robot.A_CROSSLENGTH;
             //robot parallel distance from the center of the wall
             public static double score_parallel = Units.inchesToMeters(6.472);
 
