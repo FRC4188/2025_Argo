@@ -19,7 +19,7 @@ public class IntakeIOReal implements IntakeIO {
     private final NeutralOut neutralOut = new NeutralOut();
 
     public IntakeIOReal(){
-        motor = new WPI_TalonSRX(Constants.ids.INTAKE);
+        motor = new WPI_TalonSRX(Constants.Id.kIntake);
         TalonSRXConfiguration talonConfig = new TalonSRXConfiguration();
         motor.setSafetyEnabled(false);
 

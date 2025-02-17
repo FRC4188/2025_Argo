@@ -1,16 +1,11 @@
-package frc.robot.subsystems.scoring;
 
-import static edu.wpi.first.units.Units.Inches;
+package frc.robot.subsystems.scoring.Superstructure;
+
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Pounds;
-
-import org.dyn4j.dynamics.joint.Joint;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 
@@ -31,9 +26,6 @@ public class SuperstructureConfig {
         Meters.of(wristRadiusCOG).magnitude());
 
 
-    //TODO: need starting, lowest, highest, point of origin of arm
-    static final double LOWEST_H = Inches.of(9.13250).magnitude();//0.228362383 meters
-    static final double HIGHEST_H = Inches.of(9.13250 + 72.0).magnitude();//2.057162383 meters
 
     //config.json has all of these at zero, these are values from the robot's origin -rn
     public static Pose3d origin = new Pose3d(0.0, 0.0, 0, new Rotation3d(0,0,0));

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring;
+package frc.robot.subsystems.scoring.Superstructure;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -18,7 +18,7 @@ import frc.robot.Main;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.subsystems.scoring.SuperstructureConfig.*;
+import static frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig.*;
 
 import org.littletonrobotics.junction.Logger;
 
