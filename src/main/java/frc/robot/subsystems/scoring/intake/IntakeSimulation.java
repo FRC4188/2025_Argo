@@ -174,8 +174,6 @@ package frc.robot.subsystems.scoring.intake;
     
             sim.update(Constants.robot.loopPeriodSecs);
             inputs.appliedVolts = appliedVolts;
-            inputs.posRads = sim.getAngularPositionRad();
-            inputs.velRadsPerSec = sim.getAngularVelocityRadPerSec();
             }   
     
             public final class GamePieceContactListener implements ContactListener<Body> {

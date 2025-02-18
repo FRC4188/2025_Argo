@@ -14,13 +14,14 @@ import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.util.FieldConstant;
 
 public class AutoScore extends SequentialCommandGroup {
-    public AutoScore(Pose2d goal, SuperState state, Drive drive, Superstructure superstructure, Intake intake, TrajectoryConfig config, TrapezoidProfile constraints) {
+    public AutoScore(Pose2d goal, SuperState state, Drive drive, Superstructure superstructure, Intake intake, boolean isIntake) {
         addRequirements(superstructure, drive);
         addCommands(
-            new DriveTo(drive, goal, config),
-            new SuperToState(superstructure, state, constraints),
+            new DriveTo(drive, goal),
+            new SuperToState(superstructure, state),
             Commands.runOnce(()->FieldConstant.setClose(true)),
-            intake.eject()
+            isIntake? intake.ingest(): intake.eject(),
+            Commands.runOnce(()->FieldConstant.setClose(false))
         );
 
     }

@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.robot;
+import frc.robot.Constants.robot.*;
 
 public class Intake extends SubsystemBase{
 
@@ -39,33 +41,31 @@ public class Intake extends SubsystemBase{
         ALGAE
     }
 
-    public void isSafetyOn(boolean isSafe) {
-        io.isSafetyOn(isSafe);
+    public boolean isSafetyOn() {
+        return io.isSafetyOn();
     }
 
     public void runVolts(double volts){
         io.runVolts(volts);
     }
 
-    public void stop(){
-        io.stop();
-    }
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest() {
         return Commands.run(
             () -> {
-                GamePieceType type = GamePieceType.CORAL;
-                switch (type) {
+                switch (robot.intakeState) {
                     case CORAL:
                         io.invertMotor(false);
                         break;
                     case ALGAE:
                         io.invertMotor(true);
                         break;
+                    default:
+                        break;
                 }
                 runVolts(1);
-            });
+            }).until(()-> isSafetyOn());
     }
 
     public Command eject() {
@@ -81,14 +81,7 @@ public class Intake extends SubsystemBase{
                         break;
                 }
                 runVolts(1);
-            });
-    }
-
-    public Command halt() {
-        return Commands.run(
-            () -> {
-                stop();
-            });
+            }).until(() -> isSafetyOn());
     }
 
     public ConditionalCommand stopOrIngest(Command halt, Command ingest, boolean isSafe) {

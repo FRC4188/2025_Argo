@@ -11,8 +11,6 @@ public interface IntakeIO {
         public boolean connected = true;
         public double appliedVolts = 0.0;
         public double tempC = 0.0;
-        public double posRads = 0.0;
-        public double velRadsPerSec = 0.0;
     }
 
     public default void updateInputs(IntakeIOInputs inputs) {}
@@ -21,7 +19,7 @@ public interface IntakeIO {
 
     public default void invertMotor(boolean isInverted) {}
 
-    public default boolean isSafetyOn(boolean isSafe) {return isSafe;}
+    public default boolean isSafetyOn() {return true;}
 
     public default void stop(){}
 }
