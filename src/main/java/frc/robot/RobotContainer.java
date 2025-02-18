@@ -212,9 +212,6 @@ public class RobotContainer {
     autoChooser.addOption("Mid to 2 corals manual", AutoTests.toBasetoSource());
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
 
-    //follow path commd test
-    autoChooser.addOption("2 corals manual follow", AutoTests.follow2Coral(drive));
-
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));

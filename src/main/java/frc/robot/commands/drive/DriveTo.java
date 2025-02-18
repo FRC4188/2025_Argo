@@ -17,7 +17,9 @@ public class DriveTo extends Command {
     Timer timer;
     Supplier<Pose2d> goalPose;
     Trajectory traj;
-    TrajectoryConfig config;
+    TrajectoryConfig config =  new TrajectoryConfig(
+        TunerConstants.kSpeedAt12Volts.magnitude() / 2, 
+        Constants.robot.MAX_ACCELERATION.magnitude() / 2);;
     DriveToPose driving;
     Drive drive;
 

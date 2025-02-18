@@ -1,10 +1,20 @@
 package frc.robot.subsystems.scoring.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class Arm extends SubsystemBase {
     private final ArmIO io;
@@ -38,5 +48,28 @@ public class Arm extends SubsystemBase {
     @AutoLogOutput(key = "Arm/isAtSetpoint")
     public boolean isAtAngle(double targetAngle) {
         return Math.abs(getAngle() - targetAngle) < Constants.ArmConstants.kTolerance;
+    }
+    public Command runSysId(){
+        SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.of(4).per(Seconds),
+                Volts.of(8),
+                Seconds.of(6)
+            ),new SysIdRoutine.Mechanism(
+                voltage -> runVolt(voltage.magnitude()),
+                null,
+                this));
+        
+        return Commands.sequence(
+            routine.quasistatic(Direction.kForward)
+                .until(() -> getAngle() >= SuperConstraints.ArmConstraints.HIGHEST_A),
+            routine.quasistatic(Direction.kReverse)
+                .until(() -> getAngle() <= SuperConstraints.ArmConstraints.LOWEST_A),
+                
+            routine.dynamic(Direction.kForward)
+                .until(() -> getAngle() >= SuperConstraints.ArmConstraints.HIGHEST_A),
+            routine.dynamic(Direction.kReverse)
+                .until(() -> getAngle() <= SuperConstraints.ArmConstraints.LOWEST_A)
+        );
     }
 }

@@ -160,6 +160,10 @@ public class FieldConstant {
             public static Pose2d mid_brg_right = new Pose2d(
                 Base.mid_brg_wall.getTranslation().plus(score_right.rotateBy(new Rotation2d(Degrees.of(180)))),
                 new Rotation2d(Degrees.of(180)));
+
+            public static Pose2d[] coralGoals = {
+                alliance_right, alliance_left, left_brg_left, left_brg_right, left_src_left, left_src_right,
+                right_brg_left,right_brg_right, right_src_left, right_src_right};
         }
 
         public class AlgaeSource {
@@ -193,7 +197,10 @@ public class FieldConstant {
             public static Pose2d mid_brg_src = new Pose2d(
                 Base.mid_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(180)))),
                 new Rotation2d(Degrees.of(180)));
-
+                
+            public static Pose2d[] algGoal = {
+                alliance_src, left_brg_src, left_src_src, right_brg_src, right_brg_src, mid_brg_src
+            };
         }
 
         public class Base{

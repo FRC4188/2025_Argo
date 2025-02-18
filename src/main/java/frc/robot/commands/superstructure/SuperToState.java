@@ -3,6 +3,7 @@ package frc.robot.commands.superstructure;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.superstructure.anglegen.AngleGen;
@@ -17,6 +18,7 @@ public class SuperToState extends Command {
     Timer timer;
     Supplier<SuperState> traj_states;
     SuperTraj trajectory;
+    TrapezoidProfile tp = new TrapezoidProfile(new Constraints(10, 10));
     SuperState goal;
     
     public SuperToState(Superstructure superstruct, SuperState goalState) {
