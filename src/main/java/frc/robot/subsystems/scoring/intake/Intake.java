@@ -52,7 +52,7 @@ public class Intake extends SubsystemBase{
     }
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
-    public Command ingest(Intake intake) {
+    public Command ingest() {
         return Commands.run(
             () -> {
                 GamePieceType type = GamePieceType.CORAL;
@@ -65,10 +65,10 @@ public class Intake extends SubsystemBase{
                         break;
                 }
                 runVolts(1);
-            }, intake);
+            });
     }
 
-    public Command eject(Intake intake) {
+    public Command eject() {
         return Commands.run(
             () -> {
                 GamePieceType type = GamePieceType.CORAL;
@@ -81,14 +81,14 @@ public class Intake extends SubsystemBase{
                         break;
                 }
                 runVolts(1);
-            }, intake);
+            });
     }
 
-    public Command halt(Intake intake) {
+    public Command halt() {
         return Commands.run(
             () -> {
                 stop();
-            }, intake);
+            });
     }
 
     public ConditionalCommand stopOrIngest(Command halt, Command ingest, boolean isSafe) {

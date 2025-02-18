@@ -20,7 +20,8 @@ package frc.robot.subsystems.scoring.intake;
     import org.ironmaple.simulation.SimulatedArena;
     import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
     import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
-    import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
     
     import edu.wpi.first.math.MathUtil;
     import edu.wpi.first.math.system.plant.DCMotor;
@@ -29,6 +30,7 @@ package frc.robot.subsystems.scoring.intake;
     import edu.wpi.first.wpilibj.DriverStation;
     import edu.wpi.first.wpilibj.simulation.DCMotorSim;
     import frc.robot.Constants;
+    import frc.robot.subsystems.scoring.intake.Intake.GamePieceType;
     
     // should be the working file for intake simulation
     public class IntakeSimulation extends BodyFixture implements IntakeIO {
@@ -47,6 +49,7 @@ package frc.robot.subsystems.scoring.intake;
     
         private double appliedVolts = 0.0;
 
+        // um, don't need? maybe?
         private final DCMotorSim sim = 
             new DCMotorSim(
                 LinearSystemId.createDCMotorSystem(
@@ -101,7 +104,6 @@ package frc.robot.subsystems.scoring.intake;
             return rectangleyIntake;
             }
     
-            // add/remove return type if necessary
             public IntakeSimulation (
                 String targetedGamePieceType, 
                 AbstractDriveTrainSimulation driveTrainSim, 
@@ -208,6 +210,14 @@ package frc.robot.subsystems.scoring.intake;
                     else if (collisionBody2 instanceof ReefscapeCoralAlgaeStack stack
                             && coralOrAlgaeIntake
                             && fixture1 == IntakeSimulation.this) indicateGamePieceRemoval(stack);
+                        
+                    if (gamePiecesInsideIntake > 0 && "Coral".equals(IntakeSimulation.this.targetedGamePieceType)) {
+                        Constants.robot.robotstate = Constants.robot.STATE.CORAL;
+                    }
+
+                    if (gamePiecesInsideIntake > 0 && "Algae".equals(IntakeSimulation.this.targetedGamePieceType)) {
+                        Constants.robot.robotstate = Constants.robot.STATE.ALGAE;
+                    }
                 }
                 
                 @Override

@@ -4,86 +4,72 @@ import static edu.wpi.first.units.Units.Hertz;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
-import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 
 public class ArmIOReal implements ArmIO {
-    TalonFX armMotor;
-    CANcoder armEncoder;
-    double armZero = 0;
+    private final TalonFX armMotor;
+    private final CANcoder armEncoder;
 
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
     private final StatusSignal<Angle> posRads;
-    private final StatusSignal<AngularVelocity> velRadsPerSec;
     private final StatusSignal<Angle> desiredPos;
-    private final StatusSignal<AngularVelocity> desiredVel;
 
     public ArmIOReal() {
-        //TODO: Set device IDs
-        armMotor = new TalonFX(0);
-        armEncoder = new CANcoder(0);
+        armMotor = new TalonFX(Constants.Id.kArm);
+        armEncoder = new CANcoder(Constants.Id.kArmNcoder);
+        //TODO: encoder config? (which includes zero offset)
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
-        
-        OpenLoopRampsConfigs openLoopRampsConfigs = new OpenLoopRampsConfigs();
-        openLoopRampsConfigs.VoltageOpenLoopRampPeriod = 0.5;
-        armMotor.getConfigurator().apply(openLoopRampsConfigs);
-        
-        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
-        closedLoopRampsConfigs.VoltageClosedLoopRampPeriod = 0.5;
-        armMotor.getConfigurator().apply(closedLoopRampsConfigs);
-
-        armMotor.clearStickyFaults();
-        armEncoder.clearStickyFaults();
-
-        MagnetSensorConfigs sensorConfigs = new MagnetSensorConfigs();
-        sensorConfigs.MagnetOffset = -(armZero / 360.0);
-        sensorConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
-        armEncoder.getConfigurator().apply(sensorConfigs);
-        armMotor.getConfigurator().setPosition(armEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
-
+        armMotor.getConfigurator().apply(ArmConstants.kMotorConfig);
         armMotor.optimizeBusUtilization();
 
         appliedVolts = armMotor.getMotorVoltage();
         tempC = armMotor.getDeviceTemp();
         posRads = armMotor.getPosition();
-        velRadsPerSec = armMotor.getVelocity();
         desiredPos = armEncoder.getAbsolutePosition();
-        desiredVel = armEncoder.getVelocity();
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             Hertz.of(50), 
             appliedVolts,
-            posRads,
-            velRadsPerSec);
+            posRads)    ;
     }
 
+    @Override
     public void runVolts(double volts) {
+        volts = MathUtil.clamp(volts,-12, 12);
         armMotor.set(volts);
     }
 
+    @Override
     public void stop() {
-        armMotor.set(0.0);
+        runVolts(0);
     }
 
+    @Override
     public void updateInputs(ArmIOInputs inputs) {
+        if(DriverStation.isDisabled()){
+            runVolts(0.0);
+        }
+
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
         inputs.positionRads = posRads.getValueAsDouble();
-        inputs.velocityRadPerSec = velRadsPerSec.getValueAsDouble();
         inputs.desiredPositionRads = desiredPos.getValueAsDouble();
-        inputs.desiredVelocityRadPerSec = desiredVel.getValueAsDouble();
+    }
+
+    @Override
+    public double getAngle(){
+        return posRads.getValueAsDouble();
     }
 }

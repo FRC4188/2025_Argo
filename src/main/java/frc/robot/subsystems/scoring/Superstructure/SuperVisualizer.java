@@ -1,25 +1,23 @@
 package frc.robot.subsystems.scoring.Superstructure;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.Main;
+import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.util.FieldConstant;
 
-import static edu.wpi.first.units.Units.Inch;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig.*;
 
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
 public class SuperVisualizer {
@@ -63,29 +61,25 @@ public class SuperVisualizer {
     }
 
 
-    public void update(double elevatorHeight, double armAngle, double wristAngle){
-        elevatorHeight = MathUtil.clamp(elevatorHeight, 0, HIGHEST_H - LOWEST_H);
-        elevatorHeight = Meters.convertFrom(elevatorHeight, Inches);
+    public void update(SuperState state){
 
-
-        armLig.setAngle(armAngle);
-        wristLig.setAngle(wristAngle);
-        elevatorLig.setLength(elevatorHeight);
+        armLig.setAngle(state.getArmAngle());
+        wristLig.setAngle(state.getWristAngle());
+        elevatorLig.setLength(state.getEleHeight());
         //Logger.recordOutput("Mechanism2d", mainMech);
 
         //update pose3d for 3d simulation (ligaments alone are 2d)
         Pose3d carriage = carriageOrigin.transformBy(
             new Transform3d(
-                new Translation3d(0, 0, -elevatorHeight),
+                new Translation3d(0, 0, -state.getEleHeight()),
                 new Rotation3d(0, 0, 0)
             )
         );
 
-        //Pose3d armPos = new Pose3d(-0.231965, 0, 0.231965, new Rotation3d(0, Units.degreesToRadians(90), 0));
         Pose3d armPos = armOrigin.transformBy(
             new Transform3d(
-                new Translation3d(0, 0, -elevatorHeight),
-                new Rotation3d(0, Units.degreesToRadians(armAngle), 0)
+                new Translation3d(0, 0, -state.getEleHeight()),
+                new Rotation3d(0, state.getArmAngle(), 0)
             )
         );
         
@@ -95,19 +89,29 @@ public class SuperVisualizer {
         ).rotateAround(new Translation2d(
             armOrigin.getX(),
             armOrigin.getZ()
-        ), Rotation2d.fromDegrees(armAngle));
+        ), Rotation2d.fromRadians(state.getArmAngle()));
 
         Pose3d wristPos = new Pose3d(
                 new Translation3d(wrist_rotate.getX(), wristOrigin.getY(), wrist_rotate.getY()),
                 wristOrigin.getRotation()
         ).transformBy(
             new Transform3d(
-                new Translation3d(0, 0, -elevatorHeight),
-                new Rotation3d(0, Units.degreesToRadians(wristAngle +  armAngle), 0)
+                new Translation3d(0, 0, -state.getEleHeight()),
+                new Rotation3d(0,state.getGlobalAngle(), 0)
             )
         );
+        SwerveDriveSimulation driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
+
+        Pose3d endEffectorPos = wristPos.transformBy(
+            new Transform3d(
+                new Translation3d(
+                    driveSim.getSimulatedDriveTrainPose().getTranslation().getX(),
+                    driveSim.getSimulatedDriveTrainPose().getTranslation().getY(),
+                    0),
+                new Rotation3d(0, 0, driveSim.getSimulatedDriveTrainPose().getRotation().getRadians())
+            ));
 
         
-        Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos);
+        Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos, endEffectorPos);
     }
 }

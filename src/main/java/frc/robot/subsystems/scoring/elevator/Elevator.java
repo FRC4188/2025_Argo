@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase{
         return instance;
     }
 
-    private Elevator(ElevatorIO io){
+    public Elevator(ElevatorIO io){
         this.io = io;
         //Ansh said Ly said this will be generated.
         inputs = new ElevatorIOInputsAutoLogged();
