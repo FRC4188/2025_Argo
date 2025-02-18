@@ -2,6 +2,9 @@ package frc.robot.subsystems.scoring.intake;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
+// i added stuff in here - anish
 public interface IntakeIO {
     @AutoLog
     public static class IntakeIOInputs {
@@ -15,6 +18,10 @@ public interface IntakeIO {
     public default void updateInputs(IntakeIOInputs inputs) {}
 
     public default void runVolts(double volts) {}
+
+    public default void invertMotor(boolean isInverted) {}
+
+    public default boolean isSafetyOn(boolean isSafe) {return isSafe;}
 
     public default void stop(){}
 }
