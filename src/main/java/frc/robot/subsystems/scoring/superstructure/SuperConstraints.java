@@ -3,10 +3,13 @@ package frc.robot.subsystems.scoring.superstructure;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.commands.autos.pathgen.PG_math;
 
 public class SuperConstraints {
+
+    public static Constraints SuperTrajConstraints = new Constraints(20, 20);
 
     public class ArmConstraints {
         public final static double LOWEST_A = Units.degreesToRadians(-180);

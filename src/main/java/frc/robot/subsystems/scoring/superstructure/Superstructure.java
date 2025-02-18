@@ -7,11 +7,14 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIO;
 import frc.robot.subsystems.scoring.arm.ArmIOReal;
 import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
@@ -136,8 +139,19 @@ public class Superstructure extends SubsystemBase{
         return current;
     }
 
-    public void setTarget(SuperState goal) {
+    public boolean setTarget(SuperState goal) {
+        if (Constants.robot.robotstate == Constants.robot.STATE.ALGAE) {
+            Translation2d g_cartesian = goal.getCartesian(false);
+            Translation2d c_cartesian = goal.getCartesian(false);
+
+            if (c_cartesian.getX() > 0 && g_cartesian.getX() <= Units.inchesToMeters(12) || 
+                c_cartesian.getX() < 0 && g_cartesian.getX() >= Units.inchesToMeters(-12)) {
+                    return false;
+                }
+        }
+
         target = goal;
+        return true;
     } 
 
     private static double applyKs(double volts, double kS, double kSDeadband) {

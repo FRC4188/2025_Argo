@@ -17,19 +17,17 @@ public class SuperToState extends Command {
     Timer timer;
     Supplier<SuperState> traj_states;
     SuperTraj trajectory;
-    TrapezoidProfile tp;
     SuperState goal;
     
-    public SuperToState(Superstructure superstruct, SuperState goalState, TrapezoidProfile constraints) {
+    public SuperToState(Superstructure superstruct, SuperState goalState) {
         superstructure = superstruct;
-        tp = constraints;
         timer = new Timer();
         goal = goalState;
         traj_states = () -> goal;
     }
 
     public void initialize() {
-        trajectory = AngleGen.getInstance().generateTrajectory(superstructure.getState(), goal, tp);
+        trajectory = AngleGen.getInstance().generateTrajectory(superstructure.getState(), goal);
 
         System.out.println(trajectory);
 

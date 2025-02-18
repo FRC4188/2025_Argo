@@ -6,13 +6,14 @@ import java.util.stream.Collectors;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 
 public class SuperTraj {
     private final double m_totalTimeSeconds;
     private final List<SuperState> m_states;
 
-    private TrapezoidProfile tp;
+    private TrapezoidProfile tp = new TrapezoidProfile(SuperConstraints.SuperTrajConstraints);
     private double distance;
 
     public SuperTraj() {
@@ -20,9 +21,8 @@ public class SuperTraj {
         m_totalTimeSeconds = 0.0;
     }
 
-    public SuperTraj(final List<SuperState> states, double distance, TrapezoidProfile tp) {
+    public SuperTraj(final List<SuperState> states, double distance) {
         m_states = states;
-        this.tp = tp;
         this.distance = distance;
         if (m_states.isEmpty()) {
             throw new IllegalArgumentException("Trajectory manually created with no states.");

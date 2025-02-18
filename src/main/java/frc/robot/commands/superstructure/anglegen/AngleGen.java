@@ -101,10 +101,10 @@ public class AngleGen {
 
     }
 
-    public SuperTraj generateTrajectory(SuperState start, SuperState end, TrapezoidProfile tp) {
+    public SuperTraj generateTrajectory(SuperState start, SuperState end) {
         ArrayList<SuperState> result = gen_pivots(start, end);
 
-        return new SuperTraj(result, (result.size() - 1), tp);
+        return new SuperTraj(result, (result.size() - 1));
     }
 
     //TODO: reduce pivots to reduce awkward movement

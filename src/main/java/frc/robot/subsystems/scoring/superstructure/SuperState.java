@@ -8,6 +8,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.commands.autos.pathgen.PG_math;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ArmConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ElevatorConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
 import frc.robot.util.FieldConstant.Reef;
 
 
@@ -24,19 +27,10 @@ public class SuperState {
     
     public SuperState() {}
 
-    //cartesian pose
-    public SuperState(Translation2d endEffectorPos, double optimal_angle, boolean isCoral) {
-        SuperState calculated = fromPose(endEffectorPos, optimal_angle, isCoral);
-
-        wrist_angle = calculated.getWristAngle();
-        arm_angle = calculated.getArmAngle();
-        elevator_height = calculated.getEleHeight();
-    }
-
     public SuperState(double wrist, double arm, double elevator) {
-        wrist_angle = wrist;
-        arm_angle = arm;
-        elevator_height = elevator;
+        wrist_angle = MathUtil.clamp(wrist, WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
+        arm_angle = MathUtil.clamp(arm, ArmConstraints.LOWEST_A, ArmConstraints.HIGHEST_A);
+        elevator_height = MathUtil.clamp(elevator_height, 0, ElevatorConstraints.RANGE);
     }
 
     public static SuperState fromPose(Translation2d t, double optimal_score_angle, boolean isCoral) {

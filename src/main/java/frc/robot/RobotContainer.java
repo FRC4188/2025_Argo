@@ -226,7 +226,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-     return new SuperToState(superstructure, SuperPreset.SOURCE.getState(), new TrapezoidProfile(new Constraints(10, 10)));
+     return new SuperToState(superstructure, SuperPreset.SOURCE.getState());
   }
 
   public void resetSimulation(){

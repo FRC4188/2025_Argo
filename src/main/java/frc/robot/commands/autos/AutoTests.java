@@ -41,10 +41,6 @@ public final class AutoTests {
             DegreesPerSecondPerSecond.of(862),
             Volts.of(12),
             false);
-    
-    public static TrajectoryConfig config = new TrajectoryConfig(
-        TunerConstants.kSpeedAt12Volts.magnitude() / 2, 
-        Constants.robot.MAX_ACCELERATION.magnitude() / 2);
         
     //run barely, slow and not accurate
     public static Command toBasetoSource(){
@@ -81,36 +77,19 @@ public final class AutoTests {
         return new SequentialCommandGroup();
     }
 
-    //not moving like irl for sim
-    public static Command follow2Coral(Drive drive){
-        return new FollowPath(
-            TrajectoryGenerator.generateTrajectory(
-                drive.getPose(), 
-                List.of(
-                    Reef.Base.left_brg_corner,
-                    Source.left_srcs[0].getTranslation(),
-                    Reef.Base.right_field_corner),
-                new Pose2d(Reef.Base.right_field_corner, drive.getRotation()),
-                config),
-            
-            new Rotation2d(Degrees.of(0)),
-            drive
-            );
-    }
-
     public static Command AG2Coral(Drive drive){
         
         System.out.println(FieldConstant.Processor.processor_wall);
         System.out.println(FieldConstant.Processor.processor_goal);
 
         return Commands.sequence(
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src, config),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config),
-            new DriveTo(drive, FieldConstant.Source.left_srcs[0], config),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right, config),
-            new DriveTo(drive, FieldConstant.Source.right_srcs[0], config),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left, config),
-            new DriveTo(drive, FieldConstant.Processor.processor_goal, config)
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),
+            new DriveTo(drive, FieldConstant.Source.left_srcs[0]),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right),
+            new DriveTo(drive, FieldConstant.Source.right_srcs[0]),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),
+            new DriveTo(drive, FieldConstant.Processor.processor_goal)
         );
         
     }

@@ -14,6 +14,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.pathplanner.lib.config.PIDConstants;
+
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -35,6 +37,7 @@ public final class Constants {
   }
 
   public static class robot {
+
     public static final double loopPeriodSecs = 0.02;
 
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;
