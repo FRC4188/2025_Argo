@@ -19,6 +19,8 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -53,14 +55,6 @@ public final class Constants {
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
-
-    public static enum STATE {
-      EMPTY,
-      ALGAE,
-      CORAL
-    }
-  
-    public static STATE robotstate = STATE.EMPTY; //to be set
   }
 
   public static enum Mode {
@@ -87,7 +81,24 @@ public final class Constants {
     public static final double kDrumeRadius = Units.inchesToMeters(0.75000 / 2); //TODO: get drum radius
 
     public static final double kGearRatio = 6;
+    public static final double kTolerance = 0.0;
     public static final double kZero = 0; //TODO: get zero
+
+    public static final double kMax_Vel = 3;
+    public static final double kMax_Accel = 6;
+    public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
+
+    public static final double kP = 1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kF = 0.0;
+    public static final double kS = 0.1;
+    public static final double kG = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+    
+    public static final ProfiledPIDController ElePID = new ProfiledPIDController(kP, kI, kD, kConstraints);
+    public static final ElevatorFeedforward EleFF = new ElevatorFeedforward(kS, kG, kV, kA);
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)
@@ -105,11 +116,12 @@ public final class Constants {
 
     private static final Slot0Configs kSlot0Configs = new Slot0Configs()
       .withGravityType(GravityTypeValue.Elevator_Static)
-      .withKP(0.0)
-      .withKD(0.0)
-      .withKS(0)
-      .withKV(0.0)
-      .withKA(0.0);
+      .withKP(kP)
+      .withKD(kD)
+      .withKS(kS)
+      .withKG(kG)
+      .withKV(kV)
+      .withKA(kA);
 
     private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
     private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
@@ -122,33 +134,36 @@ public final class Constants {
       .withClosedLoopRamps(kClosedLoopRampsConfigs)
       .withOpenLoopRamps(kOpenLoopRampsConfigs);
   }
+
   public static class WristConstants {
+    public static final double kTolerance = 0.75;
+    public static final double kZero = 0.0; //TODO: to be tuned
+
+    public static final double kGearRatio = 4.6666666667;
+    public static final int kCurrentLimit = 0; //int for some reason
+    public static final double kDegree_per_rads = (360 / kGearRatio);
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final ProfiledPIDController WristPID = new ProfiledPIDController(0.325, 0.0, 0.02, kConstraints);
-    
-    public static final int kCurrentLimit = 0;
-    public static final double kGearRatio = 4.6666666667;
-
-    public static final double kDegree_per_rads = (360 / kGearRatio);
-
-    public static final double kTolerance = 0.75;
-    public static final double kZero = 0.0; //TODO: to be tuned
-
-    public static final double kP = 0.1;
+    public static final double kP = 2;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final double kD = 3;
     public static final double kF = 0.0;
-    public static final double kS = 0.0;
+    public static final double kS = 0.1;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
-    
+    public static final double kG = 0.0;
+
+    public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
+    public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
   }
 
   public static class ArmConstants {
+    public static final double kTolerance = 0.75;
+    public static final double kZero = 0; //TODO: get zero
+
     public static final double kGearRatio = 5.0625;
 
     public static final double kP = 0.1;
@@ -156,11 +171,16 @@ public final class Constants {
     public static final double kD = 0.0;
     public static final double kF = 0.0;
     public static final double kS = 0.0;
+    public static final double kG = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
+    
+    public static final double kMax_Vel = Units.degreesToRadians(960.0);
+    public static final double kMax_Accel = Units.degreesToRadians(720.0);
+    public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kTolerance = 0.75;
-    public static final double kZero = 0; //TODO: get zero
+    public static final ProfiledPIDController ArmPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
+    public static final ArmFeedforward ArmFF = new ArmFeedforward(kS, kG, kV, kA);
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)
@@ -177,10 +197,11 @@ public final class Constants {
       .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
 
     private static final Slot0Configs kSlot0Configs = new Slot0Configs()
-      .withGravityType(GravityTypeValue.Arm_Cosine)
+      .withGravityType(GravityTypeValue.Arm_Cosine) //TODO: check arm angle cause 0 is horizontal and our 0 is vertical
       .withKP(kP)
       .withKD(kI)
       .withKS(kS)
+      .withKG(kG)
       .withKV(kV)
       .withKA(kA);
 
@@ -195,6 +216,4 @@ public final class Constants {
       .withClosedLoopRamps(kClosedLoopRampsConfigs)
       .withOpenLoopRamps(kOpenLoopRampsConfigs);
   }
-  
-
 }

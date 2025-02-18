@@ -3,6 +3,10 @@ package frc.robot.subsystems.scoring.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+
 
 public interface WristIO {//J.C
     @AutoLog
@@ -14,9 +18,11 @@ public interface WristIO {//J.C
         public double desiredPositionRads = 0.0;
     }
 
+    public default ProfiledPIDController getPID() {return new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));}
+    public default ArmFeedforward getFF() {return new ArmFeedforward(0, 0, 0);}
+
     default void updateInputs(WristIOInputs inputs) {}
     default void runVolts(double volts) {}
     default double getAngle() {return 0;}
-    default void stop() {}
 
 }

@@ -2,7 +2,13 @@ package frc.robot.subsystems.scoring.arm;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+
 public interface ArmIO {
+
     @AutoLog
     public static class ArmIOInputs {
         public boolean connected = true;
@@ -12,8 +18,10 @@ public interface ArmIO {
         public double desiredPositionRads = 0.0;
     }
 
+    public default ProfiledPIDController getPID() {return new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));}
+    public default ArmFeedforward getFF() {return new ArmFeedforward(0, 0, 0);}
+
     public default void updateInputs(ArmIOInputs inputs) {}
     public default void runVolts(double volts) {}
     public default double getAngle(){ return  0;}
-    public default void stop() {}
 }

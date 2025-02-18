@@ -18,10 +18,13 @@ import frc.robot.subsystems.scoring.arm.ArmIO;
 import frc.robot.subsystems.scoring.arm.ArmIOReal;
 import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
+import frc.robot.subsystems.scoring.elevator.ElevatorIO;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.wrist.Wrist;
+import frc.robot.subsystems.scoring.wrist.WristIO;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
 import frc.robot.subsystems.scoring.wrist.WristIOSim;
 
@@ -32,33 +35,8 @@ public class Superstructure extends SubsystemBase{
 
     private SuperVisualizer sim;
 
-    ArmFF ff;
+    //ArmFF ff;
 
-    private final Constraints constraints = new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0));
-
-    private ProfiledPIDController armPID = 
-        new ProfiledPIDController(
-            0.1, 0.0, 0.0, 
-            constraints);
-
-    private ProfiledPIDController wristPID = 
-        new ProfiledPIDController(
-            2, 0, 3,
-            constraints);
-
-
-    private ProfiledPIDController elePID = 
-        new ProfiledPIDController(
-            1, 0.0, 0.0, 
-            constraints);
-
-    private ElevatorFeedforward eleff =
-        new ElevatorFeedforward(
-            0.1, 0, 0);
-
-    private ArmFeedforward wristff = 
-        new ArmFeedforward(0.1, 0, 0);
-        
     private SuperState target;
     private SuperState current;
     
@@ -75,15 +53,17 @@ public class Superstructure extends SubsystemBase{
                 this.elevator = new Elevator(new ElevatorIOSim());
                 break;
             default: 
-                this.arm = new Arm(new ArmIOSim());
-                this.wrist = new Wrist(new WristIOSim());
-                this.elevator = new Elevator(new ElevatorIOSim());
+                this.arm = new Arm(new ArmIO() {});
+                this.wrist = new Wrist(new WristIO() {});
+                this.elevator = new Elevator(new ElevatorIO() {});
         }
         sim = new SuperVisualizer("Superstructure");
 
         target = SuperPreset.START.getState();
 
-        ff = new ArmFF();
+        wrist.setTarget(target.getWristAngle());
+        arm.setTarget(target.getArmAngle());
+        elevator.setHeight(target.getEleHeight());
 
         this.current = new SuperState(
             wrist.getAngle(),
@@ -91,15 +71,8 @@ public class Superstructure extends SubsystemBase{
             elevator.getHeight());
     }
 
-    public void setgoal(SuperState goal){
-        target = goal;
-
-    }
-
-
     @Override
     public void periodic(){
-
         current = new SuperState(
             wrist.getAngle(),
             arm.getAngle(),
@@ -107,40 +80,25 @@ public class Superstructure extends SubsystemBase{
 
         sim.update(current);
 
-        var ffVolt = ff.calculate(
-            VecBuilder.fill(target.getArmAngle(), target.getWristAngle())
-        );
-
-        arm.runVolt(
-            armPID.calculate(arm.getAngle(), target.getArmAngle())
-            //+ ffVolt.get(0, 0)
-            //^- until singlejointedarmsim gets workin, using for other stuff like autos
-        );
-
-        elevator.runVolts(
-            elePID.calculate(Units.metersToInches(elevator.getHeight()), Units.metersToInches(target.getEleHeight())) + eleff.calculate(20)
-        );
-
-        wrist.runVolts(
-            wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
-            + wristff.calculate(target.getGlobalAngle() + Math.PI/2, 0)
-        );
-        
         wrist.periodic();
         arm.periodic();
         elevator.periodic();
+
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
         Logger.recordOutput("wrist setpoint", target.getWristAngle());
         Logger.recordOutput("ele setpoint", target.getEleHeight());
-
     }
 
     public SuperState getState() {
         return current;
     }
 
+    public boolean atTarget() {
+        return wrist.atGoal() && arm.atGoal() && elevator.atGoal();
+    }
+
     public boolean setTarget(SuperState goal) {
-        if (Constants.robot.robotstate == Constants.robot.STATE.ALGAE) {
+        if (Intake.intakeState == Intake.Mode.ALGAE) {
             Translation2d g_cartesian = goal.getCartesian(false);
             Translation2d c_cartesian = goal.getCartesian(false);
 
@@ -151,6 +109,11 @@ public class Superstructure extends SubsystemBase{
         }
 
         target = goal;
+
+        wrist.setTarget(target.getWristAngle());
+        arm.setTarget(target.getArmAngle());
+        elevator.setHeight(target.getEleHeight());
+
         return true;
     } 
 

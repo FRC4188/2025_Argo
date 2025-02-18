@@ -20,18 +20,22 @@ public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
+  public double target = 0;
+
   public Wrist(WristIO io){
     this.io = io;
   }
 
   @Override
   public void periodic(){
+    io.runVolts(io.getPID().calculate(getAngle(), target) + io.getFF().calculate(getAngle() + Math.PI / 2, 0));
+
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);    
   }
 
-  public void runVolts(double volts) {
-    io.runVolts(volts);
+  public void setTarget(double angle) {
+    target = angle;
   }
 
   @AutoLogOutput(key = "Wrist/Angle Radians")
@@ -39,13 +43,9 @@ public class Wrist extends SubsystemBase {//J.C
     return io.getAngle();
   }
 
-  public double getVolt(){
-    return inputs.appliedVolts;
-  }
-
   @AutoLogOutput(key = "Wrist/isAtGoal")
-  public boolean atGoal(double goal) {
-    return Math.abs(getAngle() - goal) < Constants.WristConstants.kTolerance;
+  public boolean atGoal() {
+    return Math.abs(getAngle() - target) < Constants.WristConstants.kTolerance;
   }
   public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
@@ -54,7 +54,7 @@ public class Wrist extends SubsystemBase {//J.C
                 Volts.of(8),
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(
-                voltage -> runVolts(voltage.magnitude()),
+                voltage -> io.runVolts(voltage.magnitude()),
                 null,
                 this));
         

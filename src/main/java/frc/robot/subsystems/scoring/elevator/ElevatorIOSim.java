@@ -2,6 +2,8 @@
 package frc.robot.subsystems.scoring.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -49,16 +51,21 @@ public class ElevatorIOSim implements ElevatorIO{
         physSim.update(robot.loopPeriodSecs);
     }
 
+    public ProfiledPIDController getPID() {
+        return ElevatorConstants.ElePID;
+    }
+    public ElevatorFeedforward getFF() {
+        return ElevatorConstants.EleFF;
+    }
+
+
     @Override
     public void runVolts(double volts){
         appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+        
         sim.setInputVoltage(appliedVolts);
-        physSim.setInputVoltage(volts);
-    }
-
-    @Override
-    public void stop() {
-        runVolts(0);
+        physSim.setInputVoltage(appliedVolts);
+       
     }
 
     @Override

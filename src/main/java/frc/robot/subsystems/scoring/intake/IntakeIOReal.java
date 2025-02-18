@@ -12,16 +12,12 @@ public class IntakeIOReal implements IntakeIO {
 
     private final double appliedVolts;
     private final double tempC;
-    // private final StatusSignal<Angle> posRads;
-    // private final StatusSignal<AngularVelocity> velRadsPerSec;
 
     public IntakeIOReal(){
         motor = new WPI_TalonSRX(Constants.Id.kIntake);
 
         appliedVolts = motor.getMotorOutputVoltage();
         tempC = motor.getTemperature();
-        // posRads = encoder.getPosition();
-        // velRadsPerSec = encoder.getVelocity();
     }
 
 
@@ -31,7 +27,6 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void runVolts(double volts) {
-        // motor.set(voltageOut.withOutput(volts));
         motor.setVoltage(volts);
     }
 
@@ -39,8 +34,6 @@ public class IntakeIOReal implements IntakeIO {
     public void updateInputs(IntakeIOInputs inputs) {
         inputs.appliedVolts = appliedVolts;
         inputs.tempC = tempC;
-        // inputs.posRads = posRads.getValueAsDouble();
-        // inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
     }
     
 }

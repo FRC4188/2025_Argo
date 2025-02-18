@@ -11,11 +11,16 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.Id;
+import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOReal implements ElevatorIO {
 
@@ -28,7 +33,6 @@ public class ElevatorIOReal implements ElevatorIO {
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
     private final StatusSignal<Angle> posRads;
-    private final StatusSignal<AngularVelocity> velRadsPerSec;
     private final StatusSignal<Voltage> appliedVoltsFollow;
     private final StatusSignal<Temperature> tempCFollow;
 
@@ -73,7 +77,6 @@ public class ElevatorIOReal implements ElevatorIO {
         posRads = leader.getPosition();
         appliedVolts = leader.getMotorVoltage();
         tempC = leader.getDeviceTemp();
-        velRadsPerSec = leader.getVelocity();
         appliedVoltsFollow = follower.getMotorVoltage();
         tempCFollow = follower.getDeviceTemp();
         
@@ -83,7 +86,7 @@ public class ElevatorIOReal implements ElevatorIO {
     public void updateInputs(ElevatorIOInputs inputs) {
         inputs.connected =
         BaseStatusSignal.refreshAll(
-                posRads, appliedVolts, tempC, velRadsPerSec, appliedVoltsFollow, tempCFollow)
+                posRads, appliedVolts, tempC, appliedVoltsFollow, tempCFollow)
             .isOK();
     
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
@@ -94,16 +97,18 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.followerTempC = tempCFollow.getValueAsDouble();
     }
 
+    public ProfiledPIDController getPID() {
+        return ElevatorConstants.ElePID;
+    }
+    public ElevatorFeedforward getFF() {
+        return ElevatorConstants.EleFF;
+    }
+
     @Override
     public void runVolts(double volts){
         leader.setControl(new VoltageOut(volts));
     }
 
-    @Override
-    public void stop() {
-        runVolts(0);
-    }
-    
     @Override
     public double getHeight(){
         return posRads.getValueAsDouble() - kZero / 6 * kDrumeRadius * 2; //TODO: test da math

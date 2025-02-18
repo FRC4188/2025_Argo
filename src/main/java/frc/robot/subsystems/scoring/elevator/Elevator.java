@@ -8,44 +8,45 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
-
-import static frc.robot.Constants.ElevatorConstants.*;
 
 public class Elevator extends SubsystemBase{
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs;
 
-    ElevatorFeedforward ff;
+    public double target = 0;
 
     public Elevator(ElevatorIO io){
         this.io = io;
         inputs = new ElevatorIOInputsAutoLogged();
-        ff = new ElevatorFeedforward(
-            kMotorConfig.Slot0.kS, 
-            kMotorConfig.Slot0.kS, 
-            kMotorConfig.Slot0.kS); //TODO: get values from sysid
     }
 
     @Override
     public void periodic(){
+        io.runVolts(io.getPID().calculate(Units.metersToInches(getHeight()), Units.metersToInches(target)) + io.getFF().calculate(20));
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);   
-
     }
+
+    public void setHeight(double target) {
+        this.target = target;
+    } 
 
     @AutoLogOutput(key = "Elevator/Height Meters")
     public double getHeight(){
         return io.getHeight();
     }
 
-    public void runVolts(double volts) {
-        io.runVolts(volts);
+    //TODO: add autologoutput
+    public boolean atGoal() {
+        return Math.abs(getHeight() - target) < ElevatorConstants.kTolerance;
     }
 
     public Command runSysId(){
@@ -55,7 +56,7 @@ public class Elevator extends SubsystemBase{
                 Volts.of(8),
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(
-                voltage -> runVolts(voltage.magnitude()),
+                voltage -> io.runVolts(voltage.magnitude()),
                 null,
                 this));
         

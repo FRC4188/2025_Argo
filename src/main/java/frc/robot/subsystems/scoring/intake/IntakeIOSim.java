@@ -31,7 +31,7 @@ package frc.robot.subsystems.scoring.intake;
     import frc.robot.Constants;
     
     // should be the working file for intake simulation
-    public class IntakeSimulation extends BodyFixture implements IntakeIO {
+    public class IntakeIOSim extends BodyFixture implements IntakeIO {
         // private final Distance width;
         // private final Distance extendyLength;
         
@@ -63,8 +63,8 @@ package frc.robot.subsystems.scoring.intake;
         }
        
     // TODO: Find actual width of intake and extension of intake over bumper    
-            
-        public static IntakeSimulation OverTheBumperIntake (
+
+        public static IntakeIOSim OverTheBumperIntake (
             String targetedGamePieceType,
             AbstractDriveTrainSimulation driveTrainSim,
             Distance width,
@@ -72,7 +72,7 @@ package frc.robot.subsystems.scoring.intake;
             IntakeSide intakeside,
             int capacity
         ) {
-            return new IntakeSimulation (
+            return new IntakeIOSim (
                 targetedGamePieceType,
                 driveTrainSim,
                 getIntakeRectangle(driveTrainSim, width.in(Meters), extendyLength.in(Meters), intakeside),
@@ -102,7 +102,7 @@ package frc.robot.subsystems.scoring.intake;
             }
     
             // add/remove return type if necessary
-            public IntakeSimulation (
+            public IntakeIOSim (
                 String targetedGamePieceType, 
                 AbstractDriveTrainSimulation driveTrainSim, 
                 Convex shape, 
@@ -193,19 +193,19 @@ package frc.robot.subsystems.scoring.intake;
     
                     if (collisionBody1 instanceof GamePieceOnFieldSimulation gamePiece
                             && Objects.equals(gamePiece.type, targetedGamePieceType)
-                            && fixture2 == IntakeSimulation.this) indicateGamePieceRemoval(gamePiece);
+                            && fixture2 == IntakeIOSim.this) indicateGamePieceRemoval(gamePiece);
                     else if (collisionBody2 instanceof GamePieceOnFieldSimulation gamePiece
                             && Objects.equals(gamePiece.type, targetedGamePieceType)
-                            && fixture1 == IntakeSimulation.this) indicateGamePieceRemoval(gamePiece);
+                            && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(gamePiece);
     
-                    boolean coralOrAlgaeIntake = "Coral".equals(IntakeSimulation.this.targetedGamePieceType)
-                            || "Algae".equals(IntakeSimulation.this.targetedGamePieceType);
+                    boolean coralOrAlgaeIntake = "Coral".equals(IntakeIOSim.this.targetedGamePieceType)
+                            || "Algae".equals(IntakeIOSim.this.targetedGamePieceType);
                     if (collisionBody1 instanceof ReefscapeCoralAlgaeStack stack
                             && coralOrAlgaeIntake
-                            && fixture2 == IntakeSimulation.this) indicateGamePieceRemoval(stack);
+                            && fixture2 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
                     else if (collisionBody2 instanceof ReefscapeCoralAlgaeStack stack
                             && coralOrAlgaeIntake
-                            && fixture1 == IntakeSimulation.this) indicateGamePieceRemoval(stack);
+                            && fixture1 == IntakeIOSim.this) indicateGamePieceRemoval(stack);
                 }
                 
                 @Override

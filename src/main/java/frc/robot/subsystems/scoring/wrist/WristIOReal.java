@@ -13,10 +13,13 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 import com.revrobotics.RelativeEncoder;
 
-import static frc.robot.Constants.WristConstants.*;
+import static frc.robot.Constants.WristConstants;
 
 public class WristIOReal implements WristIO {
     private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
@@ -31,8 +34,8 @@ public class WristIOReal implements WristIO {
         config.inverted(true).idleMode(IdleMode.kBrake);
         config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
         config.idleMode(IdleMode.kBrake);
-        config.smartCurrentLimit(kCurrentLimit);
-        config.absoluteEncoder.apply(new AbsoluteEncoderConfig().zeroOffset(kZero));
+        config.smartCurrentLimit(WristConstants.kCurrentLimit);
+        config.absoluteEncoder.apply(new AbsoluteEncoderConfig().zeroOffset(WristConstants.kZero));
 
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         encoder = max.getEncoder();
@@ -44,9 +47,11 @@ public class WristIOReal implements WristIO {
         max.setVoltage(volts);
     }
 
-    @Override  
-    public void stop() {
-        runVolts(0);
+    public ProfiledPIDController getPID() {
+        return WristConstants.WristPID;
+    }
+    public ArmFeedforward getFF() {
+        return WristConstants.WristFF;
     }
 
     @Override

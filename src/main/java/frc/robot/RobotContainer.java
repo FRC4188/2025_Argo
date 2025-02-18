@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.scoring.AutoScore;
 import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -45,6 +46,10 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.intake.Intake;
+import frc.robot.subsystems.scoring.intake.IntakeIO;
+import frc.robot.subsystems.scoring.intake.IntakeIOReal;
+import frc.robot.subsystems.scoring.intake.IntakeIOSim;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
@@ -66,9 +71,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private Superstructure superstructure;
+  private Intake intake;
+
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
-  private Superstructure superstructure;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -94,7 +101,10 @@ public class RobotContainer {
         vis = new Limelight(drive, 
             new VisionIOLL("limelight-back", drive::getRotation),
             new VisionIOLL("limelight-front", drive::getRotation));
+        
             superstructure = new Superstructure(Mode.REAL);
+
+        intake = new Intake(new IntakeIOReal());
         break;
 
       case SIM:
@@ -121,6 +131,7 @@ public class RobotContainer {
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
         superstructure = new Superstructure(Mode.SIM);
+        intake = new Intake(new IntakeIO() {});
         break;
 
       default:
@@ -178,14 +189,14 @@ public class RobotContainer {
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
       controller2.a().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L2_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L2_CORAL.getState())));
 
       controller2.b().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L3_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L3_CORAL.getState())));
       controller2.x().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
+        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.START.getState())));
 
   }
 
@@ -223,7 +234,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-     return new SuperToState(superstructure, SuperPreset.SOURCE.getState());
+     return new AutoScore(FieldConstant.Reef.CoralGoal.alliance_left, SuperState.SuperPreset.L3_CORAL.getState(), drive, superstructure, intake);
   }
 
   public void resetSimulation(){

@@ -1,12 +1,15 @@
 package frc.robot.subsystems.scoring.wrist;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
 
@@ -35,15 +38,19 @@ public class WristIOSim implements WristIO{
             );
     }
 
+
+    public ProfiledPIDController getPID() {
+        return WristConstants.WristPID;
+    }
+
+    public ArmFeedforward getFF() {
+        return WristConstants.WristFF;
+    }
+    
     @Override
     public void runVolts(double volts) {
         appliedVolts = MathUtil.clamp(volts,-12, 12);
         sim.setInputVoltage(appliedVolts);
-    }
-
-    @Override 
-    public void stop() {
-        runVolts(0);
     }
 
     @Override

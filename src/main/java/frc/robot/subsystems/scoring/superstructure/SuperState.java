@@ -30,7 +30,9 @@ public class SuperState {
     public SuperState(double wrist, double arm, double elevator) {
         wrist_angle = MathUtil.clamp(wrist, WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
         arm_angle = MathUtil.clamp(arm, ArmConstraints.LOWEST_A, ArmConstraints.HIGHEST_A);
-        elevator_height = MathUtil.clamp(elevator_height, 0, ElevatorConstraints.RANGE);
+        elevator_height = MathUtil.clamp(elevator, 0, ElevatorConstraints.RANGE);
+
+       
     }
 
     public static SuperState fromPose(Translation2d t, double optimal_score_angle, boolean isCoral) {

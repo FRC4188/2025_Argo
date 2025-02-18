@@ -11,14 +11,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+
+    public double target = 0;
     
     public Arm(ArmIO io) {
         this.io = io;
@@ -26,28 +25,26 @@ public class Arm extends SubsystemBase {
     
     @Override
     public void periodic() {
+        io.runVolts(
+            io.getPID().calculate(getAngle(), target)
+            + io.getFF().calculate(getAngle() + Math.PI, 0));
 
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
     }
 
-   public void runVolt(double volt){
-        io.runVolts(volt);
+   public void setTarget(double target) {
+        this.target = target;
    }
-
-   public double getVolt(){
-    return inputs.appliedVolts;
-   }
-
 
     @AutoLogOutput(key = "Arm/Angle Radians")
-    public  double getAngle() {
+    public double getAngle() {
         return io.getAngle();
     }
     
     @AutoLogOutput(key = "Arm/isAtSetpoint")
-    public boolean isAtAngle(double targetAngle) {
-        return Math.abs(getAngle() - targetAngle) < Constants.ArmConstants.kTolerance;
+    public boolean atGoal() {
+        return Math.abs(getAngle() - target) < Constants.ArmConstants.kTolerance;
     }
     public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
@@ -56,7 +53,7 @@ public class Arm extends SubsystemBase {
                 Volts.of(8),
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(
-                voltage -> runVolt(voltage.magnitude()),
+                voltage -> io.runVolts(voltage.magnitude()),
                 null,
                 this));
         
