@@ -66,15 +66,16 @@ public final class Constants {
 
   public class Id{
     //DT ids are 1->12
+    //Pigeon is 15
     public static final int kElevatorLead = 13;
     public static final int kElevatorFollow = 14;
-    public static final int kElevatorLeadNcoder = 15;
-    public static final int kElevatorFollowNcoder = 16;
-    public static final int kArm = 17;
-    public static final int kArmNcoder = 18;    
-    public static final int kWrist = 19;
-    public static final int kWristNcoder = 20;    
-    public static final int kIntake = 21;
+    public static final int kElevatorLeadNcoder = 16;
+    public static final int kElevatorFollowNcoder = 17;
+    public static final int kArm = 18;
+    public static final int kArmNcoder = 19;    
+    public static final int kWrist = 20;
+    public static final int kWristNcoder = 21;    
+    public static final int kIntake = 22;
   }
 
   public static class ElevatorConstants{    
@@ -84,11 +85,11 @@ public final class Constants {
     public static final double kTolerance = 0.0;
     public static final double kZero = 0; //TODO: get zero
 
-    public static final double kMax_Vel = 3;
-    public static final double kMax_Accel = 6;
+    public static final double kMax_Vel = 20;
+    public static final double kMax_Accel = 20;
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 1;
+    public static final double kP = 10;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;

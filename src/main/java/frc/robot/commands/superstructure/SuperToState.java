@@ -2,6 +2,7 @@ package frc.robot.commands.superstructure;
 
 import java.util.function.Supplier;
 
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
@@ -18,10 +19,12 @@ public class SuperToState extends Command {
     Timer timer;
     Supplier<SuperState> traj_states;
     SuperTraj trajectory;
-    TrapezoidProfile tp = new TrapezoidProfile(new Constraints(10, 10));
+    TrapezoidProfile tp = new TrapezoidProfile(new Constraints(20, 20));
     SuperState goal;
     
     public SuperToState(Superstructure superstruct, SuperState goalState) {
+        addRequirements(superstruct);
+
         superstructure = superstruct;
         timer = new Timer();
         goal = goalState;
@@ -38,6 +41,7 @@ public class SuperToState extends Command {
         } else {
             traj_states = () -> trajectory.sample(timer.get());
         }
+        System.out.println(trajectory);
 
         timer.start();
     }

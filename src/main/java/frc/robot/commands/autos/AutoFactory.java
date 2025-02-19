@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.commands.drive.DriveTo;
-import frc.robot.commands.scoring.AutoScore;
+import frc.robot.commands.scoring.Score;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.scoring.intake.Intake;
@@ -36,8 +36,8 @@ public final class AutoFactory {
             either(
                 idle(superstructure, drive, intake),
                 repeatingSequence(
-                    new AutoScore(goal, SuperState.SuperPreset.L4_CORAL.getState(), drive, superstructure, intake),
-                    new AutoScore(goal, SuperState.SuperPreset.SOURCE.getState(), drive, superstructure, intake),
+                    new Score(goal, SuperState.SuperPreset.L4_CORAL.getState(), intake.eject(), drive, superstructure, intake),
+                    new Score(goal, SuperState.SuperPreset.SOURCE.getState(), intake.eject(), drive, superstructure, intake),
                     Commands.runOnce(() -> avai.remove(goal))
                 ), 
                 ()-> time.hasElapsed(15))

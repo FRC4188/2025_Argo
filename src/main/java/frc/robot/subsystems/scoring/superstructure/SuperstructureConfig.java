@@ -38,15 +38,4 @@ public class SuperstructureConfig {
         double inertiaAbtCoM,
         double disFromPivot2CoG
     ){}
-
-    public enum IntakeMode{
-        ALGAE(0.0),
-        CORAL(0.0),
-        ALGAE_FEEDING(0.0); //need testing to see if possible to descore w just 1 side of the algae wheels + if it gets stuck
-
-        double angleOffset;
-        IntakeMode(double angleOffset){
-            this.angleOffset = angleOffset;
-        }
-    }
 }

@@ -27,7 +27,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.runVolts(
             io.getPID().calculate(getAngle(), target)
-            + io.getFF().calculate(getAngle() + Math.PI, 0));
+            + io.getFF().calculate(getAngle() + Math.PI/2, 0));
 
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);

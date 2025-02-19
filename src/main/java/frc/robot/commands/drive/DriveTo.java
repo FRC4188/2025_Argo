@@ -24,6 +24,8 @@ public class DriveTo extends Command {
     Drive drive;
 
     public DriveTo(Drive drive, Pose2d goal) {
+        
+
         this.drive = drive;
         config = new TrajectoryConfig(
             TunerConstants.kSpeedAt12Volts.magnitude() / 2, 

@@ -29,12 +29,14 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.scoring.AutoScore;
+import frc.robot.commands.scoring.Score;
 import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -234,14 +236,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-     return new AutoScore(FieldConstant.Reef.CoralGoal.alliance_left, SuperState.SuperPreset.L3_CORAL.getState(), drive, superstructure, intake);
+    return AutoScore.algaeScore(drive, superstructure, intake);
   }
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    // drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-    drive.setPose(FieldConstant.Source.left_srcs[1].transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg))); //0(clip in wall), 2 3 awk in mid n left
+    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     SimulatedArena.getInstance().resetFieldForAuto();
   }

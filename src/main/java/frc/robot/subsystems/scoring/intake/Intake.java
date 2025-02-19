@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase{
-    public enum Mode {
+    public static enum Mode {
         EMPTY,
         ALGAE,
         CORAL
@@ -17,7 +17,7 @@ public class Intake extends SubsystemBase{
 
     //I need this to be global value - RN
     public static Mode intakeState = Mode.EMPTY;
-    private Mode intakeMode = Mode.CORAL;
+
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
 
@@ -26,30 +26,30 @@ public class Intake extends SubsystemBase{
         inputs = new IntakeIOInputsAutoLogged();
     }
 
-    public void setMode(Mode mode) {
-        intakeMode = mode;
-    }
-
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     //TODO: create stall method
-    public Command ingest() {
+    public Command ingest(Mode intakeMode) {
         return Commands.run(
             () -> {
                 io.invertMotor(intakeMode == Mode.ALGAE);
                 io.runVolts(1);
-            }).until(()-> io.isSafetyOn());
+            }).until(()-> io.isSafetyOn()).andThen(() -> intakeState = intakeMode);
     }
 
     public Command eject() {
         return Commands.run(
             () -> {
-                io.invertMotor(intakeMode == Mode.CORAL);
+                io.invertMotor(intakeState == Mode.CORAL);
                 io.runVolts(1);
-            });
+            }).andThen(() -> intakeState = Mode.EMPTY);
     }
 
     public Mode getState() {
         return intakeState;
+    }
+
+    public void setState(Mode state) {
+        intakeState = state;
     }
 
     @Override
