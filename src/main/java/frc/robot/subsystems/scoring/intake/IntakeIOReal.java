@@ -1,5 +1,7 @@
 package frc.robot.subsystems.scoring.intake;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -21,8 +23,14 @@ public class IntakeIOReal implements IntakeIO {
     }
 
 
+    @AutoLogOutput(key = "Intake/Safety On")
     public boolean isSafetyOn() {
         return motor.isSafetyEnabled();
+    }
+
+    @AutoLogOutput(key = "Intake/Is Alive")
+    public boolean isAlive() {
+        return motor.isAlive();
     }
 
     @Override
