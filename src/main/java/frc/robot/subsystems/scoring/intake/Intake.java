@@ -29,21 +29,20 @@ public class Intake extends SubsystemBase{
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     //TODO: create stall method
     public Command ingest(Mode intakeMode) {
-        System.out.println("ingesting algae " + (intakeMode == Mode.ALGAE));
         io.invertMotor(intakeMode == Mode.ALGAE);
         return Commands.run(
             () -> {
                 io.runVolts(1);
-            }).until(()-> io.isSafetyOn()).andThen(() -> intakeState = intakeMode).andThen(() -> System.out.println("ingested algae: " + (intakeState == Mode.ALGAE)));
+            }).until(()-> io.isSafetyOn()).withTimeout(2).andThen(() -> intakeState = intakeMode);
     }
 
     public Command eject() {
-        System.out.println("ejecting");
         io.invertMotor(intakeState == Mode.CORAL);
         return Commands.run(
             () -> {
                 io.runVolts(1);
-            }).andThen(() -> intakeState = Mode.EMPTY).andThen(() -> System.out.println("ejected"));
+                intakeState = Mode.EMPTY;
+            }).withTimeout(1).andThen(() -> intakeState = Mode.EMPTY);
     }
 
     public Mode getState() {

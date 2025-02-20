@@ -97,13 +97,6 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.followerTempC = tempCFollow.getValueAsDouble();
     }
 
-    public ProfiledPIDController getPID() {
-        return ElevatorConstants.ElePID;
-    }
-    public ElevatorFeedforward getFF() {
-        return ElevatorConstants.EleFF;
-    }
-
     @Override
     public void runVolts(double volts){
         leader.setControl(new VoltageOut(volts));

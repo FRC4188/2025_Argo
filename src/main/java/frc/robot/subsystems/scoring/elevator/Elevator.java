@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
@@ -24,8 +25,8 @@ import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 public class Elevator extends SubsystemBase{
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs;
-    private final ElevatorFeedforward ff =  new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
-    private final ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, new Constraints(20, 20));
+    private final ElevatorFeedforward ff =  Constants.ElevatorConstants.SimEleFF; //Constants.ElevatorConstants.EleFF
+    private final ProfiledPIDController pid = Constants.ElevatorConstants.SimElePID; //Constants.ElevatorConstants.ElePID
 
     public double target = 0;
 

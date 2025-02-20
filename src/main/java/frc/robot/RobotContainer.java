@@ -240,18 +240,17 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
-    // return new SequentialCommandGroup(
-    //   new AutoScore.coralScore(4, drive, superstructure, intake),
-    //   new AutoScore.coralSource(drive, superstructure, intake),
-    //   new AutoScore.coralScore(4, drive, superstructure, intake),
-    //   new AutoScore.coralSource(FieldConstant.Source.right_src_mid, drive, superstructure, intake),
-    //   new AutoScore.coralScore(FieldConstant.Reef.CoralGoal.mid_brg_right, 4, drive, superstructure, intake),
-    //   new AutoScore.algaeSource(drive, superstructure, intake),
-    //   new AutoScore.algaeScore(drive, superstructure, intake),
-    //   new AutoScore.algaeSource(FieldConstant.Reef.AlgaeSource.left_brg_src, drive, superstructure, intake),
-    //   new AutoScore.algaeScore(drive, superstructure, intake)
-    //   );
+    return new SequentialCommandGroup(
+      new AutoScore.coralScore(4, drive, superstructure, intake),
+      new AutoScore.coralSource(drive, superstructure, intake),
+      new AutoScore.coralScore(4, drive, superstructure, intake),
+      new AutoScore.coralSource(drive, superstructure, intake),
+      new AutoScore.coralScore(4, drive, superstructure, intake),
+      new AutoScore.algaeSource(drive, superstructure, intake),
+      new AutoScore.algaeScore(drive, superstructure, intake),
+      new AutoScore.algaeSource(drive, superstructure, intake),
+      new AutoScore.algaeScore(drive, superstructure, intake)
+      );
   }
 
   public void resetSimulation(){

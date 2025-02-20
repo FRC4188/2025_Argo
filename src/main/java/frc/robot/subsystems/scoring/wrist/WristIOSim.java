@@ -37,15 +37,6 @@ public class WristIOSim implements WristIO{
              0.0
             );
     }
-
-
-    public ProfiledPIDController getPID() {
-        return WristConstants.SimWristPID;
-    }
-
-    public ArmFeedforward getFF() {
-        return WristConstants.SimWristFF;
-    }
     
     @Override
     public void runVolts(double volts) {

@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.drive.DriveTo;
@@ -23,11 +23,17 @@ public class Score extends SequentialCommandGroup {
 
         addCommands(
             new DriveTo(drive, goal).alongWith(
-                new SuperToState(superstructure, (Intake.intakeState == Mode.ALGAE)?SuperPreset.L2_ALGAE.getState():SuperPreset.START.getState())
+                new ConditionalCommand(
+                    new SuperToState(superstructure, SuperPreset.START.getState()), 
+                    new SuperToState(superstructure, 
+                        (superstructure.getState().getCartesian(false).getX() < 0)?
+                        SuperPreset.PROCESSOR.getState():
+                        SuperPreset.PROCESSOR_REVERSE.getState()), 
+                    () -> intake.getState() != Mode.ALGAE)
                 .until(() -> (drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
                 .andThen(new WaitUntilCommand(() -> (drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
                 .andThen(new SuperToState(superstructure, state)))),
-            intakeCommand.withTimeout(1)
+            intakeCommand
         );
 
     }

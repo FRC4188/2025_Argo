@@ -120,26 +120,29 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
+            
+
             if (goal == null) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
-    
+            
             boolean flip = Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
             int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
-    
+            Pose2d correctedgoal = goal;
+            
             if (!flip && height == 1) {
                 preset = SuperPreset.L3_ALGAE;
             } else if(!flip && height == 0) {
                 preset = SuperPreset.L2_ALGAE;
             } else if (flip && height == 1) {
                 preset = SuperPreset.L3_ALGAE_REVERSE;
-                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedgoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
             } else if (flip && height == 0) {
                 preset = SuperPreset.L2_ALGAE_REVERSE;
-                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedgoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
             } else {
                 scoring = new Command() {};
             }
 
-            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.ALGAE), drive, superstruct, intake);
+            scoring = new Score(correctedgoal, preset.getState(), intake.ingest(Mode.ALGAE).andThen(() -> FieldConstant.Reef.AlgaeSource.asources.remove(goal)), drive, superstruct, intake);
         }
     }
 
@@ -185,7 +188,7 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
-            if (superstruct.getState().getCartesian(false).getX() < 0) {
+            if (superstruct.getState().getCartesian(false).getX() > 0) {
                 goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
                 preset = SuperPreset.PROCESSOR_REVERSE;
             } else {

@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-    private final ArmFeedforward ff =  new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV);
-    private final ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD, new Constraints(20, 20));
+    private final ArmFeedforward ff =  Constants.ArmConstants.SimArmFF; //Constants.ArmConstants.ArmFF;
+    private final ProfiledPIDController pid = Constants.ArmConstants.SimArmPID; //Constants.ArmConstants.ArmPID;
 
     public double target = 0;
     

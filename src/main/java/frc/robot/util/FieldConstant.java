@@ -4,6 +4,9 @@ package frc.robot.util;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Translation3d;
@@ -49,10 +52,8 @@ public class FieldConstant {
         public static Translation2d alliance_left_corner = new Translation2d(Units.inchesToMeters(0), field_width - Units.inchesToMeters(50.750));
         public static Translation2d all_wall_left_corner = new Translation2d(Units.inchesToMeters(67.039), field_width);
 
-        public static Translation2d opposing_right_corner = new Translation2d(field_length, Units.inchesToMeters(50.750));
-        public static Translation2d opp_wall_right_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), 0);
-        public static Translation2d opposing_left_corner = new Translation2d(field_length, field_width - Units.inchesToMeters(50.750));
-        public static Translation2d opp_wall_left_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), field_width);
+        public static Translation2d mid_left_wall = new Translation2d(field_center_x, field_width);
+        public static Translation2d mid_right_wall = new Translation2d(field_center_x, 0);
     }
 
     public class Cage {
@@ -201,7 +202,7 @@ public class FieldConstant {
                 Base.mid_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(180)))),
                 new Rotation2d(Degrees.of(180)));
                 
-            public static List<Pose2d> asources = List.of(alliance_src, left_brg_src, right_brg_src, left_src_src, right_src_src, mid_brg_src);
+            public static List<Pose2d> asources = new LinkedList<Pose2d>(Arrays.asList(alliance_src, left_brg_src, right_brg_src, left_src_src, right_src_src, mid_brg_src));
 
             public static int algaeHeight(Pose2d algae_src) {
                 if (algae_src == alliance_src || algae_src == left_brg_src || algae_src == right_brg_src) {

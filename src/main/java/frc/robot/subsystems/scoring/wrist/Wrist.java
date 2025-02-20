@@ -24,8 +24,8 @@ import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
-  private final ArmFeedforward ff =  new ArmFeedforward(WristConstants.kS, WristConstants.kG, WristConstants.kV);
-  private final ProfiledPIDController pid = new ProfiledPIDController(WristConstants.kP, WristConstants.kI, WristConstants.kD, new Constraints(20, 20));
+  private final ArmFeedforward ff = Constants.WristConstants.SimWristFF; //Constants.WristConstants.WristFF;
+  private final ProfiledPIDController pid = Constants.WristConstants.SimWristPID; //Constants.WristConstants.WristPID;
 
     public double target = 0;
 
