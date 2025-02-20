@@ -1,6 +1,11 @@
+
 package frc.robot.subsystems.scoring.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 public interface ElevatorIO {
     @AutoLog
@@ -14,13 +19,12 @@ public interface ElevatorIO {
         public double followerAppliedVolts = 0.0;
     }
 
+    public default ProfiledPIDController getPID() {return new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));}
+    public default ElevatorFeedforward getFF() {return new ElevatorFeedforward(0, 0, 0);}
+
     public default void updateInputs(ElevatorIOInputs inputs) {}
 
     public default void runVolts(double volts) {}
-
-    public default void runPosition(double position, double ff) {}
-
-    public default void stop() {}
 
     public default double getHeight(){return 0;}
 }
