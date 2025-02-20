@@ -26,6 +26,7 @@ public class AutoScore extends Command {
     protected Pose2d goal;
     protected SuperPreset preset;
     protected Command scoring;
+    protected boolean presetGoal = false;;
 
     public void factory() {
 
@@ -45,6 +46,7 @@ public class AutoScore extends Command {
     }
 
     public final void end(boolean interrupted) {
+        
         scoring.end(interrupted);
     }
 
@@ -77,6 +79,7 @@ public class AutoScore extends Command {
             this.superstruct = superstructure;
             this.intake = intake;
             goal = pose;
+            presetGoal = true;
     
             switch (bar) {
                 case 2:
@@ -97,7 +100,7 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
-            if (goal == null) goal = drive.getPose().nearest(FieldConstant.Reef.CoralGoal.cgoals);
+            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.CoralGoal.cgoals);
     
             scoring = new Score(goal, preset.getState(), intake.eject(), drive, superstruct, intake);
         }
@@ -116,13 +119,12 @@ public class AutoScore extends Command {
             this.superstruct = superstructure;
             this.intake = intake;
             goal = pose;
+            presetGoal = true;
         }
         
         @Override
         public void factory() {
-            
-
-            if (goal == null) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
+            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
             
             boolean flip = Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
             int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
@@ -159,20 +161,23 @@ public class AutoScore extends Command {
             this.superstruct = superstructure;
             this.intake = intake;
             goal = pose;
+            presetGoal = true;
         }
         
         @Override
         public void factory() {
-            if (goal == null) goal = drive.getPose().nearest(FieldConstant.Source.csources);
-    
+            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Source.csources);
+            
+            Pose2d correctedGoal = goal;
+
             if (Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2) {
-                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedGoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
                 preset = SuperPreset.SOURCE_REVERSE;
             } else {
                 preset = SuperPreset.SOURCE;
             }
 
-            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.CORAL), drive, superstruct, intake);
+            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(Mode.CORAL), drive, superstruct, intake);
         }
     }
 
@@ -188,14 +193,16 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
+            Pose2d correctedGoal = goal;
+
             if (superstruct.getState().getCartesian(false).getX() > 0) {
-                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedGoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
                 preset = SuperPreset.PROCESSOR_REVERSE;
             } else {
                 preset = SuperPreset.PROCESSOR;
             }
 
-            scoring = new Score(goal, preset.getState(), intake.eject(), drive, superstruct, intake);
+            scoring = new Score(correctedGoal, preset.getState(), intake.eject(), drive, superstruct, intake);
         }
     }
 

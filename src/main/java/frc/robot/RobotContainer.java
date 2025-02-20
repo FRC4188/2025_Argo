@@ -240,17 +240,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new SequentialCommandGroup(
-      new AutoScore.coralScore(4, drive, superstructure, intake),
-      new AutoScore.coralSource(drive, superstructure, intake),
-      new AutoScore.coralScore(4, drive, superstructure, intake),
-      new AutoScore.coralSource(drive, superstructure, intake),
-      new AutoScore.coralScore(4, drive, superstructure, intake),
-      new AutoScore.algaeSource(drive, superstructure, intake),
-      new AutoScore.algaeScore(drive, superstructure, intake),
-      new AutoScore.algaeSource(drive, superstructure, intake),
-      new AutoScore.algaeScore(drive, superstructure, intake)
-      );
+    return AutoFactory.leftCoralSource(drive, superstructure, intake);
   }
 
   public void resetSimulation(){
