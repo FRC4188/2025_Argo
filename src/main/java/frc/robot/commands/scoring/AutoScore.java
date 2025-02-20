@@ -120,8 +120,10 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
+            
+
             if (goal == null) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
-    
+            
             boolean flip = Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
             int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
     
@@ -139,7 +141,7 @@ public class AutoScore extends Command {
                 scoring = new Command() {};
             }
 
-            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.ALGAE), drive, superstruct, intake);
+            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.ALGAE).andThen(() -> FieldConstant.Reef.AlgaeSource.asources.remove(goal)), drive, superstruct, intake);
         }
     }
 
@@ -185,7 +187,7 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
-            if (superstruct.getState().getCartesian(false).getX() < 0) {
+            if (superstruct.getState().getCartesian(false).getX() > 0) {
                 goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
                 preset = SuperPreset.PROCESSOR_REVERSE;
             } else {
