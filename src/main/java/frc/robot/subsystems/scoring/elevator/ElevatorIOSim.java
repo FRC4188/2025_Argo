@@ -52,10 +52,10 @@ public class ElevatorIOSim implements ElevatorIO{
     }
 
     public ProfiledPIDController getPID() {
-        return ElevatorConstants.ElePID;
+        return ElevatorConstants.SimElePID;
     }
     public ElevatorFeedforward getFF() {
-        return ElevatorConstants.EleFF;
+        return ElevatorConstants.SimEleFF;
     }
 
 

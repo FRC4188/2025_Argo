@@ -28,8 +28,8 @@ public final class AutoFactory {
     static Timer time = new Timer();
 
     public static Command leftCoralSource(Drive drive, Superstructure superstructure, Intake intake){
-        Pose2d source = AllianceFlip.flipDS(drive.getPose().nearest(List.of(Source.left_srcs)));
-        List<Pose2d> avai = List.of(CoralGoal.coralGoals);
+        Pose2d source = AllianceFlip.flipDS(drive.getPose().nearest(Source.csources));
+        List<Pose2d> avai = CoralGoal.cgoals;
         Pose2d goal = AllianceFlip.apply(drive.getPose().nearest(avai));
         return parallel(
             runOnce(() -> time.restart()),

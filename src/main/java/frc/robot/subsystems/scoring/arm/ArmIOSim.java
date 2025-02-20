@@ -42,10 +42,10 @@ public class ArmIOSim implements ArmIO {
     }
 
     public ProfiledPIDController getPID() {
-        return ArmConstants.ArmPID;
+        return ArmConstants.SimArmPID;
     }
     public ArmFeedforward getFF() {
-        return ArmConstants.ArmFF;
+        return ArmConstants.SimArmFF;
     }
 
     @Override

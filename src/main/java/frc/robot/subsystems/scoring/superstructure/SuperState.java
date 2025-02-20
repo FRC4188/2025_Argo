@@ -140,31 +140,31 @@ public class SuperState {
                 Units.degreesToRadians(-25), Units.degreesToRadians(-30), Reef.L3_highest_h - Units.inchesToMeters(20))),
         L3_ALGAE_REVERSE(
             new SuperState(
-                Units.degreesToRadians( -60), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
+                Units.degreesToRadians( 30), Units.degreesToRadians(45), Reef.L3_highest_h - Units.inchesToMeters(20))),
         L3_ALGAE(
             new SuperState(
-                Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L3_highest_h - Units.inchesToMeters(20))),
+                Units.degreesToRadians(-60), Units.degreesToRadians(-30), Reef.L3_highest_h - Units.inchesToMeters(20))),
         L2_CORAL(
             new SuperState(
                 Units.degreesToRadians(-25), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
         L2_ALGAE(
             new SuperState(
-                Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L2_highest_h - Units.inchesToMeters(20))),
+                Units.degreesToRadians(-60), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
         L2_ALGAE_REVERSE(
             new SuperState(
-                Units.degreesToRadians(-60), Units.degreesToRadians(-30), Reef.L2_highest_h - Units.inchesToMeters(20))),
+                Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L2_highest_h - Units.inchesToMeters(20))),
         PROCESSOR(
             new SuperState(
-                Units.degreesToRadians(15), Units.degreesToRadians(65), 0)),
+                Units.degreesToRadians(-30), Units.degreesToRadians(-65), 0)),
         PROCESSOR_REVERSE(
             new SuperState(
-                Units.degreesToRadians(-30), Units.degreesToRadians(-65),0 )),
+                Units.degreesToRadians(15), Units.degreesToRadians(65),0 )),
         SOURCE(
             new SuperState(
-                Units.degreesToRadians(70), Units.degreesToRadians(45), Units.inchesToMeters(14))),
+                Units.degreesToRadians(25), Units.degreesToRadians(-30), Units.inchesToMeters(7))),
         SOURCE_REVERSE(
             new SuperState(
-                Units.degreesToRadians(25),Units.degreesToRadians( -30), Units.inchesToMeters(7))),
+                Units.degreesToRadians(70),Units.degreesToRadians( 45), Units.inchesToMeters(14))),
         // ALGAE_GROUND(
         //     new SuperState(
         //         new Translation3d(), false)),

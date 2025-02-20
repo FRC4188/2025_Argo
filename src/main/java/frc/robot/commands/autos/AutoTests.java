@@ -17,21 +17,15 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
-import frc.robot.commands.drive.FollowPath;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
-import frc.robot.util.FieldConstant.Reef;
-import frc.robot.util.FieldConstant.Source;
 
 public final class AutoTests {
     private final static PathConstraints  constraints =  new PathConstraints(
@@ -41,29 +35,6 @@ public final class AutoTests {
             DegreesPerSecondPerSecond.of(862),
             Volts.of(12),
             false);
-        
-    //run barely, slow and not accurate
-    public static Command toBasetoSource(){
-        Pose2d currPose = new Pose2d(FieldConstant.Cage.cage_positions[1].getX(), FieldConstant.Cage.cage_positions[1].getY(), new Rotation2d(Degrees.of(0)));
-    
-        Pose2d targetPose2d = new Pose2d(FieldConstant.Reef.Base.left_brg_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d targetPose2d1 = new Pose2d(FieldConstant.Reef.Base.right_brg_corner, new Rotation2d(Degrees.of(0)));
-        Pose2d source = FieldConstant.Source.right_srcs[0];
-    
-        List<Waypoint> pts  = PathPlannerPath.waypointsFromPoses(currPose,targetPose2d, source, targetPose2d1);
-            
-            
-
-        return AutoBuilder.pathfindThenFollowPath(
-            new PathPlannerPath(
-                pts,
-                constraints, 
-                new IdealStartingState(0, currPose.getRotation()),
-                new GoalEndState(0.0, targetPose2d1.getRotation())),
-
-            constraints
-        );
-    }
 
     //runs fine, bit off
     public static Command twoCoral(){
@@ -78,16 +49,12 @@ public final class AutoTests {
     }
 
     public static Command AG2Coral(Drive drive){
-        
-        System.out.println(FieldConstant.Processor.processor_wall);
-        System.out.println(FieldConstant.Processor.processor_goal);
-
         return Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),
-            new DriveTo(drive, FieldConstant.Source.left_srcs[0]),
+            new DriveTo(drive, FieldConstant.Source.left_src_mid),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right),
-            new DriveTo(drive, FieldConstant.Source.right_srcs[0]),
+            new DriveTo(drive, FieldConstant.Source.right_src_mid),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),
             new DriveTo(drive, FieldConstant.Processor.processor_goal)
         );

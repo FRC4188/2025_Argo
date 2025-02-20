@@ -19,64 +19,181 @@ import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.util.FieldConstant;
 
-public class AutoScore {
+public class AutoScore extends Command {
+    protected Drive drive;
+    protected Superstructure superstruct;
+    protected Intake intake;
+    protected Pose2d goal;
+    protected SuperPreset preset;
+    protected Command scoring;
 
-    public static List<Pose2d> cgoals = Arrays.asList(FieldConstant.Reef.CoralGoal.coralGoals);
-    public static List<Pose2d> agoals = Arrays.asList(FieldConstant.Reef.AlgaeSource.algGoal);
+    public void factory() {
 
-    public static Command coralScore(int bar, Drive drive, Superstructure superstruct, Intake intake) {
-        cgoals.sort((a, b) -> Double.compare(
-            drive.getPose().getTranslation().getDistance(a.getTranslation()), 
-            drive.getPose().getTranslation().getDistance(b.getTranslation())));
-        
-        Pose2d closest = cgoals.get(0);
-
-        SuperPreset preset;
-        switch (bar) {
-            case 2:
-                preset = SuperPreset.L2_CORAL;
-                break;
-            case 3:
-                preset = SuperPreset.L3_CORAL;
-                break;
-            case 4:
-                preset = SuperPreset.L4_CORAL;
-                break;
-        
-            default:
-                preset = SuperPreset.L2_CORAL;
-                break;
-        }
-
-        return new Score(closest, preset.getState(), intake.eject(), drive, superstruct, intake);
     }
 
-    public static Command algaeScore(Drive drive, Superstructure superstruct, Intake intake) {
-        agoals.sort((a, b) -> Double.compare(
-            drive.getPose().getTranslation().getDistance(a.getTranslation()), 
-            drive.getPose().getTranslation().getDistance(b.getTranslation())));
-        
-        Pose2d closest = agoals.get(0);
-        
-        SuperPreset preset;
+    public final void initialize() {
+        factory();
+        scoring.initialize();
+    }
 
-        if (FieldConstant.Reef.AlgaeSource.algaeHeight(closest) == 1 && superstruct.getState().getCartesian(false).getX() >= 0) {
-            preset = SuperPreset.L3_ALGAE;
+    public final void execute() {
+        scoring.execute();
+    }
+
+    public final boolean isFinished() {
+        return scoring.isFinished();
+    }
+
+    public final void end(boolean interrupted) {
+        scoring.end(interrupted);
+    }
+
+    public static class coralScore extends AutoScore {
+
+        public coralScore(int bar, Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+    
+            switch (bar) {
+                case 2:
+                    preset = SuperPreset.L2_CORAL;
+                    break;
+                case 3:
+                    preset = SuperPreset.L3_CORAL;
+                    break;
+                case 4:
+                    preset = SuperPreset.L4_CORAL;
+                    break;
             
-        } else if (FieldConstant.Reef.AlgaeSource.algaeHeight(closest) == 1 && superstruct.getState().getCartesian(false).getX() <= 0){
-            preset = SuperPreset.L3_ALGAE_REVERSE;
-            closest.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
-        } else if (FieldConstant.Reef.AlgaeSource.algaeHeight(closest) == 0 && superstruct.getState().getCartesian(false).getX() >= 0){
-            preset = SuperPreset.L2_ALGAE;
+                default:
+                    preset = SuperPreset.L2_CORAL;
+                    break;
+            }
+        }
+
+        public coralScore(Pose2d pose, int bar, Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+            goal = pose;
+    
+            switch (bar) {
+                case 2:
+                    preset = SuperPreset.L2_CORAL;
+                    break;
+                case 3:
+                    preset = SuperPreset.L3_CORAL;
+                    break;
+                case 4:
+                    preset = SuperPreset.L4_CORAL;
+                    break;
             
-        } else if(FieldConstant.Reef.AlgaeSource.algaeHeight(closest) == 0 && superstruct.getState().getCartesian(false).getX() <= 0) {
-            preset = SuperPreset.L2_ALGAE_REVERSE;
-            closest.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
-        } else {
-            return new Command() {};
+                default:
+                    preset = SuperPreset.L2_CORAL;
+                    break;
+            }
         }
         
-        return new Score(closest, preset.getState(), intake.ingest(Mode.ALGAE), drive, superstruct, intake);
+        @Override
+        public void factory() {
+            if (goal == null) goal = drive.getPose().nearest(FieldConstant.Reef.CoralGoal.cgoals);
+    
+            scoring = new Score(goal, preset.getState(), intake.eject(), drive, superstruct, intake);
+        }
+    }
+
+    public static class algaeSource extends AutoScore {
+
+        public algaeSource(Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+        }
+
+        public algaeSource(Pose2d pose, Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+            goal = pose;
+        }
+        
+        @Override
+        public void factory() {
+            if (goal == null) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
+    
+            boolean flip = Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
+            int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
+    
+            if (!flip && height == 1) {
+                preset = SuperPreset.L3_ALGAE;
+            } else if(!flip && height == 0) {
+                preset = SuperPreset.L2_ALGAE;
+            } else if (flip && height == 1) {
+                preset = SuperPreset.L3_ALGAE_REVERSE;
+                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+            } else if (flip && height == 0) {
+                preset = SuperPreset.L2_ALGAE_REVERSE;
+                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+            } else {
+                scoring = new Command() {};
+            }
+
+            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.ALGAE), drive, superstruct, intake);
+        }
+    }
+
+    public static class coralSource extends AutoScore {
+
+        public coralSource(Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+        }
+
+        public coralSource(Pose2d pose, Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+            goal = pose;
+        }
+        
+        @Override
+        public void factory() {
+            if (goal == null) goal = drive.getPose().nearest(FieldConstant.Source.csources);
+    
+            if (Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2) {
+                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                preset = SuperPreset.SOURCE_REVERSE;
+            } else {
+                preset = SuperPreset.SOURCE;
+            }
+
+            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.CORAL), drive, superstruct, intake);
+        }
+    }
+
+    public static class algaeScore extends AutoScore {
+
+        public algaeScore(Drive drive, Superstructure superstructure, Intake intake) {
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+            goal = FieldConstant.Processor.processor_goal;
+        }
+
+        
+        @Override
+        public void factory() {
+            if (superstruct.getState().getCartesian(false).getX() < 0) {
+                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                preset = SuperPreset.PROCESSOR_REVERSE;
+            } else {
+                preset = SuperPreset.PROCESSOR;
+            }
+
+            scoring = new Score(goal, preset.getState(), intake.eject(), drive, superstruct, intake);
+        }
     }
 
 }

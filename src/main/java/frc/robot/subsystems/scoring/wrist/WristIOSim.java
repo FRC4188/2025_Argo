@@ -40,11 +40,11 @@ public class WristIOSim implements WristIO{
 
 
     public ProfiledPIDController getPID() {
-        return WristConstants.WristPID;
+        return WristConstants.SimWristPID;
     }
 
     public ArmFeedforward getFF() {
-        return WristConstants.WristFF;
+        return WristConstants.SimWristFF;
     }
     
     @Override

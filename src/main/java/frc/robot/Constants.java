@@ -85,11 +85,11 @@ public final class Constants {
     public static final double kTolerance = 0.0;
     public static final double kZero = 0; //TODO: get zero
 
-    public static final double kMax_Vel = 20;
-    public static final double kMax_Accel = 20;
+    public static final double kMax_Vel = 3;
+    public static final double kMax_Accel = 3;
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 10;
+    public static final double kP = 0.1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
@@ -100,6 +100,12 @@ public final class Constants {
     
     public static final ProfiledPIDController ElePID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ElevatorFeedforward EleFF = new ElevatorFeedforward(kS, kG, kV, kA);
+
+    public static final ProfiledPIDController SimElePID = new ProfiledPIDController(
+      10, 0, 0, new Constraints(20, 20)
+      );
+
+    public static final ElevatorFeedforward SimEleFF = new ElevatorFeedforward(0.1, 0.0, 0.0, 0.0);
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)
@@ -148,9 +154,9 @@ public final class Constants {
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 2;
+    public static final double kP = 0.1;
     public static final double kI = 0.0;
-    public static final double kD = 3;
+    public static final double kD = 0.0;
     public static final double kF = 0.0;
     public static final double kS = 0.1;
     public static final double kV = 0.0;
@@ -159,6 +165,10 @@ public final class Constants {
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
+
+    //sim
+    public static final ProfiledPIDController SimWristPID = new ProfiledPIDController(3, 0.0, 6, new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0)));
+    public static final ArmFeedforward SimWristFF = new ArmFeedforward(0.1, 0, 0, 0);
   }
 
   public static class ArmConstants {
@@ -171,7 +181,7 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
-    public static final double kS = 0.0;
+    public static final double kS = 0.1;
     public static final double kG = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
@@ -182,6 +192,10 @@ public final class Constants {
 
     public static final ProfiledPIDController ArmPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward ArmFF = new ArmFeedforward(kS, kG, kV, kA);
+
+    public static final ProfiledPIDController SimArmPID = new ProfiledPIDController(0.1, 0.0, 0.0, 
+      new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0)));
+    public static final ArmFeedforward SimArmFF = new ArmFeedforward(0.1, 0.0, 0.0, 0.0);
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)

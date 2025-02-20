@@ -34,14 +34,11 @@ public class SuperToState extends Command {
     public void initialize() {
         trajectory = AngleGen.getInstance().generateTrajectory(superstructure.getState(), goal);
 
-        System.out.println(trajectory);
-
         if (trajectory.getStates().isEmpty()) {
             traj_states = () -> superstructure.getState();
         } else {
             traj_states = () -> trajectory.sample(timer.get());
         }
-        System.out.println(trajectory);
 
         timer.start();
     }

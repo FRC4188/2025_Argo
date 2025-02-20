@@ -59,6 +59,9 @@ import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
+
+import java.lang.reflect.Field;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -222,7 +225,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
-    autoChooser.addOption("Mid to 2 corals manual", AutoTests.toBasetoSource());
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
 
     //drive to pose cmmd test
@@ -236,7 +238,17 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoScore.algaeScore(drive, superstructure, intake);
+    return new SequentialCommandGroup(
+      new AutoScore.coralScore(4, drive, superstructure, intake),
+      new AutoScore.coralSource(drive, superstructure, intake),
+      new AutoScore.coralScore(4, drive, superstructure, intake),
+      new AutoScore.coralSource(FieldConstant.Source.right_src_mid, drive, superstructure, intake),
+      new AutoScore.coralScore(FieldConstant.Reef.CoralGoal.mid_brg_right, 4, drive, superstructure, intake),
+      new AutoScore.algaeSource(drive, superstructure, intake),
+      new AutoScore.algaeScore(drive, superstructure, intake),
+      new AutoScore.algaeSource(FieldConstant.Reef.AlgaeSource.left_brg_src, drive, superstructure, intake),
+      new AutoScore.algaeScore(drive, superstructure, intake)
+      );
   }
 
   public void resetSimulation(){
@@ -244,6 +256,7 @@ public class RobotContainer {
 
     drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
+    //drive.setPose(FieldConstant.Source.left_src_mid);
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
