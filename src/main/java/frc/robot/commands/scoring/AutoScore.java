@@ -50,12 +50,12 @@ public class AutoScore extends Command {
 
     public static class coralScore extends AutoScore {
 
-        public coralScore(int bar, Drive drive, Superstructure superstructure, Intake intake) {
+        public coralScore(int level, Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
             this.superstruct = superstructure;
             this.intake = intake;
     
-            switch (bar) {
+            switch (level) {
                 case 2:
                     preset = SuperPreset.L2_CORAL;
                     break;
@@ -126,22 +126,23 @@ public class AutoScore extends Command {
             
             boolean flip = Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
             int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
-    
+            Pose2d correctedgoal = goal;
+            
             if (!flip && height == 1) {
                 preset = SuperPreset.L3_ALGAE;
             } else if(!flip && height == 0) {
                 preset = SuperPreset.L2_ALGAE;
             } else if (flip && height == 1) {
                 preset = SuperPreset.L3_ALGAE_REVERSE;
-                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedgoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
             } else if (flip && height == 0) {
                 preset = SuperPreset.L2_ALGAE_REVERSE;
-                goal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedgoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
             } else {
                 scoring = new Command() {};
             }
 
-            scoring = new Score(goal, preset.getState(), intake.ingest(Mode.ALGAE).andThen(() -> FieldConstant.Reef.AlgaeSource.asources.remove(goal)), drive, superstruct, intake);
+            scoring = new Score(correctedgoal, preset.getState(), intake.ingest(Mode.ALGAE).andThen(() -> FieldConstant.Reef.AlgaeSource.asources.remove(goal)), drive, superstruct, intake);
         }
     }
 

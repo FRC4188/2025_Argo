@@ -115,14 +115,5 @@ public class Superstructure extends SubsystemBase{
         elevator.setHeight(target.getEleHeight());
 
         return true;
-    } 
-
-    private static double applyKs(double volts, double kS, double kSDeadband) {
-        if (Math.abs(volts) < kSDeadband) {
-          return volts;
-        }
-        return volts + Math.copySign(kS, volts);
-      }
-    
-    
+    }  
 }

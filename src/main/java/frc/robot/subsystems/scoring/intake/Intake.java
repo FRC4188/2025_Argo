@@ -33,7 +33,7 @@ public class Intake extends SubsystemBase{
         return Commands.run(
             () -> {
                 io.runVolts(1);
-            }).until(()-> io.isSafetyOn()).andThen(() -> intakeState = intakeMode);
+            }).until(()-> io.isSafetyOn()).withTimeout(2).andThen(() -> intakeState = intakeMode);
     }
 
     public Command eject() {
@@ -42,7 +42,7 @@ public class Intake extends SubsystemBase{
             () -> {
                 io.runVolts(1);
                 intakeState = Mode.EMPTY;
-            }).andThen(() -> intakeState = Mode.EMPTY);
+            }).withTimeout(1).andThen(() -> intakeState = Mode.EMPTY);
     }
 
     public Mode getState() {

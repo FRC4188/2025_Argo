@@ -49,13 +49,6 @@ public class ArmIOReal implements ArmIO {
             posRads)    ;
     }
 
-    public ProfiledPIDController getPID() {
-        return ArmConstants.ArmPID;
-    }
-    public ArmFeedforward getFF() {
-        return ArmConstants.ArmFF;
-    }
-
     @Override
     public void runVolts(double volts) {
         volts = MathUtil.clamp(volts,-12, 12);

@@ -57,10 +57,8 @@ public class PathGen {
                     FieldConstant.Field.alliance_left_corner,
                     FieldConstant.Field.alliance_right_corner,
                     FieldConstant.Field.all_wall_right_corner,
-                    FieldConstant.Field.opp_wall_right_corner,
-                    FieldConstant.Field.opposing_right_corner,
-                    FieldConstant.Field.opposing_left_corner,
-                    FieldConstant.Field.opp_wall_left_corner));
+                    FieldConstant.Field.mid_right_wall,
+                    FieldConstant.Field.mid_left_wall));
         FOHandler.getInstance().addFO(
                 new RectFO(
                     (float) FieldConstant.field_center_x,

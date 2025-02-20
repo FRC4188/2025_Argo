@@ -7,19 +7,26 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 
 public class Elevator extends SubsystemBase{
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs;
+    private final ElevatorFeedforward ff =  Constants.ElevatorConstants.SimEleFF; //Constants.ElevatorConstants.EleFF
+    private final ProfiledPIDController pid = Constants.ElevatorConstants.SimElePID; //Constants.ElevatorConstants.ElePID
 
     public double target = 0;
 
@@ -30,7 +37,7 @@ public class Elevator extends SubsystemBase{
 
     @Override
     public void periodic(){
-        io.runVolts(io.getPID().calculate(Units.metersToInches(getHeight()), Units.metersToInches(target)) + io.getFF().calculate(20));
+        io.runVolts(pid.calculate(Units.metersToInches(getHeight()), Units.metersToInches(target)) + ff.calculate(20));
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);   
     }

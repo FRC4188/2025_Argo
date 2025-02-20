@@ -41,6 +41,8 @@ public class SuperToState extends Command {
         }
 
         timer.start();
+        System.out.println("Super go to state ...");
+
     }
 
     public void execute() {

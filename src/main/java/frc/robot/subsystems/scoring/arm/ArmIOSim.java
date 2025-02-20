@@ -41,13 +41,6 @@ public class ArmIOSim implements ArmIO {
             );
     }
 
-    public ProfiledPIDController getPID() {
-        return ArmConstants.SimArmPID;
-    }
-    public ArmFeedforward getFF() {
-        return ArmConstants.SimArmFF;
-    }
-
     @Override
     public void runVolts(double volts) {
         appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);

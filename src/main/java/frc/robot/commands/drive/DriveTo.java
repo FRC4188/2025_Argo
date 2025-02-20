@@ -53,6 +53,7 @@ public class DriveTo extends Command {
         timer.start();
 
         driving.repeatedly().schedule();
+        System.out.println("Driving ....");
     }
 
     @Override

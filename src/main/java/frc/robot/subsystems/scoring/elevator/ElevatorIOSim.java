@@ -51,13 +51,6 @@ public class ElevatorIOSim implements ElevatorIO{
         physSim.update(robot.loopPeriodSecs);
     }
 
-    public ProfiledPIDController getPID() {
-        return ElevatorConstants.SimElePID;
-    }
-    public ElevatorFeedforward getFF() {
-        return ElevatorConstants.SimEleFF;
-    }
-
 
     @Override
     public void runVolts(double volts){

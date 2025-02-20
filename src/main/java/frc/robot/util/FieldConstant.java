@@ -52,10 +52,8 @@ public class FieldConstant {
         public static Translation2d alliance_left_corner = new Translation2d(Units.inchesToMeters(0), field_width - Units.inchesToMeters(50.750));
         public static Translation2d all_wall_left_corner = new Translation2d(Units.inchesToMeters(67.039), field_width);
 
-        public static Translation2d opposing_right_corner = new Translation2d(field_length, Units.inchesToMeters(50.750));
-        public static Translation2d opp_wall_right_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), 0);
-        public static Translation2d opposing_left_corner = new Translation2d(field_length, field_width - Units.inchesToMeters(50.750));
-        public static Translation2d opp_wall_left_corner = new Translation2d(field_length - Units.inchesToMeters(67.039), field_width);
+        public static Translation2d mid_left_wall = new Translation2d(field_center_x, field_width);
+        public static Translation2d mid_right_wall = new Translation2d(field_center_x, 0);
     }
 
     public class Cage {

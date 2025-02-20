@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.scoring.AutoScore;
@@ -226,6 +227,7 @@ public class RobotContainer {
     
     //pathplanner pathfinding + following
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
+    autoChooser.addOption("left source coral", AutoFactory.leftCoralSource(drive, superstructure, intake));
 
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
@@ -239,19 +241,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return new SequentialCommandGroup(
-      //new AutoScore.coralScore(4, drive, superstructure, intake),
-      //new AutoScore.coralSource(drive, superstructure, intake),
-      //new AutoScore.coralScore(4, drive, superstructure, intake),
-      //new AutoScore.coralSource(FieldConstant.Source.right_src_mid, drive, superstructure, intake),
       new AutoScore.coralScore(4, drive, superstructure, intake),
-      new AutoScore.algaeSource(drive, superstructure, intake),
-      new AutoScore.algaeScore(drive, superstructure, intake),
-      new AutoScore.algaeSource(drive, superstructure, intake),
-      new AutoScore.algaeScore(drive, superstructure, intake),
-      new AutoScore.algaeSource(drive, superstructure, intake),
-      new AutoScore.algaeScore(drive, superstructure, intake),
-      new AutoScore.algaeSource(drive, superstructure, intake),
-      new AutoScore.algaeScore(drive, superstructure, intake),
+      new AutoScore.coralSource(drive, superstructure, intake),
+      new AutoScore.coralScore(4, drive, superstructure, intake),
+      new AutoScore.coralSource(drive, superstructure, intake),
+      new AutoScore.coralScore(4, drive, superstructure, intake),
       new AutoScore.algaeSource(drive, superstructure, intake),
       new AutoScore.algaeScore(drive, superstructure, intake),
       new AutoScore.algaeSource(drive, superstructure, intake),

@@ -47,13 +47,6 @@ public class WristIOReal implements WristIO {
         max.setVoltage(volts);
     }
 
-    public ProfiledPIDController getPID() {
-        return WristConstants.WristPID;
-    }
-    public ArmFeedforward getFF() {
-        return WristConstants.WristFF;
-    }
-
     @Override
     public void updateInputs(WristIOInputs inputs) {
         appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
