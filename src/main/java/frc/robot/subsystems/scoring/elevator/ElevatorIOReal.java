@@ -27,9 +27,6 @@ public class ElevatorIOReal implements ElevatorIO {
     private final TalonFX leader;
     private final TalonFX follower;
 
-    private final CANcoder leadNcoder;
-    private final CANcoder followNcoder;
-
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
     private final StatusSignal<Angle> posRads;
@@ -40,33 +37,15 @@ public class ElevatorIOReal implements ElevatorIO {
 
         //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
         leader = new TalonFX(Id.kElevatorLead);
-        leadNcoder = new CANcoder(Id.kElevatorLeadNcoder);
         follower = new TalonFX(Id.kElevatorFollow);
-        followNcoder = new CANcoder(Id.kElevatorFollowNcoder);
 
         follower.setControl(new Follower(Id.kElevatorLead, false));
 
         leader.setNeutralMode(NeutralModeValue.Brake);
         follower.setNeutralMode(NeutralModeValue.Brake);
 
-        leadNcoder.clearStickyFaults();
         leader.clearStickyFaults();
         follower.clearStickyFaults();
-        followNcoder.clearStickyFaults();
-
-        // MagnetSensorConfigs leftSensorConfigs = new MagnetSensorConfigs();
-        // leftSensorConfigs.MagnetOffset = constants.kLOffset;
-        // leftSensorConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
-        // MagnetSensorConfigs rightSensorConfigs = new MagnetSensorConfigs();
-        // rightSensorConfigs.MagnetOffset = constants.kROffset;
-        // rightSensorConfigs.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-
-        // LeftEncoder.getConfigurator().apply(e);
-        // LeftMotor.getConfigurator().setPosition(LeftEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
-
-        // RightEncoder.getConfigurator().apply(rightSensorConfigs);
-        // RightMotor.getConfigurator().setPosition(RightEncoder.getAbsolutePosition().getValueAsDouble() * 360.0);
 
         leader.getConfigurator().apply(kMotorConfig);
         follower.getConfigurator().apply(kMotorConfig);
@@ -79,7 +58,6 @@ public class ElevatorIOReal implements ElevatorIO {
         tempC = leader.getDeviceTemp();
         appliedVoltsFollow = follower.getMotorVoltage();
         tempCFollow = follower.getDeviceTemp();
-        
     }
 
     @Override
