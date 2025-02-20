@@ -19,9 +19,6 @@ public interface ElevatorIO {
         public double followerAppliedVolts = 0.0;
     }
 
-    public default ProfiledPIDController getPID() {return new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));}
-    public default ElevatorFeedforward getFF() {return new ElevatorFeedforward(0, 0, 0);}
-
     public default void updateInputs(ElevatorIOInputs inputs) {}
 
     public default void runVolts(double volts) {}

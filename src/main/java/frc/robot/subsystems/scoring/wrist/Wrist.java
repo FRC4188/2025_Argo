@@ -7,20 +7,27 @@ import static edu.wpi.first.units.Units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 
 
 public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+  private final ArmFeedforward ff =  new ArmFeedforward(WristConstants.kS, WristConstants.kG, WristConstants.kV);
+  private final ProfiledPIDController pid = new ProfiledPIDController(WristConstants.kP, WristConstants.kI, WristConstants.kD, new Constraints(20, 20));
 
-  public double target = 0;
+    public double target = 0;
 
   public Wrist(WristIO io){
     this.io = io;
@@ -28,7 +35,7 @@ public class Wrist extends SubsystemBase {//J.C
 
   @Override
   public void periodic(){
-    io.runVolts(io.getPID().calculate(getAngle(), target) + io.getFF().calculate(getAngle() + Math.PI / 2, 0));
+    io.runVolts(pid.calculate(getAngle(), target) + ff.calculate(getAngle() + Math.PI / 2, 0));
 
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);    

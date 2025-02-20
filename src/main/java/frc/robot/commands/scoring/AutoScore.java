@@ -50,12 +50,12 @@ public class AutoScore extends Command {
 
     public static class coralScore extends AutoScore {
 
-        public coralScore(int bar, Drive drive, Superstructure superstructure, Intake intake) {
+        public coralScore(int level, Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
             this.superstruct = superstructure;
             this.intake = intake;
     
-            switch (bar) {
+            switch (level) {
                 case 2:
                     preset = SuperPreset.L2_CORAL;
                     break;

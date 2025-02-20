@@ -27,7 +27,7 @@ public class Score extends SequentialCommandGroup {
                 .until(() -> (drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
                 .andThen(new WaitUntilCommand(() -> (drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
                 .andThen(new SuperToState(superstructure, state)))),
-            intakeCommand.withTimeout(2)
+            intakeCommand.withTimeout(1)
         );
 
     }

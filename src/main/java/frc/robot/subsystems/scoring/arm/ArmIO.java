@@ -18,8 +18,6 @@ public interface ArmIO {
         public double desiredPositionRads = 0.0;
     }
 
-    public default ProfiledPIDController getPID() {return new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));}
-    public default ArmFeedforward getFF() {return new ArmFeedforward(0, 0, 0);}
 
     public default void updateInputs(ArmIOInputs inputs) {}
     public default void runVolts(double volts) {}
