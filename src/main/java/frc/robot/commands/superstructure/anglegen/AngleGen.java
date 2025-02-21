@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.commands.autos.pathgen.PG_math;
-
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 
@@ -101,10 +100,10 @@ public class AngleGen {
 
     }
 
-    public SuperTraj generateTrajectory(SuperState start, SuperState end) {
+    public SuperTraj generateTrajectory(SuperState start, SuperState end, TrapezoidProfile tp) {
         ArrayList<SuperState> result = gen_pivots(start, end);
 
-        return new SuperTraj(result, (result.size() - 1));
+        return new SuperTraj(result, (result.size() - 1), tp);
     }
 
     //TODO: reduce pivots to reduce awkward movement

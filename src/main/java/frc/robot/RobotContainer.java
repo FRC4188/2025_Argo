@@ -29,15 +29,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.scoring.AutoScore;
-import frc.robot.commands.scoring.Score;
 import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -49,10 +45,6 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.arm.Arm;
-import frc.robot.subsystems.scoring.intake.Intake;
-import frc.robot.subsystems.scoring.intake.IntakeIO;
-import frc.robot.subsystems.scoring.intake.IntakeIOReal;
-import frc.robot.subsystems.scoring.intake.IntakeIOSim;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
@@ -60,9 +52,6 @@ import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
-
-import java.lang.reflect.Field;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -77,11 +66,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private Superstructure superstructure;
-  private Intake intake;
-
   private final Limelight vis;
   private SwerveDriveSimulation driveSim = null;
+  private Superstructure superstructure;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -107,10 +94,7 @@ public class RobotContainer {
         vis = new Limelight(drive, 
             new VisionIOLL("limelight-back", drive::getRotation),
             new VisionIOLL("limelight-front", drive::getRotation));
-        
             superstructure = new Superstructure(Mode.REAL);
-
-        intake = new Intake(new IntakeIOReal());
         break;
 
       case SIM:
@@ -137,7 +121,6 @@ public class RobotContainer {
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
         superstructure = new Superstructure(Mode.SIM);
-        intake = new Intake(new IntakeIO() {});
         break;
 
       default:
@@ -195,14 +178,14 @@ public class RobotContainer {
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
       controller2.a().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L2_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L2_CORAL.getState())));
 
       controller2.b().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L3_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L3_CORAL.getState())));
       controller2.x().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L4_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.START.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
 
   }
 
@@ -226,8 +209,11 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
+    autoChooser.addOption("Mid to 2 corals manual", AutoTests.toBasetoSource());
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
-    autoChooser.addOption("left source coral", AutoFactory.leftCoralSource(drive, superstructure, intake));
+
+    //follow path commd test
+    autoChooser.addOption("2 corals manual follow", AutoTests.follow2Coral(drive));
 
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
@@ -240,15 +226,16 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoFactory.leftCoralSource(drive, superstructure, intake);
+     return new SuperToState(superstructure, SuperPreset.SOURCE.getState());
+     // do we need "new TrapezoidProfile(new Constraints(10, 10)" after SuperPreset.SOURCE.getState()?
   }
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
+    // drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
+    drive.setPose(FieldConstant.Source.left_srcs[1].transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg))); //0(clip in wall), 2 3 awk in mid n left
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-    //drive.setPose(FieldConstant.Source.left_src_mid);
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 

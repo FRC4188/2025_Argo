@@ -34,10 +34,14 @@ public class Arm extends SubsystemBase {
         io.runVolts(
             pid.calculate(getAngle(), target)
             + ff.calculate(getAngle() + Math.PI/2, 0));
-
+        
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
     }
+
+   public void runVolts(double volts) {
+        io.runVolts(volts);
+   }
 
    public void setTarget(double target) {
         this.target = target;

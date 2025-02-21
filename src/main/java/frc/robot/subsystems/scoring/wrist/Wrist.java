@@ -36,7 +36,7 @@ public class Wrist extends SubsystemBase {//J.C
   @Override
   public void periodic(){
     io.runVolts(pid.calculate(getAngle(), target) + ff.calculate(getAngle() + Math.PI / 2, 0));
-
+    
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);    
   }
@@ -54,6 +54,7 @@ public class Wrist extends SubsystemBase {//J.C
   public boolean atGoal() {
     return Math.abs(getAngle() - target) < Constants.WristConstants.kTolerance;
   }
+
   public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(

@@ -2,7 +2,6 @@ package frc.robot.commands.superstructure;
 
 import java.util.function.Supplier;
 
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
@@ -10,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.superstructure.anglegen.AngleGen;
 import frc.robot.commands.superstructure.anglegen.SuperTraj;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
-import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
+import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 
 public class SuperToState extends Command {
     
@@ -19,12 +18,10 @@ public class SuperToState extends Command {
     Timer timer;
     Supplier<SuperState> traj_states;
     SuperTraj trajectory;
-    TrapezoidProfile tp = new TrapezoidProfile(new Constraints(20, 20));
+    TrapezoidProfile tp = new TrapezoidProfile(new Constraints(10, 10));
     SuperState goal;
     
     public SuperToState(Superstructure superstruct, SuperState goalState) {
-        addRequirements(superstruct);
-
         superstructure = superstruct;
         timer = new Timer();
         goal = goalState;
@@ -32,7 +29,9 @@ public class SuperToState extends Command {
     }
 
     public void initialize() {
-        trajectory = AngleGen.getInstance().generateTrajectory(superstructure.getState(), goal);
+        trajectory = AngleGen.getInstance().generateTrajectory(superstructure.getState(), goal, tp);
+
+        System.out.println(trajectory);
 
         if (trajectory.getStates().isEmpty()) {
             traj_states = () -> superstructure.getState();
@@ -41,8 +40,6 @@ public class SuperToState extends Command {
         }
 
         timer.start();
-        System.out.println("Super go to state ...");
-
     }
 
     public void execute() {
@@ -56,6 +53,4 @@ public class SuperToState extends Command {
     public void end(boolean interrupted) {
         superstructure.setTarget(goal);
     }
-
-
 }

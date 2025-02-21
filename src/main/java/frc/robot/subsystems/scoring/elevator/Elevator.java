@@ -39,6 +39,7 @@ public class Elevator extends SubsystemBase{
     public void periodic(){
         io.runVolts(pid.calculate(Units.metersToInches(getHeight()), Units.metersToInches(target)) + ff.calculate(20));
         io.updateInputs(inputs);
+        
         Logger.processInputs("Elevator", inputs);   
     }
 
