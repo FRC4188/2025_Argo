@@ -59,7 +59,10 @@ public class Superstructure extends SubsystemBase{
         }
         sim = new SuperVisualizer("Superstructure");
 
-        target = SuperPreset.START.getState();
+        target = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
 
         wrist.setTarget(target.getWristAngle());
         arm.setTarget(target.getArmAngle());
@@ -73,21 +76,23 @@ public class Superstructure extends SubsystemBase{
 
     @Override
     public void periodic(){
-        current = new SuperState(
-            wrist.getAngle(),
-            arm.getAngle(),
-            elevator.getHeight());
+        // current = new SuperState(
+        //     wrist.getAngle(),
+        //     arm.getAngle(),
+        //     elevator.getHeight());
 
-        sim.update(current);
+        // sim.update(current);
 
-        wrist.periodic();
-        arm.periodic();
-        elevator.periodic();
+        // wrist.periodic();
+        // arm.periodic();
+        // elevator.periodic();
 
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
         Logger.recordOutput("wrist setpoint", target.getWristAngle());
         Logger.recordOutput("ele setpoint", target.getEleHeight());
     }
+
+
 
     public SuperState getState() {
         return current;

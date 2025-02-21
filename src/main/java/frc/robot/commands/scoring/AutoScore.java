@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -101,8 +102,12 @@ public class AutoScore extends Command {
         @Override
         public void factory() {
             if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.CoralGoal.cgoals);
-    
-            scoring = new Score(goal, preset.getState(), intake.eject(), drive, superstruct, intake);
+            
+            if (DriverStation.isAutonomous()) {
+                scoring = new Score(goal, preset.getState(), intake.eject().andThen(() -> FieldConstant.Reef.CoralGoal.cgoals.remove(goal)), drive, superstruct, intake);
+            } else {
+                scoring = new Score(goal, preset.getState(), intake.eject(), drive, superstruct, intake);
+            }
         }
     }
 

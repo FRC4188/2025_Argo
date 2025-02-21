@@ -71,9 +71,8 @@ public final class Constants {
     public static final int kElevatorFollow = 14;
     public static final int kArm = 15;
     public static final int kArmNcoder = 16;    
-    public static final int kWrist = 17;
-    public static final int kWristNcoder = 18;    
-    public static final int kIntake = 19;
+    public static final int kWrist = 17;   
+    public static final int kIntake = 18;
   }
 
   public static class ElevatorConstants{    

@@ -227,7 +227,7 @@ public class RobotContainer {
     
     //pathplanner pathfinding + following
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
-    autoChooser.addOption("left source coral", AutoFactory.leftCoralSource(drive, superstructure, intake));
+    autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
 
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
@@ -240,13 +240,14 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoFactory.leftCoralSource(drive, superstructure, intake);
+    return AutoFactory.leftL4CoralGen(drive, superstructure, intake);
   }
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
+    superstructure.setTarget(SuperState.SuperPreset.START.getState());
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     //drive.setPose(FieldConstant.Source.left_src_mid);
     SimulatedArena.getInstance().resetFieldForAuto();
