@@ -1,7 +1,6 @@
 package frc.robot.commands.autos.pathgen.fieldobjects;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.commands.autos.pathgen.PG_math;
 
 public class RectFO extends PolygonFO {   
 

@@ -7,12 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.DriverStation;
-
 public class AllianceFlip {
 
     public static double flip (double x){
@@ -28,6 +22,14 @@ public class AllianceFlip {
             return FieldConstant.field_width - y;
         } else {
             return y;
+        }
+    }
+
+    public static Pose2d flipDS(Pose2d pos){
+        if (canFlip()) {
+            return new Pose2d(flip(pos.getX()), flipY(pos.getY()), apply(pos.getRotation()));
+        } else {
+            return pos;
         }
     }
 
@@ -68,6 +70,6 @@ public class AllianceFlip {
     }
 
     public static boolean canFlip(){
-        return false;//DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+        return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
     }
 }

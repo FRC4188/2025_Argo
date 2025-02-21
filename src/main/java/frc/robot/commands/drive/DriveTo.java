@@ -6,11 +6,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants;
 import frc.robot.commands.autos.pathgen.PathGen;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.subsystems.generated.TunerConstants;
 
 public class DriveTo extends Command {
 
@@ -21,9 +21,13 @@ public class DriveTo extends Command {
     DriveToPose driving;
     Drive drive;
 
-    public DriveTo(Drive drive, Pose2d goal, TrajectoryConfig config) {
+    public DriveTo(Drive drive, Pose2d goal) {
+        
+
         this.drive = drive;
-        this.config = config;
+        config = new TrajectoryConfig(
+            TunerConstants.kSpeedAt12Volts.magnitude(), 
+            Constants.robot.MAX_ACCELERATION.magnitude());
 
         timer = new Timer();
 
@@ -47,6 +51,7 @@ public class DriveTo extends Command {
         timer.start();
 
         driving.repeatedly().schedule();
+        System.out.println("Driving ....");
     }
 
     @Override

@@ -29,8 +29,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.AllianceFlip;
@@ -41,9 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -85,8 +80,8 @@ public class DriveCommands {
   public static Command TeleDrive(Drive drive, DoubleSupplier xInput, DoubleSupplier yInput, DoubleSupplier thetaInput){
     return Commands.run(
       () -> {
-        SlewRateLimiter limitX = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
-        SlewRateLimiter limitY = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
+        //SlewRateLimiter limitX = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
+        //SlewRateLimiter limitY = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
 
         double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
         double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);

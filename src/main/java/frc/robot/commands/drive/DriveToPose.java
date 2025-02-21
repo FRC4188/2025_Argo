@@ -4,9 +4,6 @@ package frc.robot.commands.drive;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;

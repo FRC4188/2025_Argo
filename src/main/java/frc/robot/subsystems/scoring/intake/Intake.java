@@ -1,7 +1,10 @@
 package frc.robot.subsystems.scoring.intake;
 
+
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -15,25 +18,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants;
 
 public class Intake extends SubsystemBase{
+    public static enum Mode {
+        EMPTY,
+        ALGAE,
+        CORAL
+    }
 
-    //no getters for telemetry cuz thats wut the autologged inputs do
-    private static Intake instance;
+    //I need this to be global value - RN
+    public static Mode intakeState = Mode.EMPTY;
+
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
 
-    private SparkMax motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
-    SparkMaxConfig sparkconfig = new SparkMaxConfig();
-    
-    public static Intake getInstance(IntakeIO io){
-        if(instance == null){
-            instance = new Intake(io);
-        }
-        return instance;
-    }
-
-    private Intake(IntakeIO io){
+    public Intake(IntakeIO io){
         this.io = io;
         inputs = new IntakeIOInputsAutoLogged();
     }
@@ -43,12 +43,31 @@ public class Intake extends SubsystemBase{
         ALGAE
     }
 
-    public void runVolts(double volts){
-        io.runVolts(volts);
+    //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
+    //TODO: create stall method
+    public Command ingest(Mode intakeMode) {
+        io.invertMotor(intakeMode == Mode.ALGAE);
+        return Commands.run(
+            () -> {
+                io.runVolts(1);
+            }).until(()-> io.isSafetyOn()).withTimeout(2).andThen(() -> intakeState = intakeMode);
     }
 
-    public void stop(){
-        io.stop();
+    public Command eject() {
+        io.invertMotor(intakeState == Mode.CORAL);
+        return Commands.run(
+            () -> {
+                io.runVolts(1);
+                intakeState = Mode.EMPTY;
+            }).withTimeout(0.5).andThen(() -> intakeState = Mode.EMPTY);
+    }
+
+    public Mode getState() {
+        return intakeState;
+    }
+
+    public void setState(Mode state) {
+        intakeState = state;
     }
 
     public boolean intakeVoltageSpike() {

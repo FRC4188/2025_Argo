@@ -1,0 +1,124 @@
+package frc.robot.subsystems.scoring.superstructure;
+
+
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIO;
+import frc.robot.subsystems.scoring.arm.ArmIOReal;
+import frc.robot.subsystems.scoring.arm.ArmIOSim;
+import frc.robot.subsystems.scoring.elevator.Elevator;
+import frc.robot.subsystems.scoring.elevator.ElevatorIO;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.intake.Intake;
+import frc.robot.subsystems.scoring.superstructure.SuperState.*;
+import frc.robot.subsystems.scoring.wrist.Wrist;
+import frc.robot.subsystems.scoring.wrist.WristIO;
+import frc.robot.subsystems.scoring.wrist.WristIOReal;
+import frc.robot.subsystems.scoring.wrist.WristIOSim;
+
+public class Superstructure extends SubsystemBase{
+    private final Arm arm;
+    private final Elevator elevator;
+    private final Wrist wrist;
+
+    private SuperVisualizer sim;
+
+    //ArmFF ff;
+
+    private SuperState target;
+    private SuperState current;
+    
+    public Superstructure(Mode mode){
+        switch (mode) {
+            case REAL:
+                this.arm = new Arm(new ArmIOReal());
+                this.wrist = new Wrist(new WristIOReal());
+                this.elevator = new Elevator(new ElevatorIOReal());
+                break;
+            case SIM: 
+                this.arm = new Arm(new ArmIOSim());
+                this.wrist = new Wrist(new WristIOSim());
+                this.elevator = new Elevator(new ElevatorIOSim());
+                break;
+            default: 
+                this.arm = new Arm(new ArmIO() {});
+                this.wrist = new Wrist(new WristIO() {});
+                this.elevator = new Elevator(new ElevatorIO() {});
+        }
+        sim = new SuperVisualizer("Superstructure");
+
+        target = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
+
+        wrist.setTarget(target.getWristAngle());
+        arm.setTarget(target.getArmAngle());
+        elevator.setHeight(target.getEleHeight());
+
+        this.current = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
+    }
+
+    @Override
+    public void periodic(){
+        // current = new SuperState(
+        //     wrist.getAngle(),
+        //     arm.getAngle(),
+        //     elevator.getHeight());
+
+        // sim.update(current);
+
+        // wrist.periodic();
+        // arm.periodic();
+        // elevator.periodic();
+
+        Logger.recordOutput("Arm setpoint", target.getArmAngle());
+        Logger.recordOutput("wrist setpoint", target.getWristAngle());
+        Logger.recordOutput("ele setpoint", target.getEleHeight());
+    }
+
+
+
+    public SuperState getState() {
+        return current;
+    }
+
+    public boolean atTarget() {
+        return wrist.atGoal() && arm.atGoal() && elevator.atGoal();
+    }
+
+    public boolean setTarget(SuperState goal) {
+        if (Intake.intakeState == Intake.Mode.ALGAE) {
+            Translation2d g_cartesian = goal.getCartesian(false);
+            Translation2d c_cartesian = goal.getCartesian(false);
+
+            if (c_cartesian.getX() > 0 && g_cartesian.getX() <= Units.inchesToMeters(12) || 
+                c_cartesian.getX() < 0 && g_cartesian.getX() >= Units.inchesToMeters(-12)) {
+                    return false;
+                }
+        }
+
+        target = goal;
+
+        wrist.setTarget(target.getWristAngle());
+        arm.setTarget(target.getArmAngle());
+        elevator.setHeight(target.getEleHeight());
+
+        return true;
+    }  
+}
