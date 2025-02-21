@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -40,6 +41,7 @@ import frc.robot.commands.scoring.AutoScore;
 import frc.robot.commands.scoring.Score;
 import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
+import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.drivetrain.ModuleIO;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXSim;
@@ -171,8 +173,7 @@ public class RobotContainer {
    */
   public void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        Commands.runOnce(drive::stopWithX, drive));
+    drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
     // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
@@ -183,7 +184,7 @@ public class RobotContainer {
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
       () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
       () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
+      () -> controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
     Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
@@ -194,16 +195,22 @@ public class RobotContainer {
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-      controller2.a().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L2_CORAL.getState())));
+      controller.a().onTrue(new AutoScore.coralScore(4, drive, superstructure, intake));
+      controller.b().onTrue(new AutoScore.coralScore(3, drive, superstructure, intake));
+      controller.x().onTrue(new AutoScore.coralScore(2, drive, superstructure, intake));
+      controller.y().onTrue(new AutoScore.coralSource(drive, superstructure, intake));
 
-      controller2.b().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L3_CORAL.getState())));
-      controller2.x().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.L4_CORAL.getState())));
-      controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setTarget(SuperPreset.START.getState())));
+      Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft().getY() != 0.0 || controller2.getCorrectedRight().getY() != 0.0));
 
+      superInput.onTrue(new ParallelCommandGroup(
+        superstructure.runArm(controller2.getLeftY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 5)),
+        superstructure.runWrist(controller2.getRightY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 5))
+      ));
+
+      Trigger eleInput = new Trigger(() -> controller2.getLeftTButton().getAsBoolean() || controller2.getRightTButton().getAsBoolean());
+
+      eleInput.onTrue(
+        superstructure.runEle((controller.getRightT(Scale.SQUARED) - controller.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 1 : 5)));
   }
 
   private void configureDashboard() {
@@ -247,7 +254,6 @@ public class RobotContainer {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
-    superstructure.setTarget(SuperState.SuperPreset.START.getState());
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     //drive.setPose(FieldConstant.Source.left_src_mid);
     SimulatedArena.getInstance().resetFieldForAuto();

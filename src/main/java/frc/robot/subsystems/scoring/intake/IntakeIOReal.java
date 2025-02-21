@@ -2,24 +2,26 @@ package frc.robot.subsystems.scoring.intake;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 
 public class IntakeIOReal implements IntakeIO {
-    private WPI_TalonSRX motor;
+    private TalonFX motor;
 
-    private final double appliedVolts;
-    private final double tempC;
+    private final StatusSignal<Voltage> appliedVolts;
+    private final StatusSignal<Temperature> tempC;
 
     public IntakeIOReal(){
-        motor = new WPI_TalonSRX(Constants.Id.kIntake);
+        motor = new TalonFX(Constants.Id.kIntake);
 
-        appliedVolts = motor.getMotorOutputVoltage();
-        tempC = motor.getTemperature();
+        appliedVolts = motor.getMotorVoltage();
+        tempC = motor.getDeviceTemp();
     }
 
 
@@ -40,8 +42,8 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.appliedVolts = appliedVolts;
-        inputs.tempC = tempC;
+        inputs.appliedVolts = appliedVolts.getValueAsDouble();
+        inputs.tempC = tempC.getValueAsDouble();
     }
     
 }

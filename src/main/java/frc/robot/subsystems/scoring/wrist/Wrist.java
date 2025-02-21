@@ -41,6 +41,10 @@ public class Wrist extends SubsystemBase {//J.C
     Logger.processInputs("Wrist", inputs);    
   }
 
+  public void runVolts(double volts) {
+    io.runVolts(volts);
+   }
+
   public void setTarget(double angle) {
     target = angle;
   }

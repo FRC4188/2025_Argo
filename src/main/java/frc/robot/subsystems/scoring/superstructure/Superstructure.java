@@ -10,6 +10,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -34,6 +36,8 @@ public class Superstructure extends SubsystemBase{
     private final Wrist wrist;
 
     private SuperVisualizer sim;
+
+    private boolean manual_override = true;
 
     //ArmFF ff;
 
@@ -76,23 +80,41 @@ public class Superstructure extends SubsystemBase{
 
     @Override
     public void periodic(){
-        // current = new SuperState(
-        //     wrist.getAngle(),
-        //     arm.getAngle(),
-        //     elevator.getHeight());
+        current = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
 
-        // sim.update(current);
+        //sim
+        sim.update(current);
 
-        // wrist.periodic();
-        // arm.periodic();
-        // elevator.periodic();
+        if (!manual_override) {
+            wrist.periodic();
+            arm.periodic();
+            elevator.periodic();
+        }
 
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
         Logger.recordOutput("wrist setpoint", target.getWristAngle());
         Logger.recordOutput("ele setpoint", target.getEleHeight());
     }
+ 
+   //manual override commands
+    public Command manual_override(boolean override) {
+        return Commands.runOnce(() -> manual_override = override);
+    }
 
+    public Command runArm(double volts) {
+        return Commands.run(() -> arm.runVolts(volts)).onlyIf(() -> manual_override);
+    }
 
+    public Command runWrist(double volts) {
+        return Commands.run(() -> wrist.runVolts(volts)).onlyIf(() -> manual_override);
+    }
+
+    public Command runEle(double volts) {
+        return Commands.run(() -> elevator.runVolts(volts)).onlyIf(() -> manual_override);
+    }
 
     public SuperState getState() {
         return current;

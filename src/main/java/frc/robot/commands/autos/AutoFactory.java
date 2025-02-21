@@ -21,7 +21,7 @@ public final class AutoFactory {
         Commands.repeatingSequence(
             new coralScore(4, drive, superstructure, intake),
             new coralSource(drive, superstructure, intake)
-        ).until(() -> timer.hasElapsed(15)));
+        ));//.until(() -> timer.hasElapsed(15)));
     }
 
     public static Command rightL4CoralGen(Drive drive, Superstructure superstructure, Intake intake){

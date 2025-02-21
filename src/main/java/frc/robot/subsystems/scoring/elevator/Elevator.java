@@ -42,6 +42,10 @@ public class Elevator extends SubsystemBase{
         Logger.processInputs("Elevator", inputs);   
     }
 
+    public void runVolts(double volts) {
+        io.runVolts(volts);
+       }
+
     public void setHeight(double target) {
         this.target = target;
     } 

@@ -167,7 +167,7 @@ public class FieldConstant {
 
             public static List<Pose2d> cgoals = new LinkedList<Pose2d>(Arrays.asList(
                 alliance_right, alliance_left, left_brg_left, left_brg_right, left_src_left, left_src_right,
-                right_brg_left,right_brg_right, right_src_left, right_src_right));
+                right_brg_left,right_brg_right, right_src_left, right_src_right, mid_brg_left, mid_brg_right));
         }
 
         public class AlgaeSource {

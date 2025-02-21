@@ -43,6 +43,10 @@ public class Arm extends SubsystemBase {
         this.target = target;
    }
 
+   public void runVolts(double volts) {
+    io.runVolts(volts);
+   }
+
     @AutoLogOutput(key = "Arm/Angle Radians")
     public double getAngle() {
         return io.getAngle();
