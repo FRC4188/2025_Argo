@@ -3,10 +3,6 @@ package frc.robot.subsystems.scoring.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-
 
 public interface WristIO {//J.C
     @AutoLog

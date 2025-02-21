@@ -93,8 +93,8 @@ public class DriveCommands {
         double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double rotSpeed = -theta * 5 * Math.PI;
 
-        xSpeed = limitX.calculate(xSpeed);
-        ySpeed = limitY.calculate(ySpeed);
+        // xSpeed = limitX.calculate(xSpeed);
+        // ySpeed = limitY.calculate(ySpeed);
 
 
 

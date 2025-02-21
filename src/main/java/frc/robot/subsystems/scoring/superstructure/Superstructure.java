@@ -3,15 +3,9 @@ package frc.robot.subsystems.scoring.superstructure;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.arm.ArmIO;
@@ -22,7 +16,6 @@ import frc.robot.subsystems.scoring.elevator.ElevatorIO;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
-import frc.robot.subsystems.scoring.superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.wrist.Wrist;
 import frc.robot.subsystems.scoring.wrist.WristIO;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
@@ -76,16 +69,16 @@ public class Superstructure extends SubsystemBase{
 
     @Override
     public void periodic(){
-        // current = new SuperState(
-        //     wrist.getAngle(),
-        //     arm.getAngle(),
-        //     elevator.getHeight());
+        current = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
 
-        // sim.update(current);
+        sim.update(current);
 
-        // wrist.periodic();
-        // arm.periodic();
-        // elevator.periodic();
+        wrist.periodic();
+        arm.periodic();
+        elevator.periodic();
 
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
         Logger.recordOutput("wrist setpoint", target.getWristAngle());

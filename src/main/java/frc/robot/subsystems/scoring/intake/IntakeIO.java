@@ -1,7 +1,6 @@
 package frc.robot.subsystems.scoring.intake;
 
 import org.littletonrobotics.junction.AutoLog;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 // i added stuff in here - anish
 public interface IntakeIO {

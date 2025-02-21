@@ -2,8 +2,6 @@ package frc.robot.subsystems.scoring.lift;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 public interface ElevatorIO {
     @AutoLog
     public static class ElevatorIOInputs {
@@ -22,4 +20,5 @@ public interface ElevatorIO {
     public default void runVolts(double volts) {}
 
     public default void runPosition(double height){}
-}
+
+    public default double getHeight(){return 0;}}

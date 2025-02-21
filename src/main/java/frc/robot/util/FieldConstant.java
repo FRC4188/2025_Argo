@@ -4,7 +4,6 @@ package frc.robot.util;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -319,14 +318,6 @@ public class FieldConstant {
 
         // already in meters, okay?
         // thanks - def leo
-        public static Pose2d right_approach_bottom_src = new Pose2d(0.650, 1.410, Rotation2d.fromDegrees(-125));
-        public static Pose2d left_approach_bottom_src = new Pose2d(1.700, 0.650, Rotation2d.fromDegrees(-125));
-        public static Pose2d middle_approach_bottom_src = new Pose2d(1.175, 1.030, Rotation2d.fromDegrees(-125));
-
-        public static Pose2d right_approach_top_src = new Pose2d(1.700, 7.370, Rotation2d.fromDegrees(125));
-        public static Pose2d left_approach_top_src = new Pose2d(0.650, 6.600, Rotation2d.fromDegrees(125));
-        public static Pose2d middle_approach_top_src = new Pose2d(1.175, 6.985, Rotation2d.fromDegrees(125));
-
         public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3*2, 0);
 
         public static Translation2d right_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(54.0112 - 90));

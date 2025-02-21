@@ -23,17 +23,9 @@ import java.util.Arrays;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.PhoenixUtil;
 
@@ -50,8 +42,8 @@ public class ModuleIOSim implements ModuleIO {
   private static final double DRIVE_KV = 1.0 / Units.rotationsToRadians(1.0 / DRIVE_KV_ROT);
   private static final double TURN_KP = 8.0;
   private static final double TURN_KD = 0.0;
-  private static final DCMotor DRIVE_GEARBOX = DCMotor.getKrakenX60Foc(1);
-  private static final DCMotor TURN_GEARBOX = DCMotor.getKrakenX60Foc(1);
+  // private static final DCMotor DRIVE_GEARBOX = DCMotor.getKrakenX60Foc(1);
+  // private static final DCMotor TURN_GEARBOX = DCMotor.getKrakenX60Foc(1);
 
   private final SwerveModuleSimulation sim;
   private final SimulatedMotorController.GenericMotorController drive;
