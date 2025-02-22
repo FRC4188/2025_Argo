@@ -20,25 +20,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.scoring.AutoScore;
-import frc.robot.commands.scoring.Score;
-import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.drivetrain.ModuleIO;
@@ -48,11 +39,9 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
-import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
-import frc.robot.subsystems.scoring.intake.IntakeIOSim;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
@@ -60,8 +49,6 @@ import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
-
-import java.lang.reflect.Field;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -180,9 +167,10 @@ public class RobotContainer {
     //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
     //   () -> (controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
-    drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+    drivingInput.onTrue(
+      DriveCommands.TeleDrive(drive,
+      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.125 : 1.0),
+      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.125 : 1.0),
       () -> (controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
     // Reset gyro to 0° when start button is pressed
@@ -227,11 +215,12 @@ public class RobotContainer {
     
     //pathplanner pathfinding + following
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
-    autoChooser.addOption("left source coral", AutoFactory.leftCoralSource(drive, superstructure, intake));
+    autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
 
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
+
   }
 
   /**
@@ -240,7 +229,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoFactory.leftCoralSource(drive, superstructure, intake);
+    return AutoFactory.leftL4CoralGen(drive, superstructure, intake);
   }
 
   public void resetSimulation(){

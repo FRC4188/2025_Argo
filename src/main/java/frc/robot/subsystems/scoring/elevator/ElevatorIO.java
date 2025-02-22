@@ -3,10 +3,6 @@ package frc.robot.subsystems.scoring.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-
 public interface ElevatorIO {
     @AutoLog
     public static class ElevatorIOInputs {

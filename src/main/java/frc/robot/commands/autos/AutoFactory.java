@@ -23,9 +23,16 @@ import frc.robot.util.FieldConstant.Reef;
 
 public final class AutoFactory {
     public static Timer timer = new Timer();
-    public static Command leftCoralSource(Drive drive, Superstructure superstructure, Intake intake){
-        // List<Pose2d> avai = Reef.CoralGoal.cgoals;
-        // Collections.sort(avai, Comparator.comparingDouble((Pose2d a)-> drive.getPose().getTranslation().getDistance(a.getTranslation())));
+ 
+    public static Command leftL4CoralGen(Drive drive, Superstructure superstructure, Intake intake){
+        return Commands.runOnce(() -> timer.start()).andThen(
+        Commands.repeatingSequence(
+            new coralScore(4, drive, superstructure, intake),
+            new coralSource(drive, superstructure, intake)
+        ).until(() -> timer.hasElapsed(15)));
+    }
+
+    public static Command rightL4CoralGen(Drive drive, Superstructure superstructure, Intake intake){
         return Commands.runOnce(() -> timer.start()).andThen(
             Commands.repeatingSequence(
                 new coralScore(4, drive, superstructure, intake),

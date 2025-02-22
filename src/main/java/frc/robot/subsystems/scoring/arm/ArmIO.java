@@ -2,11 +2,6 @@ package frc.robot.subsystems.scoring.arm;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-
 public interface ArmIO {
 
     @AutoLog

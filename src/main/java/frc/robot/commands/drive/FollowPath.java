@@ -5,7 +5,6 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -19,9 +18,9 @@ import frc.robot.subsystems.generated.TunerConstants;
 public class FollowPath extends Command {
 
   private HolonomicDriveController controller = new HolonomicDriveController(
-    new PIDController(Constants.robot.DRIVE_PID.kP,Constants.robot.DRIVE_PID.kI,Constants.robot.DRIVE_PID.kD), 
-    new PIDController(Constants.robot.DRIVE_PID.kP,Constants.robot.DRIVE_PID.kI,Constants.robot.DRIVE_PID.kD), 
-    new ProfiledPIDController(Constants.robot.TURN_PID.kP ,Constants.robot.TURN_PID.kI, Constants.robot.TURN_PID.kD,
+    Constants.robot.DRIVE_PID, 
+    Constants.robot.DRIVE_PID, 
+    new ProfiledPIDController(Constants.robot.TURN_PID.getP() ,Constants.robot.TURN_PID.getI(), Constants.robot.TURN_PID.getD(),
     new Constraints(TunerConstants.kSpeedAt12Volts.magnitude(), 12.6)));
 
     private final Trajectory trajectory;

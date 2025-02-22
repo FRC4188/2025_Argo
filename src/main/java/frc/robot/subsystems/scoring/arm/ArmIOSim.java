@@ -2,15 +2,12 @@
 package frc.robot.subsystems.scoring.arm;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ArmConstraints;
 // This is definetly wrong but work in progress I think I got the wrong concept

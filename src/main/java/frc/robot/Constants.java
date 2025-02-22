@@ -13,24 +13,23 @@ import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.pathplanner.lib.config.PIDConstants;
-
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-
+ 
   public static class controller {
     public static final int PILOT = 0;
     public static final int COPILOT = 1;
@@ -50,32 +49,42 @@ public final class Constants {
     public static final double A_WIDTH = Units.inchesToMeters(29); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
-    public static  final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDController DRIVE_PID = new PIDController(5.0, 0.0, 0.0);
+    public static final PIDController TURN_PID = new PIDController(5.0, 0.0, 0.0);
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
+
+    public static final double ARM_GEAR_RATIO = 5.0625;
+
+    public static enum STATE {
+      EMPTY,
+      ALGAE,
+      CORAL
+    }
+  
+    public static STATE robotstate; //to be set
   }
 
   public static enum Mode {
+    /** Running on a real robot. */
     REAL,
+
+    /** Running a physics simulator. */
     SIM,
     /** Replaying from a log file. */
     REPLAY
   }
 
   public class Id{
+    //pigeon 0
     //DT ids are 1->12
-    //Pigeon is 15
     public static final int kElevatorLead = 13;
     public static final int kElevatorFollow = 14;
-    public static final int kElevatorLeadNcoder = 16;
-    public static final int kElevatorFollowNcoder = 17;
-    public static final int kArm = 18;
-    public static final int kArmNcoder = 19;    
-    public static final int kWrist = 20;
-    public static final int kWristNcoder = 21;    
-    public static final int kIntake = 22;
+    public static final int kArm = 15;
+    public static final int kArmNcoder = 16;    
+    public static final int kWrist = 17;   
+    public static final int kIntake = 18;
   }
 
   public static class ElevatorConstants{    
