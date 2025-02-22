@@ -247,6 +247,7 @@ public class RobotContainer {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
     drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
+    superstructure.setTarget(SuperState.SuperPreset.START.getState());
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
     //drive.setPose(FieldConstant.Source.left_src_mid);
     SimulatedArena.getInstance().resetFieldForAuto();
