@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.348178430627585,
-        "y": 4.8740972867171415
+        "x": 7.288846153846154,
+        "y": 5.067371794871795
       },
       "isLocked": false,
       "linkedName": "Inside"
     },
     {
       "anchor": {
-        "x": 6.132948717948717,
-        "y": 4.014679487179487
+        "x": 5.6685256410256395,
+        "y": 4.964166666666667
       },
       "prevControl": {
-        "x": 5.923542087769931,
-        "y": 3.878118646389877
+        "x": 7.401895886822932,
+        "y": 4.729453925915706
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "3LC"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 26.5650511770781
   },
   "reversed": false,
   "folder": null,

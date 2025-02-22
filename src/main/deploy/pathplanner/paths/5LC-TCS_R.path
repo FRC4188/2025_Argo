@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.9153782894736837,
-        "y": 4.025
+        "x": 4.853205128205128,
+        "y": 2.5801282051282057
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8276663526447425,
-        "y": 4.969843085027741
+        "x": 1.003653846153846,
+        "y": -0.20641025641025568
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "5LC"
     },
     {
       "anchor": {
@@ -20,15 +20,20 @@
         "y": 7.296381578947368
       },
       "prevControl": {
-        "x": 1.9110011747622586,
-        "y": 6.908957218400386
+        "x": 2.469166666666666,
+        "y": 6.202628205128206
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "TCS_R"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7658079625292767,
+      "rotationDegrees": 90.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -48,7 +53,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -83.29016319224323
   },
   "useDefaultConstraints": true
 }

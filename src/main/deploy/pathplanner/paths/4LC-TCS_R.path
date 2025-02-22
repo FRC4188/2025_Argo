@@ -3,39 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.266025641030801,
-        "y": 2.652371794876956
+        "x": 6.0503846153846155,
+        "y": 3.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.023205128210288528,
-        "y": -1.1146153846102242
+        "x": 8.432052968960864,
+        "y": 6.632134362348179
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "4LC"
     },
     {
       "anchor": {
-        "x": 1.5816025641025637,
-        "y": 7.2862820512820505
+        "x": 1.6164473684210525,
+        "y": 7.296381578947368
       },
       "prevControl": {
-        "x": 3.7179487179538793,
-        "y": 6.698012820517981
+        "x": 1.864154910432127,
+        "y": 7.262603277764038
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "TCS_R"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.05854800936768149,
-      "rotationDegrees": -73.56036142719687
-    },
-    {
-      "waypointRelativePos": 0.35675253708040433,
-      "rotationDegrees": -148.2641372049642
+      "waypointRelativePos": 0.4067135050741594,
+      "rotationDegrees": 62.506677001988464
     }
   ],
   "constraintZones": [],
@@ -50,14 +46,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 125.00000000000001
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": -59.99999999999999
+    "velocity": 0.0,
+    "rotation": -20.0
   },
   "useDefaultConstraints": true
 }

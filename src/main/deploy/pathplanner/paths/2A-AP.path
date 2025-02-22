@@ -12,7 +12,7 @@
         "y": 4.603693693693693
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "2A"
     },
     {
       "anchor": {
@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 3.472792792797972,
-        "y": 0.5142792792792796
+        "y": 0.5142792792792797
       },
       "nextControl": null,
       "isLocked": false,

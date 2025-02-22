@@ -4,28 +4,28 @@
     {
       "anchor": {
         "x": 7.58,
-        "y": 5.05
+        "y": 7.25
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.348178430627585,
-        "y": 4.8740972867171415
+        "x": 4.9728173634219015,
+        "y": 6.705461854385585
       },
-      "isLocked": false,
-      "linkedName": "Inside"
+      "isLocked": true,
+      "linkedName": "Outside"
     },
     {
       "anchor": {
-        "x": 6.132948717948717,
-        "y": 4.014679487179487
+        "x": 4.853205128205128,
+        "y": 2.5801282051282057
       },
       "prevControl": {
-        "x": 5.923542087769931,
-        "y": 3.878118646389877
+        "x": 7.392051282051279,
+        "y": 2.9826282051282056
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "5LC"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -83.29016319224323
   },
   "reversed": false,
   "folder": null,
