@@ -235,6 +235,7 @@ public class RobotContainer {
     //pathplanner pathfinding + following
     autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
     autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
+    autoChooser.addOption("right source coral", AutoFactory.rightL4CoralGen(drive, superstructure, intake));
 
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));

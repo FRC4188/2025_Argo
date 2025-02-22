@@ -25,10 +25,6 @@ import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 public class Elevator extends SubsystemBase{
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs;
-    private final ElevatorFeedforward ff =  Constants.ElevatorConstants.SimEleFF; //Constants.ElevatorConstants.EleFF
-    private final ProfiledPIDController pid = Constants.ElevatorConstants.SimElePID; //Constants.ElevatorConstants.ElePID
-
-    public double target = 0;
 
     public Elevator(ElevatorIO io){
         this.io = io;
@@ -37,18 +33,14 @@ public class Elevator extends SubsystemBase{
 
     @Override
     public void periodic(){
-        io.runVolts(pid.calculate(Units.metersToInches(getHeight()), Units.metersToInches(target)) + ff.calculate(20));
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);   
     }
 
     public void runVolts(double volts) {
         io.runVolts(volts);
-       }
+    }
 
-    public void setHeight(double target) {
-        this.target = target;
-    } 
 
     @AutoLogOutput(key = "Elevator/Height Meters")
     public double getHeight(){
@@ -56,7 +48,7 @@ public class Elevator extends SubsystemBase{
     }
 
     //TODO: add autologoutput
-    public boolean atGoal() {
+    public boolean atGoal(double target) {
         return Math.abs(getHeight() - target) < ElevatorConstants.kTolerance;
     }
 

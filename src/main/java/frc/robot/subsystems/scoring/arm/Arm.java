@@ -20,10 +20,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-    private final ArmFeedforward ff =  Constants.ArmConstants.SimArmFF; //Constants.ArmConstants.ArmFF;
-    private final ProfiledPIDController pid = Constants.ArmConstants.SimArmPID; //Constants.ArmConstants.ArmPID;
-
-    public double target = 0;
     
     public Arm(ArmIO io) {
         this.io = io;
@@ -31,17 +27,9 @@ public class Arm extends SubsystemBase {
     
     @Override
     public void periodic() {
-        io.runVolts(
-            pid.calculate(getAngle(), target)
-            + ff.calculate(getAngle() + Math.PI/2, 0));
-
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
     }
-
-   public void setTarget(double target) {
-        this.target = target;
-   }
 
    public void runVolts(double volts) {
     io.runVolts(volts);
@@ -53,7 +41,7 @@ public class Arm extends SubsystemBase {
     }
     
     @AutoLogOutput(key = "Arm/isAtSetpoint")
-    public boolean atGoal() {
+    public boolean atGoal(double target) {
         return Math.abs(getAngle() - target) < Constants.ArmConstants.kTolerance;
     }
     public Command runSysId(){

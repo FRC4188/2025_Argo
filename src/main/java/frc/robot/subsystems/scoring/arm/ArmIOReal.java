@@ -30,8 +30,8 @@ public class ArmIOReal implements ArmIO {
     private final StatusSignal<Angle> desiredPos;
 
     public ArmIOReal() {
-        armMotor = new TalonFX(Constants.Id.kArm);
-        armEncoder = new CANcoder(Constants.Id.kArmNcoder);
+        armMotor = new TalonFX(Constants.Id.kArm, Constants.robot.rio);
+        armEncoder = new CANcoder(Constants.Id.kArmNcoder, Constants.robot.rio);
         //TODO: encoder config? (which includes zero offset)
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -43,10 +43,10 @@ public class ArmIOReal implements ArmIO {
         posRads = armMotor.getPosition();
         desiredPos = armEncoder.getAbsolutePosition();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            Hertz.of(50), 
-            appliedVolts,
-            posRads)    ;
+        appliedVolts.setUpdateFrequency(Hertz.of(50));
+        tempC.setUpdateFrequency(Hertz.of(0.5));
+        posRads.setUpdateFrequency(Hertz.of(50));
+        desiredPos.setUpdateFrequency(Hertz.of(50));
     }
 
     @Override

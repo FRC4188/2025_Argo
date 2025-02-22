@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring.elevator;
 
+import static edu.wpi.first.units.Units.Hertz;
 import static frc.robot.Constants.ElevatorConstants.kDrumeRadius;
 import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
 import static frc.robot.Constants.ElevatorConstants.kZero;
@@ -20,6 +21,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.Id;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -36,8 +38,8 @@ public class ElevatorIOReal implements ElevatorIO {
     public ElevatorIOReal() {
 
         //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
-        leader = new TalonFX(Id.kElevatorLead);
-        follower = new TalonFX(Id.kElevatorFollow);
+        leader = new TalonFX(Id.kElevatorLead, Constants.robot.rio);
+        follower = new TalonFX(Id.kElevatorFollow, Constants.robot.rio);
 
         follower.setControl(new Follower(Id.kElevatorLead, false));
 
@@ -58,6 +60,12 @@ public class ElevatorIOReal implements ElevatorIO {
         tempC = leader.getDeviceTemp();
         appliedVoltsFollow = follower.getMotorVoltage();
         tempCFollow = follower.getDeviceTemp();
+
+        posRads.setUpdateFrequency(Hertz.of(50));
+        appliedVolts.setUpdateFrequency(Hertz.of(50));
+        tempC.setUpdateFrequency(Hertz.of(0.5));
+        appliedVoltsFollow.setUpdateFrequency(Hertz.of(50));
+        tempCFollow.setUpdateFrequency(Hertz.of(0.5));
     }
 
     @Override

@@ -39,7 +39,8 @@ public final class Constants {
   }
 
   public static class robot {
-
+    public static final String rio = "rio";
+    public static final String canivore = "Default Name";
     public static final double loopPeriodSecs = 0.02;
 
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;

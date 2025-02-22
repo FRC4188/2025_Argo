@@ -42,7 +42,7 @@ public class Intake extends SubsystemBase{
             () -> {
                 io.runVolts(1);
                 intakeState = Mode.EMPTY;
-            }).withTimeout(0.5).andThen(() -> intakeState = Mode.EMPTY);
+            }).withTimeout(1).andThen(() -> intakeState = Mode.EMPTY);
     }
 
     public Mode getState() {

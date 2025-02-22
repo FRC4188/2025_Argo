@@ -1,7 +1,10 @@
 package frc.robot.subsystems.scoring.intake;
 
+import static edu.wpi.first.units.Units.Hertz;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -18,10 +21,13 @@ public class IntakeIOReal implements IntakeIO {
     private final StatusSignal<Temperature> tempC;
 
     public IntakeIOReal(){
-        motor = new TalonFX(Constants.Id.kIntake);
+        motor = new TalonFX(Constants.Id.kIntake, Constants.robot.rio);
 
         appliedVolts = motor.getMotorVoltage();
         tempC = motor.getDeviceTemp();
+
+        appliedVolts.setUpdateFrequency(Hertz.of(50));
+        tempC.setUpdateFrequency(Hertz.of(0.5));
     }
 
 

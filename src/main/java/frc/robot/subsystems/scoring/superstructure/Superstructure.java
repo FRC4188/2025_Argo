@@ -36,13 +36,17 @@ public class Superstructure extends SubsystemBase{
     private final Wrist wrist;
 
     private SuperVisualizer sim;
+    private boolean manual_override = false;
 
-    private boolean manual_override = true;
+    private ProfiledPIDController elePID = Constants.ElevatorConstants.SimElePID; //Constants.ElevatorConstants.ElePID
+    private ProfiledPIDController wristPID = Constants.WristConstants.SimWristPID; //Constants.WristConstants.WristPID
+    private ProfiledPIDController armPID = Constants.ArmConstants.SimArmPID; //Constants.ArmConstants.ArmPID
 
-    //ArmFF ff;
+    private ElevatorFeedforward eleFF = Constants.ElevatorConstants.SimEleFF; //Constants.ElevatorConstants.EleFF
+    private ArmFeedforward armFF = Constants.ArmConstants.SimArmFF; //Constants.ArmConstants.ArmFF;
+    private ArmFeedforward wristFF = Constants.WristConstants.SimWristFF; //Constants.WristConstants.WristFF
 
     private SuperState target;
-    private SuperState current;
     
     public Superstructure(Mode mode){
         switch (mode) {
@@ -67,31 +71,32 @@ public class Superstructure extends SubsystemBase{
             wrist.getAngle(),
             arm.getAngle(),
             elevator.getHeight());
-
-        wrist.setTarget(target.getWristAngle());
-        arm.setTarget(target.getArmAngle());
-        elevator.setHeight(target.getEleHeight());
-
-        this.current = new SuperState(
-            wrist.getAngle(),
-            arm.getAngle(),
-            elevator.getHeight());
     }
 
     @Override
     public void periodic(){
-        current = new SuperState(
+        SuperState current = new SuperState(
             wrist.getAngle(),
             arm.getAngle(),
             elevator.getHeight());
 
-        //sim
         sim.update(current);
 
         if (!manual_override) {
-            wrist.periodic();
-            arm.periodic();
-            elevator.periodic();
+            wrist.runVolts(
+                wristPID.calculate(wrist.getAngle(), target.getWristAngle())
+                + wristFF.calculate(target.getGlobalAngle() + Math.PI / 2, 0)
+                );
+
+            arm.runVolts(
+                armPID.calculate(arm.getAngle(), target.getArmAngle())
+                + armFF.calculate(target.getArmAngle() + Math.PI / 2, 0)
+            );
+
+            elevator.runVolts(
+                elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
+                + eleFF.calculate(target.getEleHeight(), 0)
+            );
         }
 
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
@@ -117,11 +122,11 @@ public class Superstructure extends SubsystemBase{
     }
 
     public SuperState getState() {
-        return current;
+        return new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight());
     }
 
     public boolean atTarget() {
-        return wrist.atGoal() && arm.atGoal() && elevator.atGoal();
+        return wrist.atGoal(target.getWristAngle()) && arm.atGoal(target.getArmAngle()) && elevator.atGoal(target.getEleHeight());
     }
 
     public boolean setTarget(SuperState goal) {
@@ -136,10 +141,6 @@ public class Superstructure extends SubsystemBase{
         }
 
         target = goal;
-
-        wrist.setTarget(target.getWristAngle());
-        arm.setTarget(target.getArmAngle());
-        elevator.setHeight(target.getEleHeight());
 
         return true;
     }  

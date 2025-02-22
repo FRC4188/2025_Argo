@@ -24,10 +24,6 @@ import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
-  private final ArmFeedforward ff = Constants.WristConstants.SimWristFF; //Constants.WristConstants.WristFF;
-  private final ProfiledPIDController pid = Constants.WristConstants.SimWristPID; //Constants.WristConstants.WristPID;
-
-    public double target = 0;
 
   public Wrist(WristIO io){
     this.io = io;
@@ -35,19 +31,12 @@ public class Wrist extends SubsystemBase {//J.C
 
   @Override
   public void periodic(){
-    io.runVolts(pid.calculate(getAngle(), target) + ff.calculate(getAngle() + Math.PI / 2, 0));
-
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);    
   }
-
   public void runVolts(double volts) {
     io.runVolts(volts);
    }
-
-  public void setTarget(double angle) {
-    target = angle;
-  }
 
   @AutoLogOutput(key = "Wrist/Angle Radians")
   public double getAngle(){
@@ -55,9 +44,10 @@ public class Wrist extends SubsystemBase {//J.C
   }
 
   @AutoLogOutput(key = "Wrist/isAtGoal")
-  public boolean atGoal() {
+  public boolean atGoal(double target) {
     return Math.abs(getAngle() - target) < Constants.WristConstants.kTolerance;
   }
+  
   public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(

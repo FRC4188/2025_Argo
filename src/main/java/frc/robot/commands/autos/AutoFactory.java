@@ -27,9 +27,11 @@ public final class AutoFactory {
     public static Command rightL4CoralGen(Drive drive, Superstructure superstructure, Intake intake){
 
         return Commands.runOnce(() -> timer.start()).andThen(
+            new coralScore(CoralGoal.right_brg_right, 4, drive, superstructure, intake)
+            .andThen(new coralSource(drive, superstructure, intake)).andThen(
         Commands.repeatingSequence(
             new coralScore(4, drive, superstructure, intake),
             new coralSource(drive, superstructure, intake)
-        ).until(() -> timer.hasElapsed(15)));
+        ).until(() -> timer.hasElapsed(15))));
     }
 }
