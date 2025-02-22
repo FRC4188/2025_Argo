@@ -39,6 +39,7 @@ public class ElevatorIOReal implements ElevatorIO {
         leader = new TalonFX(Id.kElevatorLead);
         follower = new TalonFX(Id.kElevatorFollow);
 
+        //TODO: doesn't opposemasterdirection need to be true?????
         follower.setControl(new Follower(Id.kElevatorLead, false));
 
         leader.setNeutralMode(NeutralModeValue.Brake);
@@ -78,6 +79,10 @@ public class ElevatorIOReal implements ElevatorIO {
     @Override
     public void runVolts(double volts){
         leader.setControl(new VoltageOut(volts));
+    }
+
+    public void setPower(double power) {
+        leader.set(power);
     }
 
     @Override

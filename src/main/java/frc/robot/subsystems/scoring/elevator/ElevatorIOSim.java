@@ -56,7 +56,6 @@ public class ElevatorIOSim implements ElevatorIO{
         physSim.setInputVoltage(volts);
     }
 
-    @Override
     public void stop() {
         runVolts(0);
     }

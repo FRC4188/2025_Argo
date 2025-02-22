@@ -21,5 +21,6 @@ public interface ArmIO {
 
     public default void updateInputs(ArmIOInputs inputs) {}
     public default void runVolts(double volts) {}
+    public default void setPower(double power) {}
     public default double getAngle(){ return  0;}
 }

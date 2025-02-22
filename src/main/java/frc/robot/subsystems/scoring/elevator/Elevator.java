@@ -47,6 +47,14 @@ public class Elevator extends SubsystemBase{
         this.target = target;
     } 
 
+    public void runVolts(double volts) {
+        io.runVolts(volts);
+    }
+
+    public void setPower(double power) {
+        io.setPower(power);
+    }
+
     @AutoLogOutput(key = "Elevator/Height Meters")
     public double getHeight(){
         return io.getHeight();

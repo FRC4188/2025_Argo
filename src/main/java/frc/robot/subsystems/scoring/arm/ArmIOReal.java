@@ -52,7 +52,11 @@ public class ArmIOReal implements ArmIO {
     @Override
     public void runVolts(double volts) {
         volts = MathUtil.clamp(volts,-12, 12);
-        armMotor.set(volts);
+        armMotor.setVoltage(volts);
+    }
+
+    public void setPower(double power) {
+        armMotor.set(power);
     }
 
     @Override

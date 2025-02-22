@@ -45,6 +45,14 @@ public class Wrist extends SubsystemBase {//J.C
     target = angle;
   }
 
+  public void runVolts(double volts) {
+    io.runVolts(volts);
+  }
+
+  public void setPower(double power) {
+    io.setPower(power);
+  }
+
   @AutoLogOutput(key = "Wrist/Angle Radians")
   public double getAngle(){
     return io.getAngle();

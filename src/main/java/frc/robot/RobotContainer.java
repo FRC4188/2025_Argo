@@ -186,8 +186,15 @@ public class RobotContainer {
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
         Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
+      controller2.leftBumper().onTrue(
+        Commands.runOnce( () -> superstructure.toggleDriverInput()));
+      if (superstructure.isDriverInput() == true) {
+        superstructure.setPowerForSuper(controller2.getRightTriggerAxis() - controller2.getLeftTriggerAxis(),
+          controller2.getLeftX(),controller2.getRightX());
+      }
 
   }
+
 
   private void configureDashboard() {
     // Set up auto routines

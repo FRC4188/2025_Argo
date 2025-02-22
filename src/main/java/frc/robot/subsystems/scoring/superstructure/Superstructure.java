@@ -29,7 +29,7 @@ public class Superstructure extends SubsystemBase{
     private final Elevator elevator;
     private final Wrist wrist;
 
-    private static boolean driverInput = true;
+    public static boolean driverInput = true;
 
     private SuperVisualizer sim;
 
@@ -112,30 +112,49 @@ public class Superstructure extends SubsystemBase{
             VecBuilder.fill(target.getArmAngle(), target.getWristAngle())
         );
 
-        arm.runVolts(
+        if (!driverInput) {
+            arm.runVolts(
             armPID.calculate(arm.getAngle(), target.getArmAngle())
             //+ ffVolt.get(0, 0)
             //^- until singlejointedarmsim gets workin, using for other stuff like autos
-        );
+            );
 
-        elevator.runVolts(
+            elevator.runVolts(
             elePID.calculate(Units.metersToInches(elevator.getHeight()), Units.metersToInches(target.getEleHeight())) + eleff.calculate(20)
-        );
+            );
 
-        wrist.runVolts(
+            wrist.runVolts(
             wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
             + wristff.calculate(target.getGlobalAngle() + Math.PI/2, 0)
-        );
+            );
         
-        wrist.periodic();
-        arm.periodic();
-        elevator.periodic();
+            wrist.periodic();
+            arm.periodic();
+            elevator.periodic();
+        }
+        
         Logger.recordOutput("Arm setpoint", target.getArmAngle());
         Logger.recordOutput("wrist setpoint", target.getWristAngle());
         Logger.recordOutput("ele setpoint", target.getEleHeight());
 
     }
 
+    public void toggleDriverInput() {
+        driverInput = !driverInput;
+    }
+
+    public boolean isDriverInput() {
+        return driverInput;
+    }
+
+    public void setPowerForSuper(double elePower, double armPower, double wristPower) {
+        if (driverInput) {
+            elevator.setPower(elePower);
+            arm.setPower(armPower);
+            wrist.setPower(wristPower);
+        }
+        
+    }
     public SuperState getState() {
         return current;
     }

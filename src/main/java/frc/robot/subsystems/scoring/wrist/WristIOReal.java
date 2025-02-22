@@ -47,6 +47,10 @@ public class WristIOReal implements WristIO {
         max.setVoltage(volts);
     }
 
+    public void setPower(double power){
+        max.set(power);
+    }
+
     @Override
     public void updateInputs(WristIOInputs inputs) {
         appliedVolts = max.getAppliedOutput() * max.getBusVoltage();

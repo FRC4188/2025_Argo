@@ -43,6 +43,10 @@ public class Arm extends SubsystemBase {
         io.runVolts(volts);
    }
 
+   public void setPower(double power) {
+        io.setPower(power);
+   }
+
    public void setTarget(double target) {
         this.target = target;
    }
