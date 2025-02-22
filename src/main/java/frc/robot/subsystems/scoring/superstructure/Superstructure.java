@@ -36,7 +36,7 @@ public class Superstructure extends SubsystemBase{
     private final Wrist wrist;
 
     private SuperVisualizer sim;
-    private boolean manual_override = false;
+    private boolean manual_override = true;
 
     private ProfiledPIDController elePID = Constants.ElevatorConstants.SimElePID; //Constants.ElevatorConstants.ElePID
     private ProfiledPIDController wristPID = Constants.WristConstants.SimWristPID; //Constants.WristConstants.WristPID
