@@ -1,14 +1,14 @@
 package frc.robot.subsystems.scoring.superstructure;
 
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,7 +24,6 @@ import frc.robot.subsystems.scoring.elevator.ElevatorIO;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
-import frc.robot.subsystems.scoring.superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.wrist.Wrist;
 import frc.robot.subsystems.scoring.wrist.WristIO;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
@@ -36,15 +35,18 @@ public class Superstructure extends SubsystemBase{
     private final Wrist wrist;
 
     private SuperVisualizer sim;
-    private boolean manual_override = true;
+    
+    public boolean eleOverride = true;
+    public boolean armOverride = true;
+    public boolean wristOverride = true;
 
-    private ProfiledPIDController elePID = Constants.ElevatorConstants.SimElePID; //Constants.ElevatorConstants.ElePID
-    private ProfiledPIDController wristPID = Constants.WristConstants.SimWristPID; //Constants.WristConstants.WristPID
-    private ProfiledPIDController armPID = Constants.ArmConstants.SimArmPID; //Constants.ArmConstants.ArmPID
+    private ProfiledPIDController elePID = Constants.ElevatorConstants.ElePID; //Constants.ElevatorConstants.SimElePID
+    private ProfiledPIDController wristPID = Constants.WristConstants.WristPID; //Constants.WristConstants.SimWristPID
+    private ProfiledPIDController armPID = Constants.ArmConstants.ArmPID; //Constants.ArmConstants.SimArmPID
 
-    private ElevatorFeedforward eleFF = Constants.ElevatorConstants.SimEleFF; //Constants.ElevatorConstants.EleFF
-    private ArmFeedforward armFF = Constants.ArmConstants.SimArmFF; //Constants.ArmConstants.ArmFF;
-    private ArmFeedforward wristFF = Constants.WristConstants.SimWristFF; //Constants.WristConstants.WristFF
+    private ElevatorFeedforward eleFF = Constants.ElevatorConstants.EleFF; //Constants.ElevatorConstants.SimEleFF
+    private ArmFeedforward armFF = Constants.ArmConstants.ArmFF; //Constants.ArmConstants.SimArmFF;
+    private ArmFeedforward wristFF = Constants.WristConstants.WristFF; //Constants.WristConstants.SimWristFF
 
     private SuperState target;
     
@@ -82,48 +84,63 @@ public class Superstructure extends SubsystemBase{
 
         sim.update(current);
 
-        if (!manual_override) {
+        if (!wristOverride) {
             wrist.runVolts(
                 wristPID.calculate(wrist.getAngle(), target.getWristAngle())
                 + wristFF.calculate(target.getGlobalAngle() + Math.PI / 2, 0)
                 );
+        }
 
+        if (!armOverride) {
             arm.runVolts(
                 armPID.calculate(arm.getAngle(), target.getArmAngle())
                 + armFF.calculate(target.getArmAngle() + Math.PI / 2, 0)
             );
+        }
 
+        if (!eleOverride) {
             elevator.runVolts(
-                elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
+                elePID.calculate(Units.metersToInches(elevator.getHeight()), Units.metersToInches(target.getEleHeight())) 
                 + eleFF.calculate(target.getEleHeight(), 0)
             );
         }
+        Logger.recordOutput("Arm manual", armOverride);
+        Logger.recordOutput("wrist manual",wristOverride);
+        Logger.recordOutput("ele manual", eleOverride);
 
-        Logger.recordOutput("Arm setpoint", target.getArmAngle());
-        Logger.recordOutput("wrist setpoint", target.getWristAngle());
-        Logger.recordOutput("ele setpoint", target.getEleHeight());
+        Logger.recordOutput("At Target", atTarget());
+    }
+
+    //sysid
+    public Command armSysId() {
+        return arm.runSysId();
+    }
+
+    public Command wristSysId() {
+        return wrist.runSysId();
+    }
+
+    public Command elevatorSysId() {
+        return elevator.runSysId();
     }
  
-   //manual override commands
-    public Command manual_override(boolean override) {
-        return Commands.runOnce(() -> manual_override = override);
+
+    public Command runArm(Supplier<Double> volts) {
+        return Commands.run(() -> arm.runVolts(volts.get())).onlyIf(() -> armOverride);
     }
 
-    public Command runArm(double volts) {
-        return Commands.run(() -> arm.runVolts(volts)).onlyIf(() -> manual_override);
+    public Command runWrist(Supplier<Double> volts) {
+        return Commands.run(() -> wrist.runVolts(volts.get())).onlyIf( () -> wristOverride);
     }
 
-    public Command runWrist(double volts) {
-        return Commands.run(() -> wrist.runVolts(volts)).onlyIf(() -> manual_override);
-    }
-
-    public Command runEle(double volts) {
-        return Commands.run(() -> elevator.runVolts(volts)).onlyIf(() -> manual_override);
+    public Command runEle(Supplier<Double> volts) {
+        return Commands.run(() -> elevator.runVolts(volts.get())).onlyIf( () -> eleOverride);
     }
 
     public SuperState getState() {
         return new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight());
     }
+
 
     public boolean atTarget() {
         return wrist.atGoal(target.getWristAngle()) && arm.atGoal(target.getArmAngle()) && elevator.atGoal(target.getEleHeight());

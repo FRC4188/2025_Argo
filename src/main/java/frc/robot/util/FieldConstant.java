@@ -4,7 +4,6 @@ package frc.robot.util;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,12 +108,14 @@ public class FieldConstant {
 
         public class CoralGoal {
             //robot perpendicular distance from the wall
-            public static double score_perp = Constants.robot.A_CROSSLENGTH / 2;
+            public static double score_perp = Constants.robot.B_CROSSLENGTH / 2;
             //robot parallel distance from the center of the wall
             public static double score_parallel = Units.inchesToMeters(6.472);
 
             public static Translation2d score_left = new Translation2d(-score_perp, score_parallel);
             public static Translation2d score_right = new Translation2d(-score_perp, -score_parallel);
+
+            
             //god help us
             //left and right relative to robot facing into the reef
             public static Pose2d alliance_left = new Pose2d(
@@ -172,7 +173,7 @@ public class FieldConstant {
 
         public class AlgaeSource {
             //robot perpendicular distance from the wall
-            public static double src_perp = Constants.robot.A_CROSSLENGTH/2;
+            public static double src_perp = Constants.robot.B_CROSSLENGTH/2;
             //robot parallel distance from the center of the wall
             public static double src_parallel = Units.inchesToMeters(0);
 
@@ -299,7 +300,7 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3 *2, 0);
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_CROSSLENGTH/3 *2, 0);
 
         public static Pose2d processor_wall = new Pose2d(
             field_center_x - Units.inchesToMeters(109.712),
@@ -327,7 +328,7 @@ public class FieldConstant {
         public static Pose2d left_approach_top_src = new Pose2d(0.650, 6.600, Rotation2d.fromDegrees(125));
         public static Pose2d middle_approach_top_src = new Pose2d(1.175, 6.985, Rotation2d.fromDegrees(125));
 
-        public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3*2, 0);
+        public static Translation2d src_pos = new Translation2d(-Constants.robot.B_CROSSLENGTH/3*2, 0);
 
         public static Translation2d right_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(54.0112 - 90));
         public static Translation2d left_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(-54.0112 + 90));

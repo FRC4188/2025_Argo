@@ -21,7 +21,7 @@ public class PathGen {
 
 
     public static synchronized PathGen getInstance() {
-        if (instance == null) instance = new PathGen(0.15f, (float)Constants.robot.A_CROSSLENGTH); 
+        if (instance == null) instance = new PathGen(0.15f, (float)Constants.robot.B_CROSSLENGTH); 
         return instance;
     }
 
@@ -82,6 +82,7 @@ public class PathGen {
                     (float) FieldConstant.Elem_Locations.corals_locations[2].getX(),
                     (float) FieldConstant.Elem_Locations.corals_locations[2].getY(),
                     (float) FieldConstant.algae_radius));
+        
     }
 
 

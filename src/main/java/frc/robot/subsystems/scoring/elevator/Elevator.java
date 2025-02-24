@@ -7,18 +7,11 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 
@@ -55,7 +48,7 @@ public class Elevator extends SubsystemBase{
     public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(4).per(Seconds),
+                Volts.of(1).per(Seconds),
                 Volts.of(8),
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(

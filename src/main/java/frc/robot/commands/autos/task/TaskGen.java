@@ -1,15 +1,7 @@
 package frc.robot.commands.autos.task;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
-
-import edu.wpi.first.math.Matrix;
-import frc.robot.subsystems.scoring.superstructure.SuperState;
-import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 
 public class TaskGen {
     

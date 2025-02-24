@@ -2,7 +2,6 @@ package frc.robot.commands.superstructure;
 
 import java.util.function.Supplier;
 
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
@@ -10,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.superstructure.anglegen.AngleGen;
 import frc.robot.commands.superstructure.anglegen.SuperTraj;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
-import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 
 public class SuperToState extends Command {

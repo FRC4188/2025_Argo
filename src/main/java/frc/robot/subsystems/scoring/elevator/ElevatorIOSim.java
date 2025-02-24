@@ -2,10 +2,9 @@
 package frc.robot.subsystems.scoring.elevator;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants.ElevatorConstants;
@@ -27,7 +26,7 @@ public class ElevatorIOSim implements ElevatorIO{
         var plant =  LinearSystemId.createElevatorSystem(
             gearbox,
             Kilograms.convertFrom(23.37, Pounds), 
-            ElevatorConstants.kDrumeRadius, 
+            Units.inchesToMeters(0.75000 / 2), 
             ElevatorConstants.kGearRatio);
         sim = new DCMotorSim(
             plant, 
@@ -44,7 +43,7 @@ public class ElevatorIOSim implements ElevatorIO{
         
         inputs.connected = true;
         inputs.appliedVolts = appliedVolts;
-        inputs.posRads = sim.getAngularPositionRad();
+        inputs.posMeters = sim.getAngularPositionRad();
         
         inputs.followerAppliedVolts = appliedVolts;
         sim.update(robot.loopPeriodSecs);

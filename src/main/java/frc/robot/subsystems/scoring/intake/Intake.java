@@ -6,7 +6,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Intake extends SubsystemBase{
     public static enum Mode {
@@ -27,22 +26,19 @@ public class Intake extends SubsystemBase{
     }
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
-    //TODO: create stall method
     public Command ingest(Mode intakeMode) {
-        io.invertMotor(intakeMode == Mode.ALGAE);
         return Commands.run(
             () -> {
-                io.runVolts(1);
-            }).until(()-> io.isSafetyOn()).withTimeout(2).andThen(() -> intakeState = intakeMode);
+                io.runVolts((intakeState == Mode.ALGAE)?1:-1);
+            }).until(()-> io.stalling()).andThen(() -> io.runVolts(0)).andThen(() -> intakeState = intakeMode);
     }
 
     public Command eject() {
-        io.invertMotor(intakeState == Mode.CORAL);
         return Commands.run(
             () -> {
-                io.runVolts(1);
+                io.runVolts((intakeState == Mode.CORAL)?1:-1);
                 intakeState = Mode.EMPTY;
-            }).withTimeout(1).andThen(() -> intakeState = Mode.EMPTY);
+            }).withTimeout(1).andThen(() -> io.runVolts(0)).andThen(() -> intakeState = Mode.EMPTY);
     }
 
     public Mode getState() {
@@ -57,5 +53,14 @@ public class Intake extends SubsystemBase{
     public void periodic(){
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);    
+
+        String state;
+        switch(intakeState) {
+            case CORAL: state = "Coral";
+            case ALGAE: state = "algae";
+            case EMPTY: state = "empty";
+            default: state = "";
+        }
+        Logger.recordOutput("State", state);
     }
 }

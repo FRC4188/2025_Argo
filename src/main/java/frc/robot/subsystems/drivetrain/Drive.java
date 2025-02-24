@@ -77,8 +77,8 @@ public class Drive extends SubsystemBase implements VisionConsumer {
                     Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
     // PathPlanner config constants
-    private static final double ROBOT_MASS_KG = 74.088;
-    private static final double ROBOT_MOI = 6.883;
+    private static final double ROBOT_MASS_KG = 54.34;
+    private static final double ROBOT_MOI = 8;
     private static final double WHEEL_COF = 1.2;
     private static final RobotConfig PP_CONFIG = new RobotConfig(
             ROBOT_MASS_KG,
@@ -163,7 +163,9 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         // Configure SysId
         sysId = new SysIdRoutine(
                 new SysIdRoutine.Config(
-                        null, null, null, (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                        Volts.of(1).per(Seconds), 
+                        Volts.of(3), 
+                        Seconds.of(5), (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
     }
 

@@ -90,7 +90,7 @@ public class DriveCommands {
         double angle = Math.atan2(y, x);
         double xSpeed = totalSpeed * Math.cos(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
-        double rotSpeed = -thetaInput.getAsDouble() * 5 * Math.PI;
+        double rotSpeed = -MathUtil.applyDeadband(thetaInput.getAsDouble(), DEADBAND) * 5 * Math.PI;
 
         //xSpeed = limitX.calculate(xSpeed);
         //ySpeed = limitY.calculate(ySpeed);

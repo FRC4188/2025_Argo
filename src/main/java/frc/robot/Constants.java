@@ -14,8 +14,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.pathplanner.lib.config.PIDConstants;
-
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -40,7 +38,7 @@ public final class Constants {
 
   public static class robot {
     public static final String rio = "rio";
-    public static final String canivore = "Default Name";
+    public static final String canivore = "canivore";
     public static final double loopPeriodSecs = 0.02;
 
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;
@@ -50,6 +48,10 @@ public final class Constants {
     public static final double A_LENGTH = Units.inchesToMeters(30); //inches
     public static final double A_WIDTH = Units.inchesToMeters(29); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
+
+    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3.2) * 2;
+    public static final double B_WIDTH = Units.inchesToMeters(3.2) * 2;
+    public static final double B_CROSSLENGTH = Math.hypot(B_LENGTH, B_WIDTH);
 
     public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
     public static  final PIDConstants TURN_PID = new PIDConstants(5.0, 0.0, 0.0);
@@ -77,11 +79,11 @@ public final class Constants {
   }
 
   public static class ElevatorConstants{    
-    public static final double kDrumeRadius = Units.inchesToMeters(0.75000 / 2); //TODO: get drum radius
-
     public static final double kGearRatio = 6;
     public static final double kTolerance = 0.0;
-    public static final double kZero = 0; //TODO: get zero
+
+    public static final double kZero = -0.046142578125;
+    public static final double kConversion = 1;
 
     public static final double kMax_Vel = 3;
     public static final double kMax_Accel = 3;
@@ -142,7 +144,7 @@ public final class Constants {
 
   public static class WristConstants {
     public static final double kTolerance = 0.75;
-    public static final double kZero = 0.0; //TODO: to be tuned
+    public static final double kZero = 2.3191165112888488; 
 
     public static final double kGearRatio = 4.6666666667;
     public static final int kCurrentLimit = 0; //int for some reason
@@ -167,6 +169,8 @@ public final class Constants {
     //sim
     public static final ProfiledPIDController SimWristPID = new ProfiledPIDController(3, 0.0, 6, new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0)));
     public static final ArmFeedforward SimWristFF = new ArmFeedforward(0.1, 0, 0, 0);
+
+    
   }
 
   public static class ArmConstants {
@@ -210,7 +214,7 @@ public final class Constants {
       .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
 
     private static final Slot0Configs kSlot0Configs = new Slot0Configs()
-      .withGravityType(GravityTypeValue.Arm_Cosine) //TODO: check arm angle cause 0 is horizontal and our 0 is vertical
+      .withGravityType(GravityTypeValue.Arm_Cosine)
       .withKP(kP)
       .withKD(kI)
       .withKS(kS)
@@ -226,6 +230,29 @@ public final class Constants {
       .withFeedback(kFeedbackConfigs)
       .withMotionMagic(kMagicConfigs)
       .withSlot0(kSlot0Configs)
+      .withClosedLoopRamps(kClosedLoopRampsConfigs)
+      .withOpenLoopRamps(kOpenLoopRampsConfigs);
+  }
+
+  public static class IntakeConstants {
+    public static double rpmStalling = 1; //rpm threshold to consider for stalling
+
+    private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(100)
+      .withSupplyCurrentLimit(60)
+      .withStatorCurrentLimitEnable(true);
+    
+    private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
+      .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
+      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
+      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
+
+    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
+    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
+
+    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
+      .withCurrentLimits(kCurrentLimitsConfigs)
+      .withMotionMagic(kMagicConfigs)
       .withClosedLoopRamps(kClosedLoopRampsConfigs)
       .withOpenLoopRamps(kOpenLoopRampsConfigs);
   }

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.scoring.elevator;
 
 import static edu.wpi.first.units.Units.Hertz;
-import static frc.robot.Constants.ElevatorConstants.kDrumeRadius;
 import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
 import static frc.robot.Constants.ElevatorConstants.kZero;
 
@@ -9,15 +8,10 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.Id;
@@ -77,7 +71,7 @@ public class ElevatorIOReal implements ElevatorIO {
     
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
-        inputs.posRads = posRads.getValueAsDouble();
+        inputs.posMeters = (posRads.getValueAsDouble() - kZero) * ElevatorConstants.kConversion;
         
         inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
         inputs.followerTempC = tempCFollow.getValueAsDouble();
@@ -90,6 +84,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public double getHeight(){
-        return posRads.getValueAsDouble() - kZero / 6 * kDrumeRadius * 2; //TODO: test da math
+        return (posRads.getValueAsDouble() - kZero) * ElevatorConstants.kConversion; //TODO: test da math
     }
 }

@@ -65,8 +65,8 @@ public class DriveToPose extends Command {
         Pose2d currentPose = driveSubsystem.getPose();
         Pose2d targetPose = poseSupplier.get();
 
-        Logger.recordOutput("DriveToPose/currentPose", currentPose);
-        Logger.recordOutput("DriveToPose/targetPose", targetPose);
+        Logger.recordOutput("Drive/DriveToPose/currentPose", currentPose);
+        Logger.recordOutput("Drive/DriveToPose/targetPose", targetPose);
 
         double currentDistance = currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation());
         double ffScaler = MathUtil.clamp(

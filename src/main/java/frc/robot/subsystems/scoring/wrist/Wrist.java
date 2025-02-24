@@ -7,23 +7,20 @@ import static edu.wpi.first.units.Units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 
 
 public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+
+  private double kZero = 0;
 
   public Wrist(WristIO io){
     this.io = io;
@@ -34,13 +31,18 @@ public class Wrist extends SubsystemBase {//J.C
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);    
   }
+
+  public void setZero() {
+    kZero = io.getAngle();
+  }
+
   public void runVolts(double volts) {
     io.runVolts(volts);
-   }
+  }
 
   @AutoLogOutput(key = "Wrist/Angle Radians")
   public double getAngle(){
-    return io.getAngle();
+    return io.getAngle() - kZero;
   }
 
   @AutoLogOutput(key = "Wrist/isAtGoal")
@@ -51,8 +53,8 @@ public class Wrist extends SubsystemBase {//J.C
   public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(4).per(Seconds),
-                Volts.of(8),
+                Volts.of(1).per(Seconds),
+                Volts.of(4),
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(
                 voltage -> io.runVolts(voltage.magnitude()),

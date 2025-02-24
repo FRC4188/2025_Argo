@@ -4,24 +4,27 @@ import static edu.wpi.first.units.Units.Hertz;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOReal implements IntakeIO {
-    private TalonFX motor;
+    private final TalonFX motor;
 
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
 
     public IntakeIOReal(){
         motor = new TalonFX(Constants.Id.kIntake, Constants.robot.rio);
+
+        motor.setNeutralMode(NeutralModeValue.Brake);
+        motor.getConfigurator().apply(IntakeConstants.kMotorConfig);
+        motor.optimizeBusUtilization();
 
         appliedVolts = motor.getMotorVoltage();
         tempC = motor.getDeviceTemp();
@@ -30,10 +33,9 @@ public class IntakeIOReal implements IntakeIO {
         tempC.setUpdateFrequency(Hertz.of(0.5));
     }
 
-
     @AutoLogOutput(key = "Intake/Safety On")
-    public boolean isSafetyOn() {
-        return motor.isSafetyEnabled();
+    public boolean stalling() {
+        return motor.getVelocity().getValueAsDouble() < 1;
     }
 
     @AutoLogOutput(key = "Intake/Is Alive")

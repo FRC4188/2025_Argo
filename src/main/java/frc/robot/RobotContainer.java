@@ -20,26 +20,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.scoring.AutoScore;
-import frc.robot.commands.scoring.Score;
-import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -50,20 +42,14 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
-import frc.robot.subsystems.scoring.arm.Arm;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
-import frc.robot.subsystems.scoring.intake.IntakeIOSim;
-import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
-import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
-
-import java.lang.reflect.Field;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -176,44 +162,64 @@ public class RobotContainer {
     drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
-    // drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-    //   () -> -controller.getCorrectedLeft().getX() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-    //   () -> -controller.getCorrectedLeft().getY() * 3.0 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-    //   () -> (controller.getRightX(Scale.SQUARED) * 3.5 * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getLeftY() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> -controller.getLeftX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> controller.getRightX() * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
+      () -> -controller.getLeftY(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> -controller.getLeftX(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
+      () -> controller.getRightX(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
     Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
       ? () -> drive.setPose(
                 driveSim
                   .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
+
       : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-      controller.a().onTrue(new AutoScore.coralScore(4, drive, superstructure, intake));
-      controller.b().onTrue(new AutoScore.coralScore(3, drive, superstructure, intake));
-      controller.x().onTrue(new AutoScore.coralScore(2, drive, superstructure, intake));
-      controller.y().onTrue(new AutoScore.coralSource(drive, superstructure, intake));
+      controller.a().onTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      controller.b().onTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      controller.x().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      controller.y().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+      controller.leftTrigger().onTrue(
+        intake.ingest(Intake.Mode.CORAL)
+      );
+
+      controller.rightTrigger().onTrue(
+        intake.ingest(Intake.Mode.ALGAE)
+      );
+
+      //manual controls down here
+      controller2.a()
+        .toggleOnTrue(new InstantCommand(() -> superstructure.armOverride = true))
+        .toggleOnFalse(new InstantCommand(() -> superstructure.armOverride = false));
+
+      controller2.b()
+        .toggleOnTrue(new InstantCommand(() -> superstructure.wristOverride = true))
+        .toggleOnFalse(new InstantCommand(() -> superstructure.wristOverride = false));
+
+      controller2.y()
+        .toggleOnTrue(new InstantCommand(() -> superstructure.eleOverride = true))
+        .toggleOnFalse(new InstantCommand(() -> superstructure.eleOverride = false));
 
       Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft().getY() != 0.0 || controller2.getCorrectedRight().getY() != 0.0));
 
       superInput.onTrue(new ParallelCommandGroup(
-        superstructure.runArm(controller2.getLeftY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 5)),
-        superstructure.runWrist(controller2.getRightY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 5))
+        superstructure.runArm(() -> controller2.getLeftY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 2)),
+        superstructure.runWrist(() ->controller2.getRightY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 2 ))
       ));
 
       Trigger eleInput = new Trigger(() -> controller2.getLeftTButton().getAsBoolean() || controller2.getRightTButton().getAsBoolean());
 
       eleInput.onTrue(
-        superstructure.runEle((controller.getRightT(Scale.SQUARED) - controller.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 1 : 5)));
+        superstructure.runEle(() -> (controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 4 : 7)));
   }
 
   private void configureDashboard() {
+    
+
     // Set up auto routines
 
     // Set up SysId routines
@@ -248,7 +254,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoFactory.leftL4CoralGen(drive, superstructure, intake);
+    return autoChooser.get();
   }
 
   public void resetSimulation(){

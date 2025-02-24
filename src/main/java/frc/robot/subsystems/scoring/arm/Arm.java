@@ -5,15 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
@@ -44,11 +40,12 @@ public class Arm extends SubsystemBase {
     public boolean atGoal(double target) {
         return Math.abs(getAngle() - target) < Constants.ArmConstants.kTolerance;
     }
+    
     public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(4).per(Seconds),
-                Volts.of(8),
+                Volts.of(1).per(Seconds),
+                Volts.of(3),
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(
                 voltage -> io.runVolts(voltage.magnitude()),

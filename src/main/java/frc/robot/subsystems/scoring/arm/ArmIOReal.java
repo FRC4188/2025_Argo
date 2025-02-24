@@ -1,38 +1,32 @@
 package frc.robot.subsystems.scoring.arm;
 
 import static edu.wpi.first.units.Units.Hertz;
-import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
-
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 
 public class ArmIOReal implements ArmIO {
     private final TalonFX armMotor;
-    private final CANcoder armEncoder;
+    private final DutyCycleEncoder armEncoder;
 
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
     private final StatusSignal<Angle> posRads;
-    private final StatusSignal<Angle> desiredPos;
+    private double encoderRad;
 
     public ArmIOReal() {
         armMotor = new TalonFX(Constants.Id.kArm, Constants.robot.rio);
-        armEncoder = new CANcoder(Constants.Id.kArmNcoder, Constants.robot.rio);
-        //TODO: encoder config? (which includes zero offset)
+        armEncoder = new DutyCycleEncoder(0, 1, ArmConstants.kZero);
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
         armMotor.getConfigurator().apply(ArmConstants.kMotorConfig);
@@ -41,18 +35,18 @@ public class ArmIOReal implements ArmIO {
         appliedVolts = armMotor.getMotorVoltage();
         tempC = armMotor.getDeviceTemp();
         posRads = armMotor.getPosition();
-        desiredPos = armEncoder.getAbsolutePosition();
+        encoderRad = Units.rotationsToRadians(armEncoder.get());
 
         appliedVolts.setUpdateFrequency(Hertz.of(50));
         tempC.setUpdateFrequency(Hertz.of(0.5));
         posRads.setUpdateFrequency(Hertz.of(50));
-        desiredPos.setUpdateFrequency(Hertz.of(50));
+        armEncoder.setAssumedFrequency(50);
     }
 
     @Override
     public void runVolts(double volts) {
         volts = MathUtil.clamp(volts,-12, 12);
-        armMotor.set(volts);
+        armMotor.setVoltage(volts);
     }
 
     @Override
@@ -60,15 +54,17 @@ public class ArmIOReal implements ArmIO {
         if(DriverStation.isDisabled()){
             runVolts(0.0);
         }
+        encoderRad = Units.rotationsToRadians(armEncoder.get());
+
 
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
         inputs.positionRads = posRads.getValueAsDouble();
-        inputs.desiredPositionRads = desiredPos.getValueAsDouble();
+        inputs.desiredPositionRads = encoderRad;
     }
 
     @Override
     public double getAngle(){
-        return posRads.getValueAsDouble();
+        return Units.rotationsToRadians(armEncoder.get());
     }
 }
