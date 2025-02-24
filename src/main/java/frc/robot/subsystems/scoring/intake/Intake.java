@@ -29,8 +29,8 @@ public class Intake extends SubsystemBase{
     public Command ingest(Mode intakeMode) {
         return Commands.run(
             () -> {
-                io.runVolts((intakeState == Mode.ALGAE)?1:-1);
-            }).until(()-> io.stalling()).andThen(() -> io.runVolts(0)).andThen(() -> intakeState = intakeMode);
+                io.runVolts((intakeState == Mode.ALGAE)? 1:-1);
+            }).until(()-> io.isStalled()).andThen(() -> io.runVolts(0)).andThen(() -> intakeState = intakeMode);
     }
 
     public Command eject() {
@@ -57,8 +57,8 @@ public class Intake extends SubsystemBase{
         String state;
         switch(intakeState) {
             case CORAL: state = "Coral";
-            case ALGAE: state = "algae";
-            case EMPTY: state = "empty";
+            case ALGAE: state = "Algae";
+            case EMPTY: state = "Empty";
             default: state = "";
         }
         Logger.recordOutput("State", state);

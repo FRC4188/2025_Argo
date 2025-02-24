@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -80,7 +81,7 @@ public final class Constants {
 
   public static class ElevatorConstants{    
     public static final double kGearRatio = 6;
-    public static final double kTolerance = 0.0;
+    public static final double kTolerance = 0.1;
 
     public static final double kZero = -0.046142578125;
     public static final double kConversion = 1;
@@ -235,25 +236,14 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static double rpmStalling = 1; //rpm threshold to consider for stalling
+    public static double voltStall = Amp.of(257).magnitude(); //rpm threshold to consider for stalling
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)
       .withSupplyCurrentLimit(60)
       .withStatorCurrentLimitEnable(true);
-    
-    private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
-      .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
-      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
-      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
 
-    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
-    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
-
-    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
-      .withCurrentLimits(kCurrentLimitsConfigs)
-      .withMotionMagic(kMagicConfigs)
-      .withClosedLoopRamps(kClosedLoopRampsConfigs)
-      .withOpenLoopRamps(kOpenLoopRampsConfigs);
+      public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
+        .withCurrentLimits(kCurrentLimitsConfigs);
   }
 }

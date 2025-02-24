@@ -20,10 +20,11 @@ public class WristIOReal implements WristIO {
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true).idleMode(IdleMode.kBrake);
-        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
         config.idleMode(IdleMode.kBrake);
         //config.smartCurrentLimit(WristConstants.kCurrentLimit);
-
+        config.signals
+            .absoluteEncoderPositionAlwaysOn(true)
+            .primaryEncoderPositionAlwaysOn(true);
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -37,7 +38,7 @@ public class WristIOReal implements WristIO {
     public void updateInputs(WristIOInputs inputs) {
         inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
         inputs.tempC = max.getMotorTemperature();
-        inputs.posRads = Units.rotationsToRadians(max.getEncoder().getPosition());
+        inputs.posRads = Units.rotationsToRadians(max.getAbsoluteEncoder().getPosition());
     }
 
     @Override

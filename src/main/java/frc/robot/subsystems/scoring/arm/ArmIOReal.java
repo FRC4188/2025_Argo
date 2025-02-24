@@ -30,7 +30,6 @@ public class ArmIOReal implements ArmIO {
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
         armMotor.getConfigurator().apply(ArmConstants.kMotorConfig);
-        armMotor.optimizeBusUtilization();
 
         appliedVolts = armMotor.getMotorVoltage();
         tempC = armMotor.getDeviceTemp();
@@ -41,6 +40,8 @@ public class ArmIOReal implements ArmIO {
         tempC.setUpdateFrequency(Hertz.of(0.5));
         posRads.setUpdateFrequency(Hertz.of(50));
         armEncoder.setAssumedFrequency(50);
+
+        armMotor.optimizeBusUtilization();
     }
 
     @Override

@@ -7,6 +7,8 @@ import static edu.wpi.first.units.Units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,7 +60,7 @@ public class Wrist extends SubsystemBase {//J.C
                 Seconds.of(6)
             ),new SysIdRoutine.Mechanism(
                 voltage -> io.runVolts(voltage.magnitude()),
-                null,
+                state -> SignalLogger.writeString("SysId_Wrist", state.toString()),
                 this));
         
         return Commands.sequence(

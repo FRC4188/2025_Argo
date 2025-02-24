@@ -24,23 +24,27 @@ public class IntakeIOReal implements IntakeIO {
 
         motor.setNeutralMode(NeutralModeValue.Brake);
         motor.getConfigurator().apply(IntakeConstants.kMotorConfig);
-        motor.optimizeBusUtilization();
-
         appliedVolts = motor.getMotorVoltage();
         tempC = motor.getDeviceTemp();
 
         appliedVolts.setUpdateFrequency(Hertz.of(50));
         tempC.setUpdateFrequency(Hertz.of(0.5));
+
+        motor.optimizeBusUtilization();
     }
 
-    @AutoLogOutput(key = "Intake/Safety On")
-    public boolean stalling() {
-        return motor.getVelocity().getValueAsDouble() < 1;
-    }
+    @AutoLogOutput(key = "Intake/Is Stalled")
+    public boolean isStalled() {
+        int count = 0;
+        while(count < 3 || count > -3){
+            if(motor.getStatorCurrent(true).getValueAsDouble() > IntakeConstants.voltStall
+                && motor.getAcceleration(true).getValueAsDouble() > 1)
+                count++;
+            else
+                count--;
+        }
 
-    @AutoLogOutput(key = "Intake/Is Alive")
-    public boolean isAlive() {
-        return motor.isAlive();
+        return count > 3;
     }
 
     @Override
