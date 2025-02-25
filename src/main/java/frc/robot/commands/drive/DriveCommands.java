@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
@@ -72,8 +74,8 @@ public class DriveCommands {
       Translation2d transInput = getLinearVelocityFromJoysticks(-x.getAsDouble(), -y.getAsDouble());
       double rotatInput = MathUtil.applyDeadband(Math.copySign(-theta.getAsDouble() * -theta.getAsDouble(), -theta.getAsDouble()), DEADBAND);
       
-      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-        transInput.getX(), transInput.getY(), rotatInput, drive.getRotation()));
+      drive.applyRequest(()-> new SwerveRequest.ApplyFieldSpeeds().withSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
+        transInput.getX(), transInput.getY(), rotatInput, drive.getState().Pose.getRotation())));
     });
   }
 
@@ -102,10 +104,10 @@ public class DriveCommands {
               xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio,
               ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio, 
               rotSpeed), 
-              AllianceFlip.apply(drive.getRotation()));
+              AllianceFlip.apply(drive.getState().Pose.getRotation()));
 
         
-        drive.runVelocity(speeds);
+        drive.applyRequest(()->new SwerveRequest.ApplyFieldSpeeds().withSpeeds(speeds));
         
       },
       drive
@@ -136,16 +138,16 @@ public class DriveCommands {
           omega = Math.copySign(omega * omega, omega);
 
           // Convert to field relative speeds & send command
-          ChassisSpeeds speeds =
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec(),
-                  AllianceFlip.apply(drive.getRotation()));
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  AllianceFlip.apply(drive.getRotation())));
+          // ChassisSpeeds speeds =
+          //     ChassisSpeeds.fromFieldRelativeSpeeds(
+          //         linearVelocity.getX() * TunerConstants.kSpeedAt12Volts.magnitude(),
+          //         linearVelocity.getY() * TunerConstants.kSpeedAt12Volts.magnitude(),
+          //         omega * ,
+          //         AllianceFlip.apply(drive.getRotation()));
+          // drive.runVelocity(
+          //     ChassisSpeeds.fromFieldRelativeSpeeds(
+          //         speeds,
+          //         AllianceFlip.apply(drive.getRotation())));
           
           
         },
@@ -182,28 +184,28 @@ public class DriveCommands {
               // Calculate angular speed
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                      drive.getState().Pose.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getX() * TunerConstants.kSpeedAt12Volts.magnitude(),
+                      linearVelocity.getY() * TunerConstants.kSpeedAt12Volts.magnitude(),
                       omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
+              drive.applyRequest(() -> new SwerveRequest.ApplyFieldSpeeds().withSpeeds(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
                       isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
+                          ? drive.getState().Pose.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getState().Pose.getRotation())));
             },
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset( drive.getState().Pose.getRotation().getRadians()));
   }
 
   /**

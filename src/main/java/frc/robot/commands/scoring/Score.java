@@ -27,8 +27,8 @@ public class Score extends SequentialCommandGroup {
                         SuperPreset.PROCESSOR.getState():
                         SuperPreset.PROCESSOR_REVERSE.getState()), 
                     () -> intake.getState() != Mode.ALGAE)
-                .until(() -> (drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
-                .andThen(new WaitUntilCommand(() -> (drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
+                .until(() -> (drive.getState().Pose.getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
+                .andThen(new WaitUntilCommand(() -> (drive.getState().Pose.getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
                 .andThen(new SuperToState(superstructure, state)))),
             intakeCommand
         );

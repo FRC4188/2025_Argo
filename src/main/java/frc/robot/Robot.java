@@ -15,6 +15,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -112,13 +114,16 @@ public class Robot extends LoggedRobot {
     cgoals = new LinkedList<Pose2d>(Arrays.asList(
                 alliance_right, alliance_left, left_brg_left, left_brg_right, left_src_left, left_src_right,
                 right_brg_left,right_brg_right, right_src_left, right_src_right, mid_brg_left, mid_brg_right));
+    SignalLogger.start();
   }
 
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    SignalLogger.stop();
+  }
 
   @Override
   public void testInit() {

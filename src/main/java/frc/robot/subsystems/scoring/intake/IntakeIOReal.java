@@ -35,7 +35,7 @@ public class IntakeIOReal implements IntakeIO {
 
     @AutoLogOutput(key = "Intake/Is Stalled")
     public boolean isStalled() {
-        return false;
+        return motor.getVelocity().getValueAsDouble() < 3&& appliedVolts.getValueAsDouble() > 0.5;
     }
 
     @Override

@@ -4,6 +4,9 @@ package frc.robot.commands.drive;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,6 +32,7 @@ public class DriveToPose extends Command {
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
+    private double thetaVelocity = 0;
     private double ffMinRadius = 0.2, ffMaxRadius = 0.8;
 
     public DriveToPose(Drive driveSubsystem, Supplier<Pose2d> poseSupplier) {
@@ -40,29 +44,29 @@ public class DriveToPose extends Command {
 
     @Override
     public void initialize() {
-        Pose2d currentPose = driveSubsystem.getPose();
+        Pose2d currentPose = driveSubsystem.getState().Pose;
         driveController.reset(
                 currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation()),
                 Math.min(
                         0.0,
-                        -new Translation2d(driveSubsystem.getChassisSpeeds().vyMetersPerSecond,
-                                driveSubsystem.getChassisSpeeds().vxMetersPerSecond)
+                        -new Translation2d(driveSubsystem.getState().Speeds.vyMetersPerSecond,
+                                driveSubsystem.getState().Speeds.vxMetersPerSecond)
                                 .rotateBy(
                                         poseSupplier
                                                 .get()
                                                 .getTranslation()
-                                                .minus(driveSubsystem.getPose().getTranslation())
+                                                .minus(driveSubsystem.getState().Pose.getTranslation())
                                                 .getAngle()
                                                 .unaryMinus())
                                 .getX()));
         thetaController.reset(currentPose.getRotation().getRadians(),
-                driveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
-        lastSetpointTranslation = driveSubsystem.getPose().getTranslation();
+                driveSubsystem.getState().Speeds.omegaRadiansPerSecond);
+        lastSetpointTranslation = driveSubsystem.getState().Pose.getTranslation();
     }
 
     @Override
     public void execute() {
-        Pose2d currentPose = driveSubsystem.getPose();
+        Pose2d currentPose = driveSubsystem.getState().Pose;
         Pose2d targetPose = poseSupplier.get();
 
         Logger.recordOutput("Drive/DriveToPose/currentPose", currentPose);
@@ -90,7 +94,7 @@ public class DriveToPose extends Command {
                 .getTranslation();
 
         // Calculate theta speed
-        double thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
+        thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
                 + thetaController.calculate(
                         currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
         thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
@@ -102,13 +106,13 @@ public class DriveToPose extends Command {
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
                 
-        driveSubsystem.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation()));
+        driveSubsystem.applyRequest(() -> new SwerveRequest.ApplyFieldSpeeds().withSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
+                driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation())));
     }
 
     @Override
     public void end(boolean interrupted) {
-        driveSubsystem.stopWithX();
+        driveSubsystem.applyRequest(()-> new SwerveRequest.SwerveDriveBrake());
     }
 
     @Override

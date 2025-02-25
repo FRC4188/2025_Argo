@@ -4,6 +4,8 @@
 
 package frc.robot.commands.drive;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -48,14 +50,15 @@ public class FollowPath extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.runVelocity(controller.calculate(
-      drive.getPose(), trajectory.sample(timer.get()), heading));
+    drive.setControl(new SwerveRequest.ApplyFieldSpeeds().withSpeeds(
+      controller.calculate(drive.getState().Pose, trajectory.sample(timer.get()), heading)
+    ));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.stopWithX();
+    drive.applyRequest(() -> new SwerveRequest.SwerveDriveBrake());
   }
 
   // Returns true when the command should end.
