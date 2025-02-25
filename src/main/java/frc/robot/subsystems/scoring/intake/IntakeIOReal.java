@@ -15,7 +15,7 @@ import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOReal implements IntakeIO {
     private final TalonFX motor;
-
+    
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
 
@@ -35,22 +35,16 @@ public class IntakeIOReal implements IntakeIO {
 
     @AutoLogOutput(key = "Intake/Is Stalled")
     public boolean isStalled() {
-        int count = 0;
-        while(count < 3 || count > -3){
-            if(motor.getStatorCurrent(true).getValueAsDouble() > IntakeConstants.voltStall
-                && motor.getAcceleration(true).getValueAsDouble() > 1)
-                count++;
-            else
-                count--;
-        }
 
-        return count > 3;
+        return false;
     }
 
     @Override
     public void runVolts(double volts) {
+        
         motor.setVoltage(volts);
     }
+
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {

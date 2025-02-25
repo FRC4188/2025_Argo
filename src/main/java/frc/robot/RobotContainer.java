@@ -183,13 +183,13 @@ public class RobotContainer {
       controller.x().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
       controller.y().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-      controller.leftTrigger().onTrue(
+      controller.leftTrigger().toggleOnTrue(
         intake.ingest(Intake.Mode.CORAL)
-      );
+      ).toggleOnFalse(intake.stop());
 
-      controller.rightTrigger().onTrue(
+      controller.rightTrigger().toggleOnTrue(
         intake.ingest(Intake.Mode.ALGAE)
-      );
+      ).toggleOnFalse(intake.stop());
 
       //manual controls down here
       controller2.a()
@@ -214,7 +214,8 @@ public class RobotContainer {
       Trigger eleInput = new Trigger(() -> controller2.getLeftTButton().getAsBoolean() || controller2.getRightTButton().getAsBoolean());
 
       eleInput.onTrue(
-        superstructure.runEle(() -> (controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 4 : 7)));
+        superstructure.runEle(() -> (controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 1 : 3)));
+
   }
 
   private void configureDashboard() {

@@ -83,7 +83,7 @@ public final class Constants {
     public static final double kGearRatio = 6;
     public static final double kTolerance = 0.1;
 
-    public static final double kZero = -0.046142578125;
+    public static final double kZero = 0;
     public static final double kConversion = 1;
 
     public static final double kMax_Vel = 3;
@@ -176,7 +176,7 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final double kTolerance = 0.75;
-    public static final double kZero = 0; //TODO: get zero
+    public static final double kZero = 0.0166; //TODO: get zero
 
     public static final double kGearRatio = 5.0625;
 

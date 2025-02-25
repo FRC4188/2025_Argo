@@ -6,6 +6,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.commands.autos.pathgen.PG_math;
 
 public class ArmIOReal implements ArmIO {
     private final TalonFX armMotor;
@@ -26,7 +28,7 @@ public class ArmIOReal implements ArmIO {
 
     public ArmIOReal() {
         armMotor = new TalonFX(Constants.Id.kArm, Constants.robot.rio);
-        armEncoder = new DutyCycleEncoder(0, 1, ArmConstants.kZero);
+        armEncoder = new DutyCycleEncoder(0, 19.8019801, 0);
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
         armMotor.getConfigurator().apply(ArmConstants.kMotorConfig);
@@ -55,7 +57,7 @@ public class ArmIOReal implements ArmIO {
         if(DriverStation.isDisabled()){
             runVolts(0.0);
         }
-        encoderRad = Units.rotationsToRadians(armEncoder.get());
+        encoderRad = PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians();
 
 
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
@@ -66,6 +68,6 @@ public class ArmIOReal implements ArmIO {
 
     @Override
     public double getAngle(){
-        return Units.rotationsToRadians(armEncoder.get());
+        return PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians();
     }
 }
