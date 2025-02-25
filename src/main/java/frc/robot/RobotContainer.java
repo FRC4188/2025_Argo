@@ -214,7 +214,7 @@ public class RobotContainer {
       Trigger eleInput = new Trigger(() -> controller2.getLeftTButton().getAsBoolean() || controller2.getRightTButton().getAsBoolean());
 
       eleInput.onTrue(
-        superstructure.runEle(() -> (controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 4 : 7)));
+        superstructure.runEle(() -> (controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 1 : 3)));
   }
 
   private void configureDashboard() {

@@ -83,7 +83,7 @@ public final class Constants {
     public static final double kGearRatio = 6;
     public static final double kTolerance = 0.1;
 
-    public static final double kZero = -0.046142578125;
+    public static final double kZero = 0;
     public static final double kConversion = 1;
 
     public static final double kMax_Vel = 3;
@@ -145,8 +145,7 @@ public final class Constants {
 
   public static class WristConstants {
     public static final double kTolerance = 0.75;
-    public static final double kZero = 2.3191165112888488; 
-
+    
     public static final double kGearRatio = 4.6666666667;
     public static final int kCurrentLimit = 0; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
