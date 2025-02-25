@@ -27,4 +27,8 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+
+  public default double getPigeonRate(){return 0;}
+
+  public default Rotation2d getRotation2d(){return new Rotation2d(0.0, 0.0);}
 }

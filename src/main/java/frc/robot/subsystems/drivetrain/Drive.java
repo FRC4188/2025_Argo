@@ -27,6 +27,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,6 +54,7 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
 import frc.robot.subsystems.vision.Limelight.VisionConsumer;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -394,4 +396,28 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
         runVelocity(speeds);
     }
-}
+
+    
+    public void updateOdometry() {
+        LimelightHelpers.SetRobotOrientation("limelight-back", poseEstimator.getEstimatedPosition().getRotation().getDegrees(), gyroIO.getPigeonRate(), 0, 0, 0, 0);
+          LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
+          if (Math.abs(gyroIO.getPigeonRate()) <= 720.0 && mt2.tagCount != 0) {
+            poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+            poseEstimator.addVisionMeasurement(
+                mt2.pose,
+                mt2.timestampSeconds);
+          } 
+          LimelightHelpers.SetRobotOrientation("limelight-front", poseEstimator.getEstimatedPosition().getRotation().getDegrees(), gyroIO.getPigeonRate(), 0, 0, 0, 0);
+          mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+          if (Math.abs(gyroIO.getPigeonRate()) <= 720.0 && mt2.tagCount != 0) {
+            poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+            poseEstimator.addVisionMeasurement(
+                mt2.pose,
+                mt2.timestampSeconds);
+          }
+    
+        poseEstimator.update(
+            gyroIO.getRotation2d(),
+            getModulePositions());
+      }
+    }
