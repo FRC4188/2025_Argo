@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -36,15 +37,14 @@ import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.drivetrain.ModuleIO;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFXSim;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFXReal;
+import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
-import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
@@ -67,9 +67,9 @@ public class RobotContainer {
   private final Drive drive;
   private Superstructure superstructure;
   private Intake intake;
+  private Telemetry telemetry;
 
   private final Limelight vis;
-  private SwerveDriveSimulation driveSim = null;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -80,21 +80,14 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    drive = TunerConstants.createDrivetrain();
+
     switch (Constants.robot.currMode) {
       case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                (pose) -> {});
-        
-        vis = new Limelight(drive, 
-            new VisionIOLL("limelight-back", drive::getRotation),
-            new VisionIOLL("limelight-front", drive::getRotation));
+        // Real robot, instantiate hardware IO implementations        
+        vis = new Limelight( drive,
+            new VisionIOLL("limelight-back", ()-> drive.getState().Pose.getRotation()),
+            new VisionIOLL("limelight-front", ()-> drive.getState().Pose.getRotation()));
         
             superstructure = new Superstructure(Mode.REAL);
 
@@ -102,25 +95,7 @@ public class RobotContainer {
         break;
 
       case SIM:
-        //maple sim
         
-        // Sim robot, instantiate physics sim IO implementations
-        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.AlgaeSource.left_src_src);
-        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
-        drive =
-            new Drive(
-                new GyroIOSim(driveSim.getGyroSimulation()),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.FrontLeft, driveSim.getModules()[0]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.FrontRight, driveSim.getModules()[1]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.BackLeft, driveSim.getModules()[2]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.BackRight, driveSim.getModules()[3]),
-                driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
@@ -130,15 +105,6 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
         break;
     }
@@ -159,24 +125,16 @@ public class RobotContainer {
    */
   public void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
+    drive.setDefaultCommand(drive.applyRequest(()-> new SwerveRequest.SwerveDriveBrake()));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
-    drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getLeftY(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> -controller.getLeftX(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0),
-      () -> controller.getRightX(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0)));
+    drivingInput.onTrue(drive.applyRequest(()-> new SwerveRequest.FieldCentric()
+      .withVelocityX(-controller.getLeftY(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))
+      .withVelocityY(-controller.getLeftX(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))
+      .withRotationalRate(controller.getRightX(Scale.SQUARED) * (controller.getRightBumperButton().getAsBoolean() ? 0.5 : 1.0))));
 
-    // Reset gyro to 0° when start button is pressed
-    Runnable resetGyro = Constants.robot.currMode == Constants.Mode.SIM
-      ? () -> drive.setPose(
-                driveSim
-                  .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
-
-      : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-      
-      controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
+    controller.getStartButton().onTrue(Commands.runOnce(()-> drive.seedFieldCentric()));
       
       controller.a().onTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
       controller.b().onTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -215,6 +173,8 @@ public class RobotContainer {
 
       eleInput.onTrue(
         superstructure.runEle(() -> (controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)) * ((controller2.getLeftBumperButton().getAsBoolean()) ? 1 : 3)));
+
+      drive.registerTelemetry(telemetry::telemeterize);
   }
 
   private void configureDashboard() {
@@ -259,17 +219,12 @@ public class RobotContainer {
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
-
-    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
-    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-    //drive.setPose(FieldConstant.Source.left_src_mid);
+    superstructure.setTarget(SuperState.SuperPreset.START.getState());
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   public void displaySimFieldToAdvantageScope() {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
-
-    Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
     Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()});
     Logger.recordOutput("FinalComponentPoses", 
       new Pose3d[] {

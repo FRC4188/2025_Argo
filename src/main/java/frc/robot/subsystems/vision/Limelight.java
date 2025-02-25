@@ -26,6 +26,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.LimelightHelpers;
 
@@ -34,12 +35,12 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
-  private final VisionConsumer consumer;
+  private final Drive consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  public Limelight(VisionConsumer consumer, VisionIO... io) {
+  public Limelight(Drive consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
 
@@ -143,7 +144,7 @@ public class Limelight extends SubsystemBase {
         }
 
         // Send vision observation
-        consumer.accept(
+        consumer.addVisionMeasurement(
             observation.pose().toPose2d(),
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
@@ -186,11 +187,4 @@ public class Limelight extends SubsystemBase {
     LimelightHelpers.setPipelineIndex(llName, index);
   }
 
-  @FunctionalInterface
-  public static interface VisionConsumer {
-    public void accept(
-        Pose2d visionRobotPoseMeters,
-        double timestampSeconds,
-        Matrix<N3, N1> visionMeasurementStdDevs);
-  }
 }
