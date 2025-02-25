@@ -35,16 +35,7 @@ public class IntakeIOReal implements IntakeIO {
 
     @AutoLogOutput(key = "Intake/Is Stalled")
     public boolean isStalled() {
-        int count = 0;
-        while(count < 3 || count > -3){
-            if(motor.getStatorCurrent(true).getValueAsDouble() > IntakeConstants.voltStall
-                && motor.getAcceleration(true).getValueAsDouble() > 1)
-                count++;
-            else
-                count--;
-        }
-
-        return count > 3;
+        return motor.getVelocity().getValueAsDouble() < 3&& appliedVolts.getValueAsDouble() > 0.5;
     }
 
     @Override

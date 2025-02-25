@@ -94,7 +94,7 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
-            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.CoralGoal.cgoals);
+            if (!presetGoal) goal = drive.getState().Pose.nearest(FieldConstant.Reef.CoralGoal.cgoals);
 
             if (DriverStation.isAutonomous()) {
                 scoring = new Score(goal, preset.getState(), intake.eject().andThen(() -> FieldConstant.Reef.CoralGoal.cgoals.remove(goal)), drive, superstruct, intake);
@@ -122,9 +122,9 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
-            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
+            if (!presetGoal) goal = drive.getState().Pose.nearest(FieldConstant.Reef.AlgaeSource.asources);
             
-            boolean flip = Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
+            boolean flip = Math.abs(drive.getState().RawHeading.minus(goal.getRotation()).getRadians()) > Math.PI/2;
             int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
             Pose2d correctedgoal = goal;
             
@@ -164,11 +164,11 @@ public class AutoScore extends Command {
         
         @Override
         public void factory() {
-            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Source.csources);
+            if (!presetGoal) goal = drive.getState().Pose.nearest(FieldConstant.Source.csources);
             
             Pose2d correctedGoal = goal;
 
-            if (Math.abs(drive.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2) {
+            if (Math.abs(drive.getState().RawHeading.minus(goal.getRotation()).getRadians()) > Math.PI/2) {
                 correctedGoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
                 preset = SuperPreset.SOURCE_REVERSE;
             } else {

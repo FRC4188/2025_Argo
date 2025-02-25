@@ -183,13 +183,13 @@ public class RobotContainer {
       controller.x().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
       controller.y().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-      controller.leftTrigger().onTrue(
+      controller.getDownButton().whileTrue(
         intake.ingest(Intake.Mode.CORAL)
-      );
+      ).onFalse(intake.stop());
 
-      controller.rightTrigger().onTrue(
+      controller.getUpButton().whileTrue(
         intake.ingest(Intake.Mode.ALGAE)
-      );
+      ).onFalse(intake.stop());
 
       //manual controls down here
       controller2.a()
@@ -207,8 +207,8 @@ public class RobotContainer {
       Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft().getY() != 0.0 || controller2.getCorrectedRight().getY() != 0.0));
 
       superInput.onTrue(new ParallelCommandGroup(
-        superstructure.runArm(() -> controller2.getLeftY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 2)),
-        superstructure.runWrist(() ->controller2.getRightY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 2 ))
+        superstructure.runArm(() -> controller2.getCorrectedLeft().getY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 2)),
+        superstructure.runWrist(() ->controller2.getCorrectedRight().getY() * (controller2.getRightBumperButton().getAsBoolean() ? 1 : 2 ))
       ));
 
       Trigger eleInput = new Trigger(() -> controller2.getLeftTButton().getAsBoolean() || controller2.getRightTButton().getAsBoolean());

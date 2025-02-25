@@ -1,6 +1,9 @@
 package frc.robot.subsystems.scoring.arm;
 
 import static edu.wpi.first.units.Units.Hertz;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -57,6 +60,7 @@ public class ArmIOReal implements ArmIO {
         }
         encoderRad = Units.rotationsToRadians(armEncoder.get());
 
+        Logger.recordOutput("encoder connected?", armEncoder.isConnected());
 
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
