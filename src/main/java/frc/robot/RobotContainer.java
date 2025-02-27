@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
+import frc.robot.commands.autos.GenAutoChooser;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
@@ -53,8 +54,11 @@ import frc.robot.util.FieldConstant;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static frc.robot.commands.scoring.AutoScore.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -67,9 +71,13 @@ public class RobotContainer {
   private final Drive drive;
   private Superstructure superstructure;
   private Intake intake;
-  private Telemetry telemetry;
+  private Telemetry telemetry = new Telemetry(TunerConstants.kSpeedAt12Volts.magnitude());
 
   private final Limelight vis;
+
+  @AutoLogOutput(key = "Current Score Level")
+  private int level = 4;
+
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -141,26 +149,48 @@ public class RobotContainer {
       controller.x().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
       controller.y().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-      controller.getDownButton().whileTrue(
-        intake.ingest(Intake.Mode.CORAL)
-      ).onFalse(intake.stop());
+    //TODO: add left or right aim on side, currently go for the closest
+    controller.a()
+      .whileTrue(new coralScore(level, drive, superstructure, intake));
+    
+    controller.b()
+      .whileTrue(new coralSource(drive, superstructure, intake));
 
-      controller.getUpButton().whileTrue(
-        intake.ingest(Intake.Mode.ALGAE)
-      ).onFalse(intake.stop());
+    controller.x()
+      .whileTrue(new algaeScore(drive, superstructure, intake));
+    
+    controller.y()
+      .whileTrue(new algaeSource(drive, superstructure, intake));
+
+    controller2.getLeftBumperButton().whileTrue(
+        intake.ingest(Intake.Mode.CORAL)
+    ).onFalse(intake.stop());
+
+    controller2.getRightBumperButton().whileTrue(
+      intake.ingest(Intake.Mode.ALGAE)
+    ).onFalse(intake.stop());
 
       //manual controls down here
       controller2.a()
-        .toggleOnTrue(new InstantCommand(() -> superstructure.armOverride = true))
-        .toggleOnFalse(new InstantCommand(() -> superstructure.armOverride = false));
+        .toggleOnTrue(new InstantCommand(() -> superstructure.armOverride = !superstructure.armOverride));
 
       controller2.b()
-        .toggleOnTrue(new InstantCommand(() -> superstructure.wristOverride = true))
-        .toggleOnFalse(new InstantCommand(() -> superstructure.wristOverride = false));
+        .toggleOnTrue(new InstantCommand(() -> superstructure.wristOverride = !superstructure.wristOverride));
 
       controller2.y()
-        .toggleOnTrue(new InstantCommand(() -> superstructure.eleOverride = true))
-        .toggleOnFalse(new InstantCommand(() -> superstructure.eleOverride = false));
+        .toggleOnTrue(new InstantCommand(() -> superstructure.eleOverride = !superstructure.eleOverride));
+      
+      controller2.getUpButton()
+        .onTrue(new InstantCommand(() -> level = 4));
+      
+      controller2.getDownButton()
+        .onTrue(new InstantCommand(() -> level = 3));
+
+      controller2.getLeftButton()
+        .onTrue(new InstantCommand(() -> level = 2));
+
+      controller2.getRightButton()
+        .onTrue(new InstantCommand(() -> level = 1));
 
       Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft().getY() != 0.0 || controller2.getCorrectedRight().getY() != 0.0));
 
@@ -206,6 +236,8 @@ public class RobotContainer {
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
+    
+    GenAutoChooser.getInstance().init();
   }
 
   /**
@@ -215,6 +247,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+
+    //return GenAutoChooser.getInstance().getAutonomousCommand(drive, superstructure, intake);
   }
 
   public void resetSimulation(){

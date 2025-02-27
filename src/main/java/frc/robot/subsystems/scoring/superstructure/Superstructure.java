@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring.superstructure;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -36,8 +37,13 @@ public class Superstructure extends SubsystemBase{
 
     private SuperVisualizer sim;
     
+    @AutoLogOutput (key = "Elevator Manual Override")
     public boolean eleOverride = true;
+
+    @AutoLogOutput (key = "Arm Manual Override")
     public boolean armOverride = true;
+
+    @AutoLogOutput (key = "Wrist Manual Override")
     public boolean wristOverride = true;
 
     private ProfiledPIDController elePID = Constants.ElevatorConstants.ElePID; //Constants.ElevatorConstants.SimElePID

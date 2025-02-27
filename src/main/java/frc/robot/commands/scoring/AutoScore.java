@@ -11,6 +11,7 @@ import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.Intake.Mode;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.FieldConstant;
 
 public class AutoScore extends Command {
@@ -124,7 +125,7 @@ public class AutoScore extends Command {
         public void factory() {
             if (!presetGoal) goal = drive.getState().Pose.nearest(FieldConstant.Reef.AlgaeSource.asources);
             
-            boolean flip = Math.abs(drive.getState().RawHeading.minus(goal.getRotation()).getRadians()) > Math.PI/2;
+            boolean flip = Math.abs(drive.getState().Pose.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2;
             int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
             Pose2d correctedgoal = goal;
             
@@ -134,10 +135,10 @@ public class AutoScore extends Command {
                 preset = SuperPreset.L2_ALGAE;
             } else if (flip && height == 1) {
                 preset = SuperPreset.L3_ALGAE_REVERSE;
-                correctedgoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedgoal = AllianceFlip.flipDS(goal);
             } else if (flip && height == 0) {
                 preset = SuperPreset.L2_ALGAE_REVERSE;
-                correctedgoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedgoal = AllianceFlip.flipDS(goal);
             } else {
                 scoring = new Command() {};
             }
@@ -168,8 +169,8 @@ public class AutoScore extends Command {
             
             Pose2d correctedGoal = goal;
 
-            if (Math.abs(drive.getState().RawHeading.minus(goal.getRotation()).getRadians()) > Math.PI/2) {
-                correctedGoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+            if (Math.abs(drive.getState().Pose.getRotation().minus(goal.getRotation()).getRadians()) > Math.PI/2) {
+                correctedGoal = AllianceFlip.flipDS(goal);
                 preset = SuperPreset.SOURCE_REVERSE;
             } else {
                 preset = SuperPreset.SOURCE;
@@ -194,7 +195,7 @@ public class AutoScore extends Command {
             Pose2d correctedGoal = goal;
 
             if (superstruct.getState().getCartesian(false).getX() > 0) {
-                correctedGoal = goal.transformBy(new Transform2d(Translation2d.kZero, Rotation2d.k180deg));
+                correctedGoal = AllianceFlip.flipDS(correctedGoal);
                 preset = SuperPreset.PROCESSOR_REVERSE;
             } else {
                 preset = SuperPreset.PROCESSOR;
