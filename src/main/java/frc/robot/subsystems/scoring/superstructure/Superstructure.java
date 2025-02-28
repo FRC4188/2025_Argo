@@ -4,6 +4,7 @@ package frc.robot.subsystems.scoring.superstructure;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkString;
@@ -42,9 +43,13 @@ public class Superstructure extends SubsystemBase{
 
     private SuperVisualizer sim;
     
-    //default valuef false after testing
+    @AutoLogOutput (key = "Elevator Manual Override")
     public boolean eleOverride = false;
+
+    @AutoLogOutput (key = "Arm Manual Override")
     public boolean armOverride = false;
+
+    @AutoLogOutput (key = "Wrist Manual Override")
     public boolean wristOverride = false;
 
     private ProfiledPIDController elePID = Constants.ElevatorConstants.ElePID; //Constants.ElevatorConstants.SimElePID
@@ -118,11 +123,6 @@ public class Superstructure extends SubsystemBase{
         //     elevator.getHeight());
 
         // sim.update(current);
-
-
-        Logger.recordOutput("SuperStruct/Arm manual", armOverride);
-        Logger.recordOutput("SuperStruct/Wrist manual",wristOverride);
-        Logger.recordOutput("SuperStruct/Elevator manual", eleOverride);
 
         Logger.recordOutput("SuperStruct/Arm target", target.getArmAngle());
         Logger.recordOutput("SuperStruct/Wrist target",target.getWristAngle());

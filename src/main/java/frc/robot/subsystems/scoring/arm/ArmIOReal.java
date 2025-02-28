@@ -1,6 +1,9 @@
 package frc.robot.subsystems.scoring.arm;
 
 import static edu.wpi.first.units.Units.Hertz;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;

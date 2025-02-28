@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -32,21 +33,21 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
+import frc.robot.commands.autos.GenAutoChooser;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.drivetrain.ModuleIO;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFXSim;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFXReal;
+import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
-import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
@@ -57,8 +58,11 @@ import frc.robot.util.FieldConstant;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import static frc.robot.commands.scoring.AutoScore.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,9 +75,13 @@ public class RobotContainer {
   private final Drive drive;
   private Superstructure superstructure;
   private Intake intake;
+  private Telemetry telemetry = new Telemetry(TunerConstants.kSpeedAt12Volts.magnitude());
 
   private final Limelight vis;
-  private SwerveDriveSimulation driveSim = null;
+
+  @AutoLogOutput(key = "Current Score Level")
+  private int level = 4;
+
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -84,6 +92,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    drive = TunerConstants.createDrivetrain();
+
     switch (Constants.robot.currMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -104,25 +114,7 @@ public class RobotContainer {
         break;
 
       case SIM:
-        //maple sim
         
-        // Sim robot, instantiate physics sim IO implementations
-        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
-        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.AlgaeSource.left_src_src);
-        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
-        drive =
-            new Drive(
-                new GyroIOSim(driveSim.getGyroSimulation()),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.FrontLeft, driveSim.getModules()[0]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.FrontRight, driveSim.getModules()[1]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.BackLeft, driveSim.getModules()[2]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.BackRight, driveSim.getModules()[3]),
-                driveSim::setSimulationWorldPose);
 
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
 
@@ -132,15 +124,6 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-
         vis = new Limelight(drive, new VisionIO(){}, new VisionIO(){});
         break;
     }
@@ -223,11 +206,11 @@ public class RobotContainer {
 
     // Set up auto routines
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    // // Set up SysId routines
+    // autoChooser.addOption(
+    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    // autoChooser.addOption(
+    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -247,6 +230,8 @@ public class RobotContainer {
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
+    
+    GenAutoChooser.getInstance().init();
   }
 
   /**
@@ -256,21 +241,18 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+
+    //return GenAutoChooser.getInstance().getAutonomousCommand(drive, superstructure, intake);
   }
 
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
-
-    drive.setPose(new Pose2d(8.251, 5.991, new Rotation2d()));
-    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-    //drive.setPose(FieldConstant.Source.left_src_mid);
+    superstructure.setTarget(SuperState.SuperPreset.START.getState());
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   public void displaySimFieldToAdvantageScope() {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
-
-    Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
     Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()});
 
     Logger.recordOutput(

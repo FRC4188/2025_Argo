@@ -14,6 +14,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import frc.robot.Constants;
+import frc.robot.subsystems.drivetrain.Drive;
 
 //import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -196,11 +197,11 @@ public class TunerConstants {
      * Creates a CommandSwerveDrivetrain instance.
      * This should only be called once in your robot program,.
      */
-    // public static CommandSwerveDrivetrain createDrivetrain() {
-    //     return new CommandSwerveDrivetrain(
-    //         DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
-    //     );
-    // }
+    public static Drive createDrivetrain() {
+        return new Drive(
+            DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
+        );
+    }
 
 
     /**
