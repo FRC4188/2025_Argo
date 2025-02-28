@@ -34,10 +34,10 @@ public class DriveTo extends Command {
 
     @Override
     public void initialize() {
-        traj = PathGen.getInstance().generateTrajectory(drive.getState().Pose, goalPose.get(), config);
+        traj = PathGen.getInstance().generateTrajectory(drive.getPose(), goalPose.get(), config);
 
         if (traj.getStates().isEmpty()) {
-            goalPose = () -> drive.getState().Pose;
+            goalPose = () -> drive.getPose();
         } else {
             goalPose = () -> traj.sample(timer.get()).poseMeters;
 

@@ -50,15 +50,15 @@ public class FollowPath extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.setControl(new SwerveRequest.ApplyFieldSpeeds().withSpeeds(
-      controller.calculate(drive.getState().Pose, trajectory.sample(timer.get()), heading)
-    ));
+    drive.runVelocity(
+      controller.calculate(drive.getPose(), trajectory.sample(timer.get()), heading)
+    );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.applyRequest(() -> new SwerveRequest.SwerveDriveBrake());
+    drive.stopWithX();
   }
 
   // Returns true when the command should end.

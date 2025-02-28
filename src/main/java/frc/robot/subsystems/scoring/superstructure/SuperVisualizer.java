@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.subsystems.drivetrain.Drive;
-import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -26,7 +25,6 @@ public class SuperVisualizer {
     MechanismRoot2d root;
     MechanismLigament2d elevatorLig, armLig, wristLig;
     String key;
-    Drive drive = TunerConstants.createDrivetrain();
 
     public SuperVisualizer(String logkey){
         mainMech = new Mechanism2d(4, 3);
@@ -102,14 +100,15 @@ public class SuperVisualizer {
                 new Rotation3d(0,state.getGlobalAngle(), 0)
             )
         );
+        SwerveDriveSimulation driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
 
         Pose3d endEffectorPos = wristPos.transformBy(
             new Transform3d(
                 new Translation3d(
-                    drive.getState().Pose.getTranslation().getX(),
-                    drive.getState().Pose.getTranslation().getY(),
+                    driveSim.getSimulatedDriveTrainPose().getTranslation().getX(),
+                    driveSim.getSimulatedDriveTrainPose().getTranslation().getY(),
                     0),
-                new Rotation3d(0, 0, drive.getState().Pose.getRotation().getRadians())
+                new Rotation3d(0, 0, driveSim.getSimulatedDriveTrainPose().getRotation().getRadians())
             ));
 
         

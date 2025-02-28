@@ -54,10 +54,6 @@ public class Intake extends SubsystemBase{
         return intakeState;
     }
 
-    public Command stop() {
-        return Commands.runOnce(() -> io.runVolts(0));
-    }
-
     public void setState(Mode state) {
         intakeState = state;
     }
