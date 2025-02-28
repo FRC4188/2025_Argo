@@ -49,7 +49,7 @@ public class ArmIOReal implements ArmIO {
     @Override
     public void runVolts(double volts) {
         volts = MathUtil.clamp(volts,-12, 12);
-        armMotor.setVoltage(volts);
+        armMotor.setVoltage(-volts);
     }
 
     @Override
@@ -59,7 +59,6 @@ public class ArmIOReal implements ArmIO {
         }
         encoderRad = PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians();
 
-
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
         inputs.positionRads = posRads.getValueAsDouble();
@@ -68,6 +67,6 @@ public class ArmIOReal implements ArmIO {
 
     @Override
     public double getAngle(){
-        return PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians();
+        return PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians() -0.1;
     }
 }

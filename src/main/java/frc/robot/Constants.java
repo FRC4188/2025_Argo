@@ -81,32 +81,24 @@ public final class Constants {
 
   public static class ElevatorConstants{    
     public static final double kGearRatio = 6;
-    public static final double kTolerance = 0.1;
+    public static final double kTolerance = 0.05;
 
-    public static final double kZero = 0;
-    public static final double kConversion = 1;
+    public static final double kConversion = 0.083711196;
 
-    public static final double kMax_Vel = 3;
-    public static final double kMax_Accel = 3;
+    public static final double kMax_Vel = 1;
+    public static final double kMax_Accel = 1;
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 0.1;
+    public static final double kP = 8.5;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kF = 0.0;
-    public static final double kS = 0.1;
-    public static final double kG = 0.0;
-    public static final double kV = 0.0;
-    public static final double kA = 0.0;
+    public static final double kFF = 0.2;
     
     public static final ProfiledPIDController ElePID = new ProfiledPIDController(kP, kI, kD, kConstraints);
-    public static final ElevatorFeedforward EleFF = new ElevatorFeedforward(kS, kG, kV, kA);
 
     public static final ProfiledPIDController SimElePID = new ProfiledPIDController(
       10, 0, 0, new Constraints(20, 20)
       );
-
-    public static final ElevatorFeedforward SimEleFF = new ElevatorFeedforward(0.1, 0.0, 0.0, 0.0);
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)
@@ -114,8 +106,7 @@ public final class Constants {
       .withStatorCurrentLimitEnable(true);
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
-      .withSensorToMechanismRatio(kGearRatio)
-      .withFeedbackRotorOffset(kZero);
+      .withSensorToMechanismRatio(kGearRatio);
     
     private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
       .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
@@ -125,11 +116,7 @@ public final class Constants {
     private static final Slot0Configs kSlot0Configs = new Slot0Configs()
       .withGravityType(GravityTypeValue.Elevator_Static)
       .withKP(kP)
-      .withKD(kD)
-      .withKS(kS)
-      .withKG(kG)
-      .withKV(kV)
-      .withKA(kA);
+      .withKD(kD);
 
     private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
     private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
@@ -144,10 +131,10 @@ public final class Constants {
   }
 
   public static class WristConstants {
-    public static final double kTolerance = 0.75;
+    public static final double kTolerance = 0.1;
     public static final double kZero = 2.3191165112888488; 
 
-    public static final double kGearRatio = 4.6666666667;
+    public static final double kGearRatio = 1 / ((82.0/18) * 10);
     public static final int kCurrentLimit = 0; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
 
@@ -155,7 +142,7 @@ public final class Constants {
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 0.1;
+    public static final double kP = 3.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
@@ -175,17 +162,17 @@ public final class Constants {
   }
 
   public static class ArmConstants {
-    public static final double kTolerance = 0.75;
+    public static final double kTolerance = 0.2;
     public static final double kZero = 0.0166; //TODO: get zero
 
-    public static final double kGearRatio = 5.0625;
+    public static final double kGearRatio = 33.75;
 
-    public static final double kP = 0.1;
+    public static final double kP = 2.5;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
-    public static final double kS = 0.1;
-    public static final double kG = 0.0;
+    public static final double kS = 0.2;
+    public static final double kG = 0.75;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     

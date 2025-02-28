@@ -2,7 +2,6 @@ package frc.robot.subsystems.scoring.elevator;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
-import static frc.robot.Constants.ElevatorConstants.kZero;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -71,7 +70,7 @@ public class ElevatorIOReal implements ElevatorIO {
     
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
-        inputs.posMeters = (posRads.getValueAsDouble() - kZero) * ElevatorConstants.kConversion;
+        inputs.posMeters = (posRads.getValueAsDouble()) * ElevatorConstants.kConversion;
         
         inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
         inputs.followerTempC = tempCFollow.getValueAsDouble();
@@ -84,6 +83,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public double getHeight(){
-        return (posRads.getValueAsDouble() - kZero) * ElevatorConstants.kConversion; //TODO: test da math
+        return (posRads.getValueAsDouble()) * ElevatorConstants.kConversion; //TODO: test da math
     }
 }

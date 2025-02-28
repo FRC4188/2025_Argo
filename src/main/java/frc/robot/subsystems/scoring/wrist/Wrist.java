@@ -47,7 +47,6 @@ public class Wrist extends SubsystemBase {//J.C
     return io.getAngle() - kZero;
   }
 
-  @AutoLogOutput(key = "Wrist/isAtGoal")
   public boolean atGoal(double target) {
     return Math.abs(getAngle() - target) < Constants.WristConstants.kTolerance;
   }

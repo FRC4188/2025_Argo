@@ -38,7 +38,6 @@ public class Arm extends SubsystemBase {
         return io.getAngle();
     }
     
-    @AutoLogOutput(key = "Arm/isAtSetpoint")
     public boolean atGoal(double target) {
         return Math.abs(getAngle() - target) < Constants.ArmConstants.kTolerance;
     }

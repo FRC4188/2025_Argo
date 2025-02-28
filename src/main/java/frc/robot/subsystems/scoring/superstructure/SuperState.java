@@ -31,8 +31,6 @@ public class SuperState {
         wrist_angle = MathUtil.clamp(wrist, WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
         arm_angle = MathUtil.clamp(arm, ArmConstraints.LOWEST_A, ArmConstraints.HIGHEST_A);
         elevator_height = MathUtil.clamp(elevator, 0, ElevatorConstraints.RANGE);
-
-       
     }
 
     public static SuperState fromPose(Translation2d t, double optimal_score_angle, boolean isCoral) {
@@ -122,7 +120,19 @@ public class SuperState {
         return elevator_height;
     }
 
-    public static double getWristOffset(){
+    public void setWristAngle(double angle) {
+        wrist_angle = angle;
+    }
+
+    public void setArmAngle(double angle) {
+        arm_angle = angle;
+    }
+
+    public void setEleHeight(double height) {
+        elevator_height = height;
+    }
+
+    public static double getCoralOffset(){
         return goal_coral_offset.getRotation().getRadians();
     }
 
@@ -171,7 +181,7 @@ public class SuperState {
         
         START(
             new SuperState(0, 0, 0));
-        
+                
         private final SuperState state;
 
         private SuperPreset(SuperState state){

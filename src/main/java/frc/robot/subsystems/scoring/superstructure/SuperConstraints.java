@@ -12,8 +12,8 @@ public class SuperConstraints {
     public static Constraints SuperTrajConstraints = new Constraints(20, 20);
 
     public class ArmConstraints {
-        public final static double LOWEST_A = Units.degreesToRadians(-180);
-        public final static double HIGHEST_A = Units.degreesToRadians(180);
+        public final static double LOWEST_A = Units.degreesToRadians(-90);
+        public final static double HIGHEST_A = Units.degreesToRadians(90);
     }
 
     public class WristConstraints{

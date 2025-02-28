@@ -28,6 +28,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -54,6 +55,7 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
 import frc.robot.subsystems.vision.Limelight.VisionConsumer;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,10 +64,28 @@ import java.util.function.Consumer;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Drive extends SubsystemBase implements VisionConsumer {
+
+    public PIDController translation =
+     new PIDController(0, 0, 0), 
+     rotation = new PIDController(0, 0, 0);
+
+    LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp");
+    LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti");
+    LoggedNetworkNumber t_d = new LoggedNetworkNumber("DriveTune/td");
+
+    LoggedNetworkNumber r_p = new LoggedNetworkNumber("DriveTune/rp");
+    LoggedNetworkNumber r_i = new LoggedNetworkNumber("DriveTune/ri");
+    LoggedNetworkNumber r_d = new LoggedNetworkNumber("DriveTune/rd");
+
+    LoggedNetworkNumber t_target = new LoggedNetworkNumber("DriveTune/ttarget", 0);
+    LoggedNetworkNumber r_target = new LoggedNetworkNumber("DriveTune/rtarget", 0);
+
     // TunerConstants doesn't include these constants, so they are declared locally
     public static final double ODOMETRY_FREQUENCY =
             new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -166,12 +186,52 @@ public class Drive extends SubsystemBase implements VisionConsumer {
                 new SysIdRoutine.Config(
                         Volts.of(1).per(Seconds), 
                         Volts.of(3), 
-                        Seconds.of(5), (state) -> SignalLogger.writeString("Drive/SysIdState", state.toString())),
+                        Seconds.of(5), 
+                        (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
     }
 
     @Override
     public void periodic() {
+        //manual tuning
+
+        // translation.setP(t_p.get());
+        // translation.setI(t_i.get());
+        // translation.setD(t_d.get());
+
+        
+        // rotation.setP(r_p.get());
+        // rotation.setI(r_i.get());
+        // rotation.setD(r_d.get());
+
+        // Logger.recordOutput("Drive/r_p", rotation.getP());
+
+        // ChassisSpeeds speeds = 
+        //     ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+        //        translation.calculate(Math.hypot(
+        //         getChassisSpeeds().vxMetersPerSecond, 
+        //         getChassisSpeeds().vyMetersPerSecond), t_target.get()),
+        //       0, 
+        //       rotation.calculate(getChassisSpeeds().omegaRadiansPerSecond,r_target.get())), 
+        //       AllianceFlip.apply(getRotation()));
+        
+        // Logger.recordOutput("Drive/tvolts",  translation.calculate(Math.hypot(
+        //         getChassisSpeeds().vxMetersPerSecond, 
+        //         getChassisSpeeds().vyMetersPerSecond), t_target.get()));
+
+        // Logger.recordOutput("Drive/rvolts",  
+        //         rotation.calculate(getChassisSpeeds().omegaRadiansPerSecond,r_target.get()));
+
+        // runVelocity(speeds);
+
+        // Logger.recordOutput("Drive/Speeds", 
+        //         Math.hypot(
+        //         getChassisSpeeds().vxMetersPerSecond, 
+        //         getChassisSpeeds().vyMetersPerSecond));
+
+        // Logger.recordOutput("Drive/Rotations",
+        //         getChassisSpeeds().omegaRadiansPerSecond);
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -234,6 +294,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     public void runVelocity(ChassisSpeeds speeds) {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
+        
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
@@ -245,7 +306,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         for (int i = 0; i < 4; i++) {
             modules[i].runSetpoint(setpointStates[i]);
         }
-
+        
         // Log optimized setpoints (runSetpoint mutates each state)
         Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
     }

@@ -9,6 +9,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
@@ -19,7 +21,7 @@ public class WristIOReal implements WristIO {
 
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true).idleMode(IdleMode.kBrake);
+        config.inverted(false);
         config.idleMode(IdleMode.kBrake);
         //config.smartCurrentLimit(WristConstants.kCurrentLimit);
         config.signals
@@ -38,11 +40,11 @@ public class WristIOReal implements WristIO {
     public void updateInputs(WristIOInputs inputs) {
         inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
         inputs.tempC = max.getMotorTemperature();
-        inputs.posRads = Units.rotationsToRadians(max.getAbsoluteEncoder().getPosition());
+        inputs.posRads = Units.rotationsToRadians(max.getAbsoluteEncoder().getPosition()* WristConstants.kGearRatio);
     }
 
     @Override
     public double getAngle() {
-        return Units.rotationsToRadians(max.getEncoder().getPosition());
+        return Units.rotationsToRadians(max.getEncoder().getPosition() * WristConstants.kGearRatio);
     }
 }

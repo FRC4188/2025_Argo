@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
@@ -18,6 +19,8 @@ public class IntakeIOReal implements IntakeIO {
     
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
+
+    Timer timer = new Timer(); //this is dumb af
 
     public IntakeIOReal(){
         motor = new TalonFX(Constants.Id.kIntake, Constants.robot.rio);
@@ -35,13 +38,12 @@ public class IntakeIOReal implements IntakeIO {
 
     @AutoLogOutput(key = "Intake/Is Stalled")
     public boolean isStalled() {
-
-        return false;
+        return motor.getVelocity().getValueAsDouble() < 1 && timer.hasElapsed(0.5);
     }
 
     @Override
     public void runVolts(double volts) {
-        
+        if (volts > 0) {timer.restart();} else {timer.stop();}
         motor.setVoltage(volts);
     }
 

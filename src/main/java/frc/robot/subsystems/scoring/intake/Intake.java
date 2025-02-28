@@ -62,12 +62,13 @@ public class Intake extends SubsystemBase{
         Logger.processInputs("Intake", inputs);    
 
         String state;
-        switch(intakeState) {
-            case CORAL: state = "Coral";
-            case ALGAE: state = "Algae";
-            case EMPTY: state = "Empty";
-            default: state = "";
+        if (intakeState == Mode.CORAL) {
+            state = "coral";
+        } else if (intakeState == Mode.ALGAE) {
+            state = "algae";
+        } else {
+            state = "empty";
         }
-        Logger.recordOutput("State", state);
+        Logger.recordOutput("Intake/State", state);
     }
 }
