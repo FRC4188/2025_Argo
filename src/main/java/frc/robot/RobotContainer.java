@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -316,12 +317,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     
     //pathplanner pathfinding + following
-    autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
     autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
     autoChooser.addOption("right source coral", AutoFactory.rightL4CoralGen(drive, superstructure, intake));
+    autoChooser.addOption("3 right coral", new PathPlannerAuto("3 Right Corals"));
+    autoChooser.addOption("3 left coral", new PathPlannerAuto("3 Left Corals"));
+    autoChooser.addOption("Leave", new PathPlannerAuto("Leave"));
+
 
     //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
+    // autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
   }

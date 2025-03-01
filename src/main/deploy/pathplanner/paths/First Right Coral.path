@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 6.620777027027027,
-        "y": 1.969594594594595
+        "y": 1.9695945945945952
       },
       "isLocked": false,
       "linkedName": null
@@ -47,7 +47,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Coral L3",
+      "name": "Coral L4",
       "waypointRelativePos": 0.6767912772585656,
       "endWaypointRelativePos": null,
       "command": null

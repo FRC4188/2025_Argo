@@ -32,17 +32,17 @@ public final class AutoTests {
             Volts.of(12),
             false);
 
-    //runs fine, bit off
-    public static Command twoCoral(){
-        PathPlannerPath a;
-        try{
-            a = PathPlannerPath.fromPathFile("2 Corals");
-            return AutoBuilder.followPath(a);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return new SequentialCommandGroup();
-    }
+    // //runs fine, bit off
+    // public static Command twoCoral(){
+    //     PathPlannerPath a;
+    //     try{
+    //         a = PathPlannerPath.fromPathFile("2 Corals");
+    //         return AutoBuilder.followPath(a);
+    //     }catch(Exception e){
+    //         e.printStackTrace();
+    //     }
+    //     return new SequentialCommandGroup();
+    // }
 
     public static Command AG2Coral(Drive drive){
         return Commands.sequence(
