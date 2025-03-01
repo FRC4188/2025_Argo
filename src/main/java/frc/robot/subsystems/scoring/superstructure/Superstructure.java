@@ -43,13 +43,13 @@ public class Superstructure extends SubsystemBase{
 
     private SuperVisualizer sim;
     
-    @AutoLogOutput (key = "Elevator Manual Override")
+    @AutoLogOutput (key = "Copilot/Elevator Manual Override")
     public boolean eleOverride = false;
 
-    @AutoLogOutput (key = "Arm Manual Override")
+    @AutoLogOutput (key = "Copilot/Arm Manual Override")
     public boolean armOverride = false;
 
-    @AutoLogOutput (key = "Wrist Manual Override")
+    @AutoLogOutput (key = "Copilot/Wrist Manual Override")
     public boolean wristOverride = false;
 
     private ProfiledPIDController elePID = Constants.ElevatorConstants.ElePID; //Constants.ElevatorConstants.SimElePID
@@ -192,14 +192,13 @@ public class Superstructure extends SubsystemBase{
         //     );
         // }
 
-
+        sim.update(new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight()));
     }
 
     public void manualOverride(DoubleSupplier wristinput, DoubleSupplier arminput, DoubleSupplier eleinput) {
         if (pidOverride) return;
 
         double wristvolts = 0;
-        Logger.recordOutput("Wrist/pid?", Math.abs(wristinput.getAsDouble()) < 0.1 && !wristOverride);
 
         if (Math.abs(wristinput.getAsDouble()) < 0.1 && !wristOverride) {
             wristvolts = 
@@ -216,7 +215,6 @@ public class Superstructure extends SubsystemBase{
 
         double armvolts = 0;
 
-        Logger.recordOutput("Arm/pid?", Math.abs(arminput.getAsDouble()) < 0.1 && !armOverride);
         if (Math.abs(arminput.getAsDouble()) < 0.1 && !armOverride) {
             armvolts = armPID.calculate(arm.getAngle(), target.getArmAngle())
                 + armFF.calculate(arm.getAngle() + Math.PI / 2, 0);
@@ -232,7 +230,6 @@ public class Superstructure extends SubsystemBase{
         double elevolts = 0;
 
 
-        Logger.recordOutput("Elevator/pid?", Math.abs(eleinput.getAsDouble()) < 0.1 && !eleOverride);
         if (Math.abs(eleinput.getAsDouble()) < 0.1  && !eleOverride) {
             elevolts = elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
             + Constants.ElevatorConstants.kFF;

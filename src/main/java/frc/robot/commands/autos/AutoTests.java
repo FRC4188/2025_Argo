@@ -67,11 +67,4 @@ public final class AutoTests {
             new DriveToPose(drive, () -> new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))))
         );
     }
-
-    //add cmds for pathplanner events
-    public static final HashMap<String, Command> EVENTS =
-      new HashMap<>(
-          Map.ofEntries(            
-            Map.entry("Delay", new WaitCommand(2.0))
-      ));
 }

@@ -24,11 +24,14 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,6 +44,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -73,6 +77,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     public PIDController translation =
      new PIDController(0, 0, 0), 
      rotation = new PIDController(0, 0, 0);
+
+    private final ProfiledPIDController driveController = new ProfiledPIDController(
+            Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+    private final ProfiledPIDController thetaController = new ProfiledPIDController(
+            Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
 
     LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp");
     LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti");
@@ -404,6 +413,10 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
+    public void setPose(){
+        setPose(getPose());
+    }
+
     /** Adds a new timestamped vision measurement. */
     @Override
     public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
@@ -430,28 +443,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         };
     }
 
-    public void drive(
-            final double xSpeedMeterPerSec,
-            final double ySpeedMetersPerSec,
-            final double omegaRadsPerSec,
-            final boolean fieldRelative,
-            final boolean invertYaw
-    ) {
-        final ChassisSpeeds speeds;
-        if (fieldRelative) {
-            final Rotation2d poseYaw = getRotation();
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeedMeterPerSec,
-                    ySpeedMetersPerSec,
-                    omegaRadsPerSec,
-                    invertYaw
-                            ? poseYaw.plus(Rotation2d.fromRadians(Math.PI))
-                            : poseYaw
-            );
-        } else {
-            speeds = new ChassisSpeeds(xSpeedMeterPerSec, ySpeedMetersPerSec, omegaRadsPerSec);
-        }
-
-        runVelocity(speeds);
-    }
+   public void followTraj(SwerveSample sample){
+        runVelocity(new ChassisSpeeds(
+            sample.vx + driveController.calculate(getPose().getX(), sample.x),
+            sample.vy + driveController.calculate(getPose().getY(), sample.y),
+            sample.omega + thetaController.calculate(getPose().getRotation().getRadians(), sample.heading)
+        ));
+   }
 }

@@ -1,13 +1,19 @@
 package frc.robot.commands.autos;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.scoring.AutoScore.coralScore;
 import frc.robot.commands.scoring.AutoScore.coralSource;
+import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
@@ -17,6 +23,7 @@ public final class AutoFactory {
     public static Timer timer = new Timer();
 
     public static Command leftL4CoralGen(Drive drive, Superstructure superstructure, Intake intake){
+        drive.setPose();
         return Commands.runOnce(() -> timer.start()).andThen(
         Commands.repeatingSequence(
             new coralScore(4, drive, superstructure, intake),
@@ -25,7 +32,7 @@ public final class AutoFactory {
     }
 
     public static Command rightL4CoralGen(Drive drive, Superstructure superstructure, Intake intake){
-
+        drive.setPose();
         return Commands.runOnce(() -> timer.start()).andThen(
             new coralScore(CoralGoal.right_brg_right, 4, drive, superstructure, intake)
             .andThen(new coralSource(drive, superstructure, intake)).andThen(

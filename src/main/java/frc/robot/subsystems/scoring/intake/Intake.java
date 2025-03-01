@@ -28,15 +28,17 @@ public class Intake extends SubsystemBase{
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest(Mode intakeMode) {
         double voltage = (intakeMode == Mode.ALGAE)? 3:-3;
-        return Commands.run(
+        return Commands.runOnce(
             () -> {
                 io.runVolts(voltage);
-            }).until(()-> io.isStalled()).andThen(() -> io.runVolts(0.05)).andThen(() -> intakeState = intakeMode);
+                //temporary
+                intakeState = intakeMode;
+            });
     }
 
     public Command eject() {
         double voltage = (intakeState == Mode.CORAL)? 3:-3;
-        return Commands.run(
+        return Commands.runOnce(
             () -> {
                 io.runVolts(voltage);
                 intakeState = Mode.EMPTY;
@@ -46,7 +48,12 @@ public class Intake extends SubsystemBase{
     }
 
     public Command stop() {
-        return Commands.runOnce(() -> io.runVolts(0));
+        return Commands.runOnce(
+            () -> {
+                io.runVolts(0);
+                //temporary
+                intakeState = Mode.EMPTY;
+            });
     }
 
 
@@ -63,14 +70,6 @@ public class Intake extends SubsystemBase{
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);    
 
-        String state;
-        if (intakeState == Mode.CORAL) {
-            state = "coral";
-        } else if (intakeState == Mode.ALGAE) {
-            state = "algae";
-        } else {
-            state = "empty";
-        }
-        Logger.recordOutput("Intake/State", state);
+        Logger.recordOutput("Intake/State", intakeState.toString());
     }
 }

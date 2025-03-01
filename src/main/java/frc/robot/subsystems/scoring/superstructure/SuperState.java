@@ -163,6 +163,9 @@ public class SuperState {
         L2_ALGAE_REVERSE(
             new SuperState(
                 Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L2_highest_h - Units.inchesToMeters(20))),
+        NET(
+            new SuperState(
+                Units.degreesToRadians(-30), Units.degreesToRadians(0), Reef.L4_highest_h - Units.inchesToMeters(20))),
         PROCESSOR(
             new SuperState(
                 Units.degreesToRadians(-30), Units.degreesToRadians(-65), 0)),
@@ -175,9 +178,9 @@ public class SuperState {
         SOURCE_REVERSE(
             new SuperState(
                 Units.degreesToRadians(70),Units.degreesToRadians( 45), Units.inchesToMeters(14))),
-        // ALGAE_GROUND(
-        //     new SuperState(
-        //         new Translation3d(), false)),
+        ALGAE_GROUND(
+             new SuperState(
+                0.67648, 1.15287, 0)),
         
         START(
             new SuperState(0, 0, 0));

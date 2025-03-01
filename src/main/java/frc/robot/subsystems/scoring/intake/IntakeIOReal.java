@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring.intake;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Hertz;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -8,6 +9,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.CurrentUnit;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
@@ -36,10 +38,10 @@ public class IntakeIOReal implements IntakeIO {
         motor.optimizeBusUtilization();
     }
 
-    @AutoLogOutput(key = "Intake/Is Stalled")
-    public boolean isStalled() {
-        return motor.getVelocity().getValueAsDouble() < 1 && timer.hasElapsed(0.5);
-    }
+    // @AutoLogOutput(key = "Intake/Is Stalled")
+    // public boolean isStalled() {
+    //     return motor.getStatorCurrent().getValueAsDouble()
+    // }
 
     @Override
     public void runVolts(double volts) {
