@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.7,
-        "y": 0.724
+        "x": 1.601,
+        "y": 0.665
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.893227396903246,
-        "y": 2.0467160748874136
+        "x": 2.794227396903246,
+        "y": 1.9877160748874136
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.646368243243243,
-        "y": 2.888597972972972
+        "x": 3.6858952702702705,
+        "y": 2.947888513513513
       },
       "prevControl": {
-        "x": 3.4578639677452334,
-        "y": 2.69935752288458
+        "x": 3.497390994772261,
+        "y": 2.758648063425121
       },
       "nextControl": null,
       "isLocked": false,
@@ -51,12 +51,6 @@
       "waypointRelativePos": 0.29828660436137294,
       "endWaypointRelativePos": 0.9338006230529616,
       "command": null
-    },
-    {
-      "name": "Score Coral",
-      "waypointRelativePos": 1.0,
-      "endWaypointRelativePos": null,
-      "command": null
     }
   ],
   "globalConstraints": {
@@ -72,7 +66,7 @@
     "rotation": 60.554571270074405
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right ",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 53.88761156975348

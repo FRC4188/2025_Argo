@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.336,
-        "y": 2.869
+        "x": 5.267,
+        "y": 2.938
       },
       "prevControl": {
-        "x": 5.691368904623343,
-        "y": 2.7011847991783653
+        "x": 5.622368904623343,
+        "y": 2.7701847991783652
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,12 +47,6 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Score Coral",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
       "name": "Coral L3",
       "waypointRelativePos": 0.6767912772585656,
       "endWaypointRelativePos": null,
@@ -69,10 +63,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 124.72100000000002
+    "rotation": 119.291
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right ",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -178.059

@@ -5,9 +5,70 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
-            "commands": []
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "First Right Coral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Score Coral"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "First Right Source"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Get Coral"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Second Right Coral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Score Coral"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Second Right Source"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Get Coral"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Third Right Coral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Score Coral"
+                }
+              }
+            ]
           }
         }
       ]
