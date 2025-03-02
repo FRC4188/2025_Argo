@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.152280405405406,
-        "y": 4.1633445945945935
+        "x": 3.8290909090909087,
+        "y": 5.146803977272728
       },
       "prevControl": {
-        "x": 2.608783783783784,
-        "y": 4.914358108108106
+        "x": 3.2855942874692867,
+        "y": 5.89781749078624
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.5599688473520247,
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.5714285714285751,
       "constraints": {
         "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
@@ -49,7 +49,7 @@
     {
       "name": "Coral L3",
       "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 0.5007788161993737,
+      "endWaypointRelativePos": 1.0,
       "command": null
     }
   ],
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -58.840695491655616
   },
   "reversed": false,
   "folder": null,

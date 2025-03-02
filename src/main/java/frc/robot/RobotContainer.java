@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -338,7 +339,7 @@ public class RobotContainer {
     autoChooser.addOption("algae Right", AutoFactory.algaeGen(FieldConstant.right_start, drive, superstructure, intake));
 
     //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
+    // autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
   }
