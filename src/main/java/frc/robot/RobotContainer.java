@@ -131,15 +131,12 @@ public class RobotContainer {
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
-                new GyroIOSim(driveSim.getGyroSimulation()),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.FrontLeft, driveSim.getModules()[0]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.FrontRight, driveSim.getModules()[1]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.BackLeft, driveSim.getModules()[2]),
-                new ModuleIOTalonFXSim(
-                  TunerConstants.BackRight, driveSim.getModules()[3]),
+                // new GyroIOSim(driveSim.getGyroSimulation()),
+                new GyroIO() {},
+                new ModuleIOTalonFXSim(TunerConstants.FrontLeft),
+                new ModuleIOTalonFXSim(TunerConstants.FrontRight),
+                new ModuleIOTalonFXSim(TunerConstants.BackLeft),
+                new ModuleIOTalonFXSim(TunerConstants.BackRight),
                 driveSim::setSimulationWorldPose);
 
         // vis = new Limelight(drive, new VisionIO(){});
@@ -163,12 +160,13 @@ public class RobotContainer {
         break;
     }
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
-    resetGyro = Constants.robot.currMode == Constants.Mode.SIM
-      ? () -> drive.setPose(
-                driveSim
-                  .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
+    resetGyro = 
+    // Constants.robot.currMode == Constants.Mode.SIM? 
+    //   () -> drive.setPose(
+    //             driveSim
+    //               .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
 
-      : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+       () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
 
     //add cmds for pathplanner events
     HashMap<String, Command> EVENTS =
@@ -325,9 +323,8 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         //pathplanner pathfinding + following
     // autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
-    autoChooser.addOption("left source coral ", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
-    autoChooser.addOption("right source coral", AutoFactory.rightL4CoralGen(drive, superstructure, intake));
-
+    autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
+    autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
@@ -359,9 +356,9 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(7.459, 5.991, new Rotation2d()));
+    // drive.setPose(new Pose2d(7.459, 5.991, new Rotation2d()));
     // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-    //drive.setPose(FieldConstant.Source.left_src_mid);
+    drive.setPose(FieldConstant.Source.left_src_mid);
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
