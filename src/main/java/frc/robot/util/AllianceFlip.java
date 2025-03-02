@@ -45,7 +45,7 @@ public class AllianceFlip {
     /** Flips a rotation based on the current alliance color. */
     public static Rotation2d apply(Rotation2d rotation) {
         if (canFlip()) {
-            return new Rotation2d(-rotation.getCos(), rotation.getSin());
+            return new Rotation2d(-rotation.getCos(), -rotation.getSin());
         } else {
             return rotation;
         }
@@ -63,7 +63,7 @@ public class AllianceFlip {
     public static Translation3d apply(Translation3d translation3d) {
         if (canFlip()) {
             return new Translation3d(
-                flip(translation3d.getX()), translation3d.getY(), translation3d.getZ());
+                flip(translation3d.getX()), flipY(translation3d.getY()), translation3d.getZ());
         } else {
             return translation3d;
         }

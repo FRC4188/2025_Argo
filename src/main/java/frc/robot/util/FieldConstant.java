@@ -36,6 +36,10 @@ public class FieldConstant {
     public static double algae_radius = Units.inchesToMeters(8.125);
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
+    public static Pose2d left_start = new Pose2d(7.459, 4.160, Rotation2d.kZero);
+    public static Pose2d mid_start = new Pose2d(7.459, 6.154, Rotation2d.kZero);
+    public static Pose2d right_start = new Pose2d(7.459, 1.836, Rotation2d.kZero);
+
     public class Field {
         public Pose2d innerCageStart = new Pose2d(new Translation2d(8.007, 5.047), new Rotation2d(0.0));
         public Pose2d middleCageStart = new Pose2d(new Translation2d(8.007, 6.164), new Rotation2d(0.0));

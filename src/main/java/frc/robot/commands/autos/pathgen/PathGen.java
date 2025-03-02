@@ -3,6 +3,7 @@ package frc.robot.commands.autos.pathgen;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -14,6 +15,7 @@ import frc.robot.commands.autos.pathgen.fieldobjects.CircleFO;
 import frc.robot.commands.autos.pathgen.fieldobjects.FOHandler;
 import frc.robot.commands.autos.pathgen.fieldobjects.PolygonFO;
 import frc.robot.commands.autos.pathgen.fieldobjects.RectFO;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.FieldConstant;
 
 public class PathGen {
@@ -98,6 +100,21 @@ public class PathGen {
     }
 
     public Trajectory generateTrajectory(Pose2d start, Pose2d end, TrajectoryConfig config) {
+        start = AllianceFlip.flipDS(start);
+        end = AllianceFlip.flipDS(end);
+
+        start = new Pose2d(
+            MathUtil.clamp(start.getX(), 0, FieldConstant.field_length),
+            MathUtil.clamp(start.getY(), 0, FieldConstant.field_width),
+            start.getRotation()
+        );
+
+        end = new Pose2d(
+            MathUtil.clamp(end.getX(), 0, FieldConstant.field_length),
+            MathUtil.clamp(end.getY(), 0, FieldConstant.field_width),
+            end.getRotation()
+        );
+
         ArrayList<Translation2d> pivots = gen_pivots(start.getTranslation(), end.getTranslation());
 
         if (pivots.isEmpty()) return new Trajectory();
@@ -110,10 +127,10 @@ public class PathGen {
             config);
 
         for (State states : result.getStates()) {
-            states.poseMeters = new Pose2d(
+            states.poseMeters = AllianceFlip.flipDS(new Pose2d(
                 states.poseMeters.getTranslation(), 
                 PG_math.interpolate_mod(start.getRotation(), end.getRotation(), states.timeSeconds / result.getTotalTimeSeconds()) 
-            );
+            ));
         }
         
         return result;
@@ -312,7 +329,7 @@ public class PathGen {
         Node getNode(short x, short y) {
             x = PG_math.clamp((short)0, x, (short) (length - 1));
             y = PG_math.clamp((short)0, y, (short) (width - 1));
-    
+        
             return nodes[y * length + x];
         }
     

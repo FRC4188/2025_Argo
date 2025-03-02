@@ -31,7 +31,7 @@ public class ArmIOReal implements ArmIO {
 
     public ArmIOReal() {
         armMotor = new TalonFX(Constants.Id.kArm, Constants.robot.rio);
-        armEncoder = new DutyCycleEncoder(0, 19.8019801, 0);
+        armEncoder = new DutyCycleEncoder(3, 19.8019801, 0);
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
         armMotor.getConfigurator().apply(ArmConstants.kMotorConfig);
@@ -60,7 +60,7 @@ public class ArmIOReal implements ArmIO {
         if(DriverStation.isDisabled()){
             runVolts(0.0);
         }
-        encoderRad = PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians();
+        encoderRad = -PG_math.modulate(Rotation2d.fromRotations(armEncoder.get()).minus(Rotation2d.fromRadians(ArmConstants.kZero))).getRadians();
 
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
@@ -70,6 +70,6 @@ public class ArmIOReal implements ArmIO {
 
     @Override
     public double getAngle(){
-        return PG_math.modulate(Rotation2d.fromRotations(armEncoder.get() - ArmConstants.kZero)).getRadians() -0.1;
+        return -PG_math.modulate(Rotation2d.fromRotations(armEncoder.get()).minus(Rotation2d.fromRadians(ArmConstants.kZero))).getRadians();
     }
 }

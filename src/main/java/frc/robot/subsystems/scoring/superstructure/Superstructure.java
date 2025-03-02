@@ -133,7 +133,7 @@ public class Superstructure extends SubsystemBase{
         Logger.recordOutput("SuperStruct/Arm At Target", arm.atGoal(target.getArmAngle()));
         Logger.recordOutput("SuperStruct/Elevator At Target", elevator.atGoal(target.getEleHeight()));
 
-        //PID tuning so ill kill myself later
+        // //PID tuning so ill kill myself later
 
         // wristPID.setPID(
         //     w_p.get(), 
@@ -192,7 +192,7 @@ public class Superstructure extends SubsystemBase{
         //     );
         // }
 
-        sim.update(new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight()));
+        // sim.update(new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight()));
     }
 
     public void manualOverride(DoubleSupplier wristinput, DoubleSupplier arminput, DoubleSupplier eleinput) {

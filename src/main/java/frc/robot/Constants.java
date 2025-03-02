@@ -87,12 +87,12 @@ public final class Constants {
 
     public static final double kMax_Vel = 1;
     public static final double kMax_Accel = 1;
-    public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
+    public static final Constraints kConstraints = new Constraints(kMax_Vel - 0.25, kMax_Accel - 0.5);
 
-    public static final double kP = 8.5;
-    public static final double kI = 0.0;
+    public static final double kP = 10;
+    public static final double kI = 0.0;  
     public static final double kD = 0.0;
-    public static final double kFF = 0.2;
+    public static final double kFF = 0.05;
     
     public static final ProfiledPIDController ElePID = new ProfiledPIDController(kP, kI, kD, kConstraints);
 
@@ -132,8 +132,6 @@ public final class Constants {
 
   public static class WristConstants {
     public static final double kTolerance = 0.1;
-    public static final double kZero = 2.3191165112888488; 
-
     public static final double kGearRatio = 1 / ((82.0/18) * 10);
     public static final int kCurrentLimit = 0; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
@@ -146,7 +144,7 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
-    public static final double kS = 0.1;
+    public static final double kS = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double kG = 0.0;
@@ -163,16 +161,16 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final double kTolerance = 0.2;
-    public static final double kZero = 0.0166; //TODO: get zero
+    public static final double kZero = -2.7436057601930743 + 1.760069499241899; //TODO: get zero
 
     public static final double kGearRatio = 33.75;
 
-    public static final double kP = 2.5;
+    public static final double kP = 3;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kF = 0.0;
-    public static final double kS = 0.2;
-    public static final double kG = 0.75;
+    public static final double kS = 0.0;
+    public static final double kG = 0.5;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     

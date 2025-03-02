@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.util.AllianceFlip;
 
 /**
  * Drives to a specified pose.
@@ -36,8 +37,8 @@ public class DriveToPose extends Command {
     private double ffMinRadius = 0.2, ffMaxRadius = 0.8;
 
     public DriveToPose(Drive driveSubsystem, Supplier<Pose2d> poseSupplier) {
+        this.poseSupplier =  poseSupplier;
         this.driveSubsystem = driveSubsystem;
-        this.poseSupplier = poseSupplier;
         addRequirements(driveSubsystem);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
     }

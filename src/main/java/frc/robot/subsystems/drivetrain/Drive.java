@@ -49,6 +49,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -72,7 +74,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-public class Drive extends SubsystemBase implements VisionConsumer {
+public class Drive extends SubsystemBase {
 
     public PIDController translation =
      new PIDController(0, 0, 0), 
@@ -93,6 +95,8 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
     LoggedNetworkNumber t_target = new LoggedNetworkNumber("DriveTune/ttarget", 0);
     LoggedNetworkNumber r_target = new LoggedNetworkNumber("DriveTune/rtarget", 0);
+
+    Field2d field;
 
     // TunerConstants doesn't include these constants, so they are declared locally
     public static final double ODOMETRY_FREQUENCY =
@@ -193,9 +197,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
                 new SysIdRoutine.Config(
                         Volts.of(1).per(Seconds), 
                         Volts.of(3), 
-                        Seconds.of(5), 
+                        Seconds.of(2), 
                         (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+        field = new Field2d();
     }
 
     @Override
@@ -291,6 +297,9 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
         // Update gyro alert
         gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.robot.currMode != Mode.SIM);
+
+        field.setRobotPose(getPose());
+        SmartDashboard.putData("Field", field);
     }
 
     /**
@@ -407,6 +416,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         return getPose().getRotation();
     }
 
+    @AutoLogOutput(key="Odomeetry/Bot Rotation")
+    public double getRotationDegrees() {
+        return getPose().getRotation().getDegrees();
+    }
+
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         resetOdometryCallBack.accept(pose);
@@ -417,11 +431,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         setPose(getPose());
     }
 
-    /** Adds a new timestamped vision measurement. */
-    @Override
-    public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
-        poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
-    }
+    // /** Adds a new timestamped vision measurement. */
+    // @Override
+    // public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
+    //     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    // }
 
     /** Returns the maximum linear speed in meters per sec. */
     public double getMaxLinearSpeedMetersPerSec() {
