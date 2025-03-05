@@ -234,7 +234,8 @@ public class Superstructure extends SubsystemBase{
             elevolts = elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
             + Constants.ElevatorConstants.kFF;
         } else {
-            elevolts = MathUtil.clamp(Constants.ElevatorConstants.kFF - eleinput.getAsDouble(), 0, 12);
+            // if needed, replace the 0 in the clamp of the next commented out line below this one to -12
+            // elevolts = MathUtil.clamp(Constants.ElevatorConstants.kFF - eleinput.getAsDouble(), 0, 12);
             target.setEleHeight(elevator.getHeight());
         }
 
