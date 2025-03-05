@@ -70,9 +70,10 @@ public class Elevator extends SubsystemBase{
     public Command runVolts(double volts){
         return run(()-> io.runVolts(volts));
     }
-    public Command runPosition(double height){
+   /*  public Command runPosition(double height){
         return run(()-> io.runPosition(height / 3 / kDrumeRadius * 6 - kZero, ff.calculate(960.0))); //TODO: test da math
     }
+        */
 
     public Command runSysId(){
         SysIdRoutine routine = new SysIdRoutine(

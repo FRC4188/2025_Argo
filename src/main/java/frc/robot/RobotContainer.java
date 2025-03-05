@@ -44,10 +44,6 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.gyro.GyroIOSim;
-import frc.robot.subsystems.scoring.arm.Arm;
-import frc.robot.subsystems.scoring.Superstructure.SuperState;
-import frc.robot.subsystems.scoring.Superstructure.SuperStructure;
-import frc.robot.subsystems.scoring.Superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -56,6 +52,8 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.scoring.Superstructure.SuperStructure;
+import frc.robot.subsystems.scoring.Superstructure.SuperState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -178,14 +176,14 @@ public class RobotContainer {
       controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
       controller2.a().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L2_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperState.SuperPreset.L2_CORAL.getState())));
 
       controller2.b().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L3_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperState.SuperPreset.L3_CORAL.getState())));
       controller2.x().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.L4_CORAL.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperState.SuperPreset.L4_CORAL.getState())));
       controller2.y().onTrue(
-        Commands.runOnce( () -> superstructure.setgoal(SuperPreset.START.getState())));
+        Commands.runOnce( () -> superstructure.setgoal(SuperState.SuperPreset.START.getState())));
 
   }
 
@@ -226,7 +224,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-     return new SuperToState(superstructure, SuperPreset.SOURCE.getState());
+     return new SuperToState(superstructure, SuperState.SuperPreset.SOURCE.getState());
      // do we need "new TrapezoidProfile(new Constraints(10, 10)" after SuperPreset.SOURCE.getState()?
   }
 

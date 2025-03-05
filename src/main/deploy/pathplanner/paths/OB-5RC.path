@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.58,
+        "y": 1.35
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.522802523034,
+        "y": 2.6896219127004803
+      },
+      "isLocked": false,
+      "linkedName": "OB (Opposition Barge)"
+    },
+    {
+      "anchor": {
+        "x": 5.606602564102563,
+        "y": 2.9723076923076923
+      },
+      "prevControl": {
+        "x": 6.190400817031206,
+        "y": 2.284529403716297
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "5RC"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -38.45370921670603
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

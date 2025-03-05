@@ -31,7 +31,7 @@ public class SuperStructure extends SubsystemBase{
 
     private SuperVisualizer sim;
 
-    ArmFF ff;
+    ArmFF ff = new ArmFF();
 
     private final Constraints constraints = new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0));
 
@@ -82,7 +82,7 @@ public class SuperStructure extends SubsystemBase{
 
         target = SuperPreset.START.getState();
 
-        ff = new ArmFF();
+       
 
         this.current = new SuperState(
             wrist.getAngle(),

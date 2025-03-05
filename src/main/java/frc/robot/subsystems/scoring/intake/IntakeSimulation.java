@@ -210,7 +210,7 @@ import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgae
                     else if (collisionBody2 instanceof ReefscapeCoralAlgaeStack stack
                             && coralOrAlgaeIntake
                             && fixture1 == IntakeSimulation.this) indicateGamePieceRemoval(stack);
-                        
+                    /* 
                     if (gamePiecesInsideIntake > 0 && "Coral".equals(IntakeSimulation.this.targetedGamePieceType)) {
                         Constants.robot.robotstate = Constants.robot.STATE.CORAL;
                     }
@@ -218,6 +218,7 @@ import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgae
                     if (gamePiecesInsideIntake > 0 && "Algae".equals(IntakeSimulation.this.targetedGamePieceType)) {
                         Constants.robot.robotstate = Constants.robot.STATE.ALGAE;
                     }
+                         */   
                 }
                 
                 @Override
