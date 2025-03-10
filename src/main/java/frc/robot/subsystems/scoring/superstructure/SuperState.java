@@ -165,7 +165,7 @@ public class SuperState {
                 Units.degreesToRadians(30), Units.degreesToRadians(45), Reef.L2_highest_h - Units.inchesToMeters(20))),
         NET(
             new SuperState(
-                Units.degreesToRadians(-30), Units.degreesToRadians(0), Reef.L4_highest_h - Units.inchesToMeters(20))),
+                Units.degreesToRadians(30), Units.degreesToRadians(0), Reef.L4_highest_h - Units.inchesToMeters(20))),
         PROCESSOR(
             new SuperState(
                 Units.degreesToRadians(-30), Units.degreesToRadians(-65), 0)),

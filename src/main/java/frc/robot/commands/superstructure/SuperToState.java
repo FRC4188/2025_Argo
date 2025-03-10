@@ -20,7 +20,7 @@ public class SuperToState extends SequentialCommandGroup {
 
     public SuperToState(Superstructure superstructure, SuperState goal) {
         addCommands(
-            new JointToState(superstructure, SuperPreset.START.getState()).onlyIf(() -> Intake.intakeState != Intake.Mode.ALGAE),
+            new JointToState(superstructure, SuperPreset.START.getState()).onlyIf(() -> !Intake.intakeState.equals(Intake.Mode.ALGAE)),
             new EleToState(superstructure, goal.getEleHeight()),
             new JointToState(superstructure, goal)
         );

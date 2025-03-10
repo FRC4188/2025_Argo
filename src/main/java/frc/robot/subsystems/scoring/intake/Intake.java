@@ -1,6 +1,8 @@
 package frc.robot.subsystems.scoring.intake;
 
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,8 +28,8 @@ public class Intake extends SubsystemBase{
     }
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
-    public Command ingest(Mode intakeMode) {
-        double voltage = (intakeMode == Mode.ALGAE)? 3:-3;
+    public Command ingest(Mode intakeMode, boolean isSlow) {
+        double voltage = ((intakeMode == Mode.ALGAE)? 3:-3) - ((isSlow)?((intakeMode == Mode.ALGAE)?2:-2):0);
         return Commands.runOnce(
             () -> {
                 io.runVolts(voltage);

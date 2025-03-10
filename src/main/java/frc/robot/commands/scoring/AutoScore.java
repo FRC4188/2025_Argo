@@ -171,7 +171,7 @@ public class AutoScore extends Command {
                 scoring = new Command() {};
             }
 
-            scoring = new Score(correctedgoal, preset.getState(), intake.ingest(Mode.ALGAE).andThen(() -> FieldConstant.Reef.AlgaeSource.asources.remove(goal)), drive, superstruct, intake);
+            // scoring = new Score(correctedgoal, preset.getState(), intake.ingest(Mode.ALGAE, false).andThen(() -> FieldConstant.Reef.AlgaeSource.asources.remove(goal)), drive, superstruct, intake);
         }
     }
 
@@ -204,7 +204,7 @@ public class AutoScore extends Command {
                 preset = SuperPreset.SOURCE;
             }
 
-            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(Mode.CORAL), drive, superstruct, intake);
+            // scoring = new Score(correctedGoal, preset.getState(), intake.ingest(Mode.CORAL, false), drive, superstruct, intake);
         }
     }
 

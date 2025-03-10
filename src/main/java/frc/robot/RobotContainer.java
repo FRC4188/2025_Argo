@@ -59,9 +59,11 @@ import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.vision.Limelight;
+import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.FieldConstant.Reef;
 import frc.robot.util.FieldConstant.Source;
 
@@ -99,6 +101,8 @@ public class RobotContainer {
 
   @AutoLogOutput(key  = "Copilot/IntakeMode")
   private Intake.Mode currMode = Intake.Mode.CORAL;
+  @AutoLogOutput(key = "Copilot/isProcessor")
+  private boolean isProc = false;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -186,23 +190,23 @@ public class RobotContainer {
             Map.entry("Algae L3", 
               new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState())),
             Map.entry("Algae L2", 
-              new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState())),
-            Map.entry("Score Coral", 
-              Commands.run(()-> 
-                intake.ingest(Intake.Mode.ALGAE)).withTimeout(1)
-              .andThen(Commands.run(()-> intake.stop()))),
-            Map.entry("Score Algae", 
-              Commands.run(()-> 
-                intake.ingest(Intake.Mode.CORAL)).withTimeout(1)
-              .andThen(Commands.run(()-> intake.stop()))),
-            Map.entry("Get Coral", 
-              Commands.run(()-> 
-                intake.ingest(Intake.Mode.CORAL)).withTimeout(2.5)
-              .andThen(Commands.run(()-> intake.stop()))),
-            Map.entry("Get Algae", 
-              Commands.run(()-> 
-                intake.ingest(Intake.Mode.ALGAE)).withTimeout(2.5)
-              .andThen(Commands.run(()-> intake.stop())))
+              new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()))
+            // Map.entry("Score Coral", 
+            //   Commands.run(()-> 
+            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(1)
+            //   .andThen(Commands.run(()-> intake.stop()))),
+            // Map.entry("Score Algae", 
+            //   Commands.run(()-> 
+            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(1)
+            //   .andThen(Commands.run(()-> intake.stop()))),
+            // Map.entry("Get Coral", 
+            //   Commands.run(()-> 
+            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(2.5)
+            //   .andThen(Commands.run(()-> intake.stop()))),
+            // Map.entry("Get Algae", 
+            //   Commands.run(()-> 
+            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(2.5)
+            //   .andThen(Commands.run(()-> intake.stop())))
         )
       );
 
@@ -211,6 +215,11 @@ public class RobotContainer {
     configureDashboard();
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  //need superstructure
+  public void teleInit() {
+    superstructure.setTarget(new SuperState());
   }
 
   /**
@@ -234,8 +243,8 @@ public class RobotContainer {
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> -controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
       () -> controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
@@ -249,12 +258,13 @@ public class RobotContainer {
 
     //outtake
     controller.getLeftTButton().onTrue(
-        intake.ingest((currMode == Intake.Mode.CORAL)? Intake.Mode.ALGAE:Intake.Mode.CORAL)
-    ).onFalse(intake.stop());
+        intake.ingest(
+          (currMode == Intake.Mode.CORAL)? Intake.Mode.ALGAE:Intake.Mode.CORAL, controller.getLeftBumperButton().getAsBoolean())
+        ).onFalse(intake.stop());
 
     //intake
     controller.getRightTButton().onTrue(
-      intake.ingest((currMode))
+      intake.ingest((currMode), controller.getLeftBumperButton().getAsBoolean())
     ).onFalse(intake.stop());
 
     // controller.a().onTrue(
@@ -262,8 +272,11 @@ public class RobotContainer {
     // ).onFalse(
     //   Commands.runOnce(()-> drive.stop())
     // );
+    
+    // testing limelight pipeline changing during match
+    controller.a().onTrue(Commands.runOnce(()-> Limelight.changePipe()));
 
-      //manual controls down here
+    //manual controls down here
     controller2.a().onTrue(Commands.runOnce(() -> superstructure.armOverride = !superstructure.armOverride));
 
     controller2.b().onTrue(Commands.runOnce(() -> superstructure.wristOverride = !superstructure.wristOverride));
@@ -275,31 +288,38 @@ public class RobotContainer {
     controller2.getRightBumperButton().onTrue(
       Commands.runOnce(() -> currMode = currMode == Intake.Mode.CORAL? Intake.Mode.ALGAE: Intake.Mode.CORAL));
 
+    controller2.getLeftBumperButton().onTrue(
+      Commands.runOnce(() -> isProc = !isProc)
+    );
+
     controller2.getStartButton().onTrue(new SuperToState(superstructure, SuperPreset.START.getState()));
 
     controller2.getUpButton().onTrue(
       new ConditionalCommand(
         new SuperToState(superstructure, SuperPreset.SOURCE.getState()), 
-        new SuperToState(superstructure, SuperPreset.PROCESSOR_REVERSE.getState()), 
-        () -> currMode == Intake.Mode.CORAL));
+        new ConditionalCommand(
+          new SuperToState(superstructure, SuperPreset.PROCESSOR_REVERSE.getState()),
+          new SuperToState(superstructure, SuperPreset.NET.getState()),
+          () -> isProc),
+        () -> currMode.equals(Intake.Mode.CORAL)));
 
     controller2.getLeftButton().onTrue(
       new ConditionalCommand(
         new SuperToState(superstructure, SuperPreset.L2_CORAL.getState()), 
         new SuperToState(superstructure, SuperPreset.L2_ALGAE_REVERSE.getState()),
-        ()-> currMode == Intake.Mode.CORAL));
+        ()-> currMode.equals(Intake.Mode.CORAL)));
     
     controller2.getRightButton().onTrue(
       new ConditionalCommand(
         new SuperToState(superstructure, SuperPreset.L3_CORAL.getState()), 
         new SuperToState(superstructure, SuperPreset.L3_ALGAE_REVERSE.getState()),
-        ()-> currMode == Intake.Mode.CORAL));
+        ()-> currMode.equals(Intake.Mode.CORAL)));
       
     controller2.getDownButton().onTrue(
       new ConditionalCommand(
       new SuperToState(superstructure, SuperPreset.L4_CORAL.getState()), 
       new SuperToState(superstructure, SuperPreset.ALGAE_GROUND.getState()),
-      ()-> currMode == Intake.Mode.CORAL));;
+      ()-> currMode.equals(Intake.Mode.CORAL)));;
 
   }
 
@@ -319,7 +339,7 @@ public class RobotContainer {
     //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    autoChooser.addDefaultOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         //pathplanner pathfinding + following
     // autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
@@ -327,7 +347,6 @@ public class RobotContainer {
     autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
-    autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
     autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
     autoChooser.addOption("right source coral", AutoFactory.rightL4CoralGen(drive, superstructure, intake));

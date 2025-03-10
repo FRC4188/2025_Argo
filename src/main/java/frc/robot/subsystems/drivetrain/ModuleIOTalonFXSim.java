@@ -128,9 +128,9 @@ public class ModuleIOTalonFXSim implements ModuleIO {
   }
 
   @Override
-  public void setDriveVelocity(double velocityRadPerSec) {
+  public void setDriveVelocity(double velocityRadPerSec, double feedforward) {
     driveClosedLoop = true;
-    driveFFVolts = DRIVE_KS * Math.signum(velocityRadPerSec) + DRIVE_KV * velocityRadPerSec;
+    driveFFVolts = feedforward;
     driveController.setSetpoint(velocityRadPerSec);
   }
 

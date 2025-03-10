@@ -73,8 +73,6 @@ public final class Constants {
     //DT ids are 1->12
     public static final int kElevatorLead = 13;
     public static final int kElevatorFollow = 14;
-    public static final int kArm = 15;
-    public static final int kArmNcoder = 16;    
     public static final int kWrist = 17;   
     public static final int kIntake = 18;
   }

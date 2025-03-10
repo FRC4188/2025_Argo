@@ -25,10 +25,15 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.util.LimelightHelpers;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -182,9 +187,75 @@ public class Limelight extends SubsystemBase {
     
   }
 
-  public void setPipeline(String llName, int index){
-    LimelightHelpers.setPipelineIndex(llName, index);
+  // public static Command changeToAlgae(){
+  //   return Commands.run(()-> {
+  //     LimelightHelpers.setPipelineIndex(frontLL, 0);
+  //   });
+  // }
+
+  // public static Command changeToTags(){
+  //   return Commands.run(()-> {
+  //     LimelightHelpers.setPipelineIndex(frontLL, 1);
+  //   });
+  // }
+
+  public static Command changePipe(){
+    return Commands.run(()-> {
+      if (LimelightHelpers.getCurrentPipelineIndex(frontLL) == algaeDetect){
+        LimelightHelpers.setPipelineIndex(frontLL, aprilTagDetect);
+      } else {
+        LimelightHelpers.setPipelineIndex(frontLL, algaeDetect);
+      }
+    });
   }
+
+  public static Pose2d getBackPose2d(){
+    if (LimelightHelpers.getTV(backLL)){
+      return LimelightHelpers.getBotPose2d(backLL); // TODO: not sure if it should be getBotPose2d, getBotPose_wpiBlue, or red
+    }
+    return new Pose2d();
+  }
+
+  public Pose2d getFrontPose2d(){
+    if (LimelightHelpers.getTV(frontLL)){
+      return LimelightHelpers.getBotPose2d(frontLL); // TODO: not sure if it should be getBotPose2d, getBotPose_wpiBlue, or red
+    }
+    return new Pose2d();
+  }
+
+  public static double frontTX(){
+    return LimelightHelpers.getTX(frontLL);
+  }
+
+  public static double backTX(){
+    return LimelightHelpers.getTX(backLL);
+  }
+
+  public static Pose2d targetID(Drive drive){
+    ArrayList<Pose2d> tags = new ArrayList<Pose2d>();
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red){
+      tags.add(VisConstants.AprilTagPose.tag6.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag7.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag8.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag9.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag10.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag11.toPose2d());
+
+      return drive.getPose().nearest(tags);
+    } 
+
+    else {
+      tags.add(VisConstants.AprilTagPose.tag17.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag18.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag19.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag20.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag21.toPose2d());
+      tags.add(VisConstants.AprilTagPose.tag22.toPose2d());
+      
+      return drive.getPose().nearest(tags);
+    }
+  }
+
 
   @FunctionalInterface
   public static interface VisionConsumer {
