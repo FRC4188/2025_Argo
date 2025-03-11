@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AB-2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-MB"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MB-3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3-MIB"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MIB-4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4-IB"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": true
+}
