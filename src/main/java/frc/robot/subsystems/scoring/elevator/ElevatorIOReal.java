@@ -30,7 +30,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     public ElevatorIOReal() {
 
-        //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
         leader = new TalonFX(Id.kElevatorLead, Constants.robot.rio);
         follower = new TalonFX(Id.kElevatorFollow, Constants.robot.rio);
 
