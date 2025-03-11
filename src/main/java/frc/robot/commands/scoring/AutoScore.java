@@ -12,7 +12,6 @@ import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.scoring.intake.Intake;
-import frc.robot.subsystems.scoring.intake.Intake.Mode;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
@@ -95,7 +94,7 @@ public class AutoScore extends Command{
                 scoring = new Command() {};
             }
 
-            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(Mode.ALGAE, false).withTimeout(1.5), drive, superstruct);
+            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct);
         }
     }
 
@@ -118,7 +117,7 @@ public class AutoScore extends Command{
             preset = SuperPreset.NET;
             
 
-            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(Mode.CORAL, false).withTimeout(1.5), drive, superstruct);
+            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct);
         }
     }
 }

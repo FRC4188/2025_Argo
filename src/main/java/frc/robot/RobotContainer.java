@@ -39,6 +39,7 @@ import choreo.auto.*;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.scoring.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -52,8 +53,11 @@ import frc.robot.subsystems.gyro.GyroIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 // import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
+import frc.robot.subsystems.scoring.superstructure.Superstructure;
 // import frc.robot.subsystems.scoring.superstructure.Superstructure;
 // import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.vision.Limelight;
@@ -83,7 +87,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  // private Superstructure superstructure;
+  private Superstructure superstructure;
   private Intake intake;
 
   // private final Limelight vis;
@@ -96,11 +100,6 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
-
-  @AutoLogOutput(key  = "Copilot/IntakeMode")
-  private Intake.Mode currMode = Intake.Mode.CORAL;
-  @AutoLogOutput(key = "Copilot/isProcessor")
-  private boolean isProc = false;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -118,7 +117,7 @@ public class RobotContainer {
         
         // vis = new Limelight(drive, 
         //     new VisionIOLL("limelight-back", drive::getRotation));        
-            // superstructure = new Superstructure(Mode.REAL);
+        superstructure = new Superstructure(Mode.REAL);
 
         intake = new Intake(new IntakeIOReal());
         break;
@@ -217,7 +216,7 @@ public class RobotContainer {
 
   //need superstructure
   public void teleInit() {
-    // superstructure.setTarget(new SuperState());
+    superstructure.setTarget(new SuperState());
   }
 
   /**
@@ -230,12 +229,11 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
 
-    // superstructure.setDefaultCommand(
-    //   Commands.run(() -> superstructure.manualOverride(
-    //     () -> 3 * -controller2.getLeftY(), 
-    //     () -> 3 * -controller2.getRightY(), 
-    //     () -> 3 * ( controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED))), superstructure
-    //     , superstructure));
+    superstructure.setDefaultCommand(
+      Commands.run(() -> superstructure.manualOverride(
+        () -> 3 * -controller2.getLeftY(), 
+        () -> 3 * ( controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)))
+        , superstructure));
     
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
@@ -256,14 +254,11 @@ public class RobotContainer {
 
     //outtake
     controller.getLeftTButton().onTrue(
-        intake.ingest(
-          (currMode == Intake.Mode.CORAL)? Intake.Mode.ALGAE:Intake.Mode.CORAL, controller.getLeftBumperButton().getAsBoolean())
-        ).onFalse(intake.stop());
+        intake.ingest(controller.getLeftBumperButton().getAsBoolean())).onFalse(intake.stop());
 
     //intake
     controller.getRightTButton().onTrue(
-      intake.ingest((currMode), controller.getLeftBumperButton().getAsBoolean())
-    ).onFalse(intake.stop());
+      intake.eject()).onFalse(intake.stop());
 
     // controller.a().onTrue(
     //   new DriveToPose(drive, ()-> drive.getPose().nearest(Source.csources))
@@ -275,49 +270,27 @@ public class RobotContainer {
     controller.a().onTrue(Commands.runOnce(()-> Limelight.changePipe()));
 
     //manual controls down here
-    // controller2.a().onTrue(Commands.runOnce(() -> superstructure.armOverride = !superstructure.armOverride));
 
-    // controller2.b().onTrue(Commands.runOnce(() -> superstructure.wristOverride = !superstructure.wristOverride));
+    controller2.b().onTrue(Commands.runOnce(() -> superstructure.wristOverride = !superstructure.wristOverride));
 
-    // controller2.y().onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
+    controller2.y().onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
 
-    // controller2.x().onTrue(superstructure.resetEle());
+    controller2.x().onTrue(superstructure.resetEle());
 
-    controller2.getRightBumperButton().onTrue(
-      Commands.runOnce(() -> currMode = currMode == Intake.Mode.CORAL? Intake.Mode.ALGAE: Intake.Mode.CORAL));
+    controller2.getStartButton().onTrue(new SuperToState(superstructure, SuperPreset.START.getState()));
 
-    controller2.getLeftBumperButton().onTrue(
-      Commands.runOnce(() -> isProc = !isProc)
-    );
+    controller2.getUpButton().onTrue(
+      new SuperToState(superstructure, SuperPreset.PROCESSOR.getState()));
 
-    // controller2.getStartButton().onTrue(new SuperToState(superstructure, SuperPreset.START.getState()));
+    controller2.getLeftButton().onTrue(
+      new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()));
 
-    // controller2.getUpButton().onTrue(
-    //   new ConditionalCommand(
-    //     new SuperToState(superstructure, SuperPreset.SOURCE.getState()), 
-    //     new ConditionalCommand(
-    //       new SuperToState(superstructure, SuperPreset.PROCESSOR_REVERSE.getState()),
-    //       new SuperToState(superstructure, SuperPreset.NET.getState()),
-    //       () -> isProc),
-    //     () -> currMode.equals(Intake.Mode.CORAL)));
-
-    // controller2.getLeftButton().onTrue(
-    //   new ConditionalCommand(
-    //     new SuperToState(superstructure, SuperPreset.L2_CORAL.getState()), 
-    //     new SuperToState(superstructure, SuperPreset.L2_ALGAE_REVERSE.getState()),
-    //     ()-> currMode.equals(Intake.Mode.CORAL)));
     
-    // controller2.getRightButton().onTrue(
-    //   new ConditionalCommand(
-    //     new SuperToState(superstructure, SuperPreset.L3_CORAL.getState()), 
-    //     new SuperToState(superstructure, SuperPreset.L3_ALGAE_REVERSE.getState()),
-    //     ()-> currMode.equals(Intake.Mode.CORAL)));
+    controller2.getRightButton().onTrue(
+      new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState()));
       
-    // controller2.getDownButton().onTrue(
-    //   new ConditionalCommand(
-    //   new SuperToState(superstructure, SuperPreset.L4_CORAL.getState()), 
-    //   new SuperToState(superstructure, SuperPreset.ALGAE_GROUND.getState()),
-    //   ()-> currMode.equals(Intake.Mode.CORAL)));;
+    controller2.getDownButton().onTrue(
+      new SuperToState(superstructure, SuperPreset.ALGAE_GROUND.getState()));
 
   }
 

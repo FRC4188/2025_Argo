@@ -22,8 +22,6 @@ public class IntakeIOReal implements IntakeIO {
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
 
-    Timer timer = new Timer(); //this is dumb af
-
     public IntakeIOReal(){
         motor = new TalonFX(Constants.Id.kIntake, Constants.robot.rio);
 
@@ -45,7 +43,6 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void runVolts(double volts) {
-        if (volts > 0) {timer.restart();} else {timer.stop();}
         motor.setVoltage(volts);
     }
 
