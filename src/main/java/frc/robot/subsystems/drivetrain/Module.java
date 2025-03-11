@@ -28,14 +28,14 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class Module {
     private static final LoggedNetworkNumber drivekS =
       new LoggedNetworkNumber("Drive/Module/DrivekS");
-  private static final LoggedNetworkNumber drivekV =
+    private static final LoggedNetworkNumber drivekV =
       new LoggedNetworkNumber("Drive/Module/DrivekV");
-  private static final LoggedNetworkNumber drivekP =
+    private static final LoggedNetworkNumber drivekP =
       new LoggedNetworkNumber("Drive/Module/DrivekP");
-  private static final LoggedNetworkNumber drivekD =
+    private static final LoggedNetworkNumber drivekD =
       new LoggedNetworkNumber("Drive/Module/DrivekD");
-  private static final LoggedNetworkNumber turnkP = new LoggedNetworkNumber("Drive/Module/TurnkP");
-  private static final LoggedNetworkNumber turnkD = new LoggedNetworkNumber("Drive/Module/TurnkD");
+    private static final LoggedNetworkNumber turnkP = new LoggedNetworkNumber("Drive/Module/TurnkP");
+    private static final LoggedNetworkNumber turnkD = new LoggedNetworkNumber("Drive/Module/TurnkD");
 
 
 
@@ -53,6 +53,15 @@ public class Module {
     public Module(ModuleIO io, int index, SwerveModuleConstants constants) {
         this.io = io;
         this.index = index;
+
+        Module.drivekD.setDefault(constants.DriveMotorGains.kD);
+        Module.drivekP.setDefault(constants.DriveMotorGains.kP);
+        Module.drivekS.setDefault(constants.DriveMotorGains.kS);
+        Module.drivekV.setDefault(constants.DriveMotorGains.kV);
+
+        Module.turnkD.setDefault(constants.SteerMotorGains.kD);
+        Module.turnkP.setDefault(constants.SteerMotorGains.kP);
+        
         ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
         this.constants = constants;
         driveDisconnectedAlert =

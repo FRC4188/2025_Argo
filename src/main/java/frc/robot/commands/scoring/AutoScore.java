@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.drive.DriveTo;
@@ -19,6 +20,7 @@ import frc.robot.util.FieldConstant;
 public class AutoScore extends Command{
     protected Drive drive;
     protected Superstructure superstruct;
+    protected Intake intake;
     protected Pose2d goal;
     protected SuperPreset preset;
     protected Command scoring;
@@ -61,16 +63,18 @@ public class AutoScore extends Command{
         }
     }
 
-    public static class algaeSource extends TeleScore {
+    public static class algaeSource extends AutoScore {
 
-        public algaeSource(Drive drive, Superstructure superstructure) {
+        public algaeSource(Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
             this.superstruct = superstructure;
+            this.intake = intake;
         }
 
-        public algaeSource(Pose2d pose, Drive drive, Superstructure superstructure) {
+        public algaeSource(Pose2d pose, Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
             this.superstruct = superstructure;
+            this.intake = intake;
             goal = pose;
             presetGoal = true;
         }
@@ -90,16 +94,18 @@ public class AutoScore extends Command{
                 scoring = new Command() {};
             }
 
-            scoring = new Score(correctedgoal, preset.getState(), drive, superstruct);
+            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct);
         }
     }
 
 
-    public static class algaeScore extends TeleScore {
+    public static class algaeScore extends AutoScore {
+        Intake intake;
 
-        public algaeScore(Drive drive, Superstructure superstructure) {
+        public algaeScore(Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
             this.superstruct = superstructure;
+            this.intake = intake;
             goal = FieldConstant.Processor.processor_goal;
         }
 
@@ -108,10 +114,10 @@ public class AutoScore extends Command{
         public void factory() {
             Pose2d correctedGoal = goal;
 
-            preset = SuperPreset.PROCESSOR;
+            preset = SuperPreset.NET;
             
 
-            scoring = new Score(correctedGoal, preset.getState(), drive, superstruct);
+            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct);
         }
     }
 }
