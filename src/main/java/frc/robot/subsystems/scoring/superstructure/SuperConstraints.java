@@ -8,9 +8,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.commands.autos.pathgen.PG_math;
 
 public class SuperConstraints {
-
-    public static Constraints SuperTrajConstraints = new Constraints(20, 20);
-
+    
     public class WristConstraints{
         public final static double LOWEST_A = Units.degreesToRadians(0);
         public final static double HIGHEST_A = Units.degreesToRadians(90);

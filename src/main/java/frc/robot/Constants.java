@@ -157,67 +157,6 @@ public final class Constants {
     
   }
 
-  public static class ArmConstants {
-    public static final double kTolerance = 0.2;
-    public static final double kZero = -2.7436057601930743 + 1.760069499241899; //TODO: get zero
-
-    public static final double kGearRatio = 33.75;
-
-    public static final double kP = 3;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kF = 0.0;
-    public static final double kS = 0.0;
-    public static final double kG = 0.5;
-    public static final double kV = 0.0;
-    public static final double kA = 0.0;
-    
-    public static final double kMax_Vel = Units.degreesToRadians(960.0);
-    public static final double kMax_Accel = Units.degreesToRadians(720.0);
-    public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
-
-    public static final ProfiledPIDController ArmPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
-    public static final ArmFeedforward ArmFF = new ArmFeedforward(kS, kG, kV, kA);
-
-    public static final ProfiledPIDController SimArmPID = new ProfiledPIDController(0.1, 0.0, 0.0, 
-      new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0)));
-    public static final ArmFeedforward SimArmFF = new ArmFeedforward(0.1, 0.0, 0.0, 0.0);
-
-    private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
-      .withStatorCurrentLimit(100)
-      .withSupplyCurrentLimit(60)
-      .withStatorCurrentLimitEnable(true);
-
-    private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
-      .withSensorToMechanismRatio(kGearRatio)
-      .withFeedbackRotorOffset(kZero);
-    
-    private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
-      .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
-      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
-      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
-
-    private static final Slot0Configs kSlot0Configs = new Slot0Configs()
-      .withGravityType(GravityTypeValue.Arm_Cosine)
-      .withKP(kP)
-      .withKD(kI)
-      .withKS(kS)
-      .withKG(kG)
-      .withKV(kV)
-      .withKA(kA);
-
-    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
-    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
-
-    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
-      .withCurrentLimits(kCurrentLimitsConfigs)
-      .withFeedback(kFeedbackConfigs)
-      .withMotionMagic(kMagicConfigs)
-      .withSlot0(kSlot0Configs)
-      .withClosedLoopRamps(kClosedLoopRampsConfigs)
-      .withOpenLoopRamps(kOpenLoopRampsConfigs);
-  }
-
   public static class IntakeConstants {
     public static double voltStall = Amp.of(257).magnitude(); //rpm threshold to consider for stalling
 

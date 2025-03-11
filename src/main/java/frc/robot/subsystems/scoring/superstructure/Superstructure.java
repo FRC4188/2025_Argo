@@ -148,7 +148,7 @@ public class Superstructure extends SubsystemBase{
         // sim.update(new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight()));
     }
 
-    public void manualOverride(DoubleSupplier wristinput, DoubleSupplier arminput, DoubleSupplier eleinput) {
+    public void manualOverride(DoubleSupplier wristinput, DoubleSupplier eleinput) {
         if (pidOverride) return;
 
         double wristvolts = 0;

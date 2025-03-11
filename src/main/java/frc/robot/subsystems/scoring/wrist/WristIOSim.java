@@ -20,7 +20,7 @@ public class WristIOSim implements WristIO{
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getNeo550(1), 
                 SuperstructureConfig.wrist.inertiaAbtCoM(), 
-                Constants.ArmConstants.kGearRatio), 
+                5), 
             DCMotor.getNeo550(1));
 
         wSim = new SingleJointedArmSim(

@@ -70,9 +70,9 @@ public class Module {
 
         // PID Tuning
 
-            ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
-            io.setDrivePID(drivekP.get(), 0, drivekD.get());
-            io.setTurnPID(turnkP.get(), 0, turnkD.get());
+            // ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
+            // io.setDrivePID(drivekP.get(), 0, drivekD.get());
+            // io.setTurnPID(turnkP.get(), 0, turnkD.get());
 
         // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
