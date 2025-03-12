@@ -21,9 +21,9 @@ public class WristIOReal implements WristIO {
 
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(false);
+        config.inverted(true);
         config.idleMode(IdleMode.kBrake);
-        //config.smartCurrentLimit(WristConstants.kCurrentLimit);
+        config.smartCurrentLimit(WristConstants.kCurrentLimit);
         config.signals
             .absoluteEncoderPositionAlwaysOn(true)
             .primaryEncoderPositionAlwaysOn(true);

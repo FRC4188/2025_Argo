@@ -35,8 +35,6 @@ import frc.robot.subsystems.scoring.wrist.WristIOSim;
 public class Superstructure extends SubsystemBase{
     private final Elevator elevator;
     private final Wrist wrist;
-
-    private SuperVisualizer sim;
     
     @AutoLogOutput (key = "Copilot/Elevator Manual Override")
     public boolean eleOverride = false;
@@ -50,16 +48,16 @@ public class Superstructure extends SubsystemBase{
 
     private SuperState target;
 
-    private boolean pidOverride = false;
+    private boolean pidOverride = true;
 
-    // LoggedNetworkNumber w_target = new LoggedNetworkNumber("WristTune/target", 0);
-    // LoggedNetworkNumber w_p = new LoggedNetworkNumber("WristTune/p", 0);
-    // LoggedNetworkNumber w_i = new LoggedNetworkNumber("WristTune/i", 0);
-    // LoggedNetworkNumber w_d = new LoggedNetworkNumber("WristTune/d", 0);
-    // LoggedNetworkNumber w_s = new LoggedNetworkNumber("WristTune/s", 0);
-    // LoggedNetworkNumber w_g = new LoggedNetworkNumber("WristTune/g", 0);
-    // LoggedNetworkNumber w_v = new LoggedNetworkNumber("WristTune/v", 0);
-    // LoggedNetworkNumber w_a = new LoggedNetworkNumber("WristTune/a", 0);
+    LoggedNetworkNumber w_target = new LoggedNetworkNumber("WristTune/target", 0);
+    LoggedNetworkNumber w_p = new LoggedNetworkNumber("WristTune/p", 0);
+    LoggedNetworkNumber w_i = new LoggedNetworkNumber("WristTune/i", 0);
+    LoggedNetworkNumber w_d = new LoggedNetworkNumber("WristTune/d", 0);
+    LoggedNetworkNumber w_s = new LoggedNetworkNumber("WristTune/s", 0);
+    LoggedNetworkNumber w_g = new LoggedNetworkNumber("WristTune/g", 0);
+    LoggedNetworkNumber w_v = new LoggedNetworkNumber("WristTune/v", 0);
+    LoggedNetworkNumber w_a = new LoggedNetworkNumber("WristTune/a", 0);
 
     // LoggedNetworkNumber e_target = new LoggedNetworkNumber("EleTune/target", 0);
     // LoggedNetworkNumber e_p = new LoggedNetworkNumber("EleTune/p", 0);
@@ -82,7 +80,6 @@ public class Superstructure extends SubsystemBase{
                 this.wrist = new Wrist(new WristIO() {});
                 this.elevator = new Elevator(new ElevatorIO() {});
         }
-        sim = new SuperVisualizer("Superstructure");
 
         target = new SuperState(
             wrist.getAngle(),
@@ -108,28 +105,27 @@ public class Superstructure extends SubsystemBase{
         Logger.recordOutput("SuperStruct/Elevator At Target", elevator.atGoal(target.getEleHeight()));
 
         // //PID tuning so ill kill myself later
+        wristPID.setPID(
+            w_p.get(), 
+            w_i.get(), 
+            w_d.get());
 
-        // wristPID.setPID(
-        //     w_p.get(), 
-        //     w_i.get(), 
-        //     w_d.get());
+        wristFF = new ArmFeedforward(
+            w_s.get(), 
+            w_g.get(), 
+            w_v.get(), 
+            w_a.get());
 
-        // wristFF = new ArmFeedforward(
-        //     w_s.get(), 
-        //     w_g.get(), 
-        //     w_v.get(), 
-        //     w_a.get());
+        double wrist_volts = wristPID.calculate(wrist.getAngle(), w_target.get())
+        + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0);
+        Logger.recordOutput("WristTune/volts", wrist_volts);
 
-        // double wrist_volts = wristPID.calculate(wrist.getAngle(), w_target.get())
-        // + wristFF.calculate(wrist.getAngle() + arm.getAngle() + Math.PI / 2, 0);
-        // Logger.recordOutput("WristTune/volts", wrist_volts);
-
-        // if (!wristOverride) {
-        //     wrist.runVolts(
-        //         wristPID.calculate(wrist.getAngle(), w_target.get())
-        //         + wristFF.calculate(wrist.getAngle() + arm.getAngle() + Math.PI / 2, 0)
-        //         );
-        // }
+        if (!wristOverride) {
+            wrist.runVolts(
+                wristPID.calculate(wrist.getAngle(), w_target.get())
+                + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0)
+                );
+        }
 
         // elePID.setPID(
         //     e_p.get(), 

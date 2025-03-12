@@ -61,7 +61,7 @@ public class SuperState {
                 Units.degreesToRadians(0),0)),
 
         ALGAE_GROUND(
-             new SuperState( Units.degreesToRadians(90), 0)),
+             new SuperState( 1.1313466901136193, 0)),
         
         START(
             new SuperState(0, 0));

@@ -90,6 +90,8 @@ public class RobotContainer {
   private Superstructure superstructure;
   private Intake intake;
 
+  private boolean isBarge = true;
+
   // private final Limelight vis;
   private SwerveDriveSimulation driveSim;
   private  Runnable resetGyro;
@@ -231,17 +233,17 @@ public class RobotContainer {
 
     superstructure.setDefaultCommand(
       Commands.run(() -> superstructure.manualOverride(
-        () -> 3 * -controller2.getLeftY(), 
-        () -> 3 * ( controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)))
+        () ->  -controller2.getCorrectedLeft().getY(), 
+        () -> 3 * controller2.getCorrectedRight().getY())
         , superstructure));
     
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> -controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> -controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> -controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
       
@@ -276,11 +278,20 @@ public class RobotContainer {
     controller2.y().onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
 
     controller2.x().onTrue(superstructure.resetEle());
+    controller2.a().onTrue(superstructure.resetWrist());
 
     controller2.getStartButton().onTrue(new SuperToState(superstructure, SuperPreset.START.getState()));
 
+    controller2.getLeftBumperButton().onTrue(
+      Commands.runOnce(()-> isBarge = !isBarge)
+    );
+
     controller2.getUpButton().onTrue(
-      new SuperToState(superstructure, SuperPreset.PROCESSOR.getState()));
+      new ConditionalCommand(
+        new SuperToState(superstructure, SuperPreset.NET.getState()),
+        new SuperToState(superstructure, SuperPreset.PROCESSOR.getState()),
+        ()-> isBarge));
+      
 
     controller2.getLeftButton().onTrue(
       new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()));

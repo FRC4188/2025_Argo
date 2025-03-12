@@ -14,7 +14,7 @@ public class SuperToState extends SequentialCommandGroup {
 
     public SuperToState(Superstructure superstruct, SuperState state) {
         addCommands(
-            new WristToState(superstruct, SuperPreset.START.getState().getWristAngle()),
+            new WristToState(superstruct, 0.75),
             new EleToState(superstruct, state.getEleHeight()),
             new WristToState(superstruct, state.getWristAngle())
         

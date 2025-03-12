@@ -131,22 +131,22 @@ public final class Constants {
   public static class WristConstants {
     public static final double koffsetFromCenter = Units.inchesToMeters(2.668); //inches
     public static final double kTolerance = 0.1;
-    public static final double kGearRatio = 1 / ((82.0/18) * 10);
-    public static final int kCurrentLimit = 0; //int for some reason
+    public static final double kGearRatio = 1.0/16.0;
+    public static final int kCurrentLimit = 40; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 3.0;
+    public static final double kP = 2.0;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final double kD = 0.1;
     public static final double kF = 0.0;
     public static final double kS = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
-    public static final double kG = 0.0;
+    public static final double kG = 1.0;
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
