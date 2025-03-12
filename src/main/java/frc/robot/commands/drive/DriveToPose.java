@@ -18,25 +18,27 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.util.AllianceFlip;
 
 /**
  * Drives to a specified pose.
  */
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            Constants.robot.DRIVE_PID.getP(), 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            Constants.robot.TURN_PID.getP(), 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
     private Drive driveSubsystem;
     private Supplier<Pose2d> poseSupplier;
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
+    private double thetaVelocity = 0;
     private double ffMinRadius = 0.2, ffMaxRadius = 0.8;
 
     public DriveToPose(Drive driveSubsystem, Supplier<Pose2d> poseSupplier) {
+        this.poseSupplier =  poseSupplier;
         this.driveSubsystem = driveSubsystem;
-        this.poseSupplier = poseSupplier;
         addRequirements(driveSubsystem);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -68,8 +70,8 @@ public class DriveToPose extends Command {
         Pose2d currentPose = driveSubsystem.getPose();
         Pose2d targetPose = poseSupplier.get();
 
-        Logger.recordOutput("DriveToPose/currentPose", currentPose);
-        Logger.recordOutput("DriveToPose/targetPose", targetPose);
+        Logger.recordOutput("Drive/DriveToPose/currentPose", currentPose);
+        Logger.recordOutput("Drive/DriveToPose/targetPose", targetPose);
 
         double currentDistance = currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation());
         double ffScaler = MathUtil.clamp(
@@ -93,7 +95,7 @@ public class DriveToPose extends Command {
                 .getTranslation();
 
         // Calculate theta speed
-        double thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
+        thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
                 + thetaController.calculate(
                         currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
         thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());

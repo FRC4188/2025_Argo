@@ -4,6 +4,8 @@
 
 package frc.robot.commands.drive;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -19,9 +21,9 @@ import frc.robot.subsystems.generated.TunerConstants;
 public class FollowPath extends Command {
 
   private HolonomicDriveController controller = new HolonomicDriveController(
-    Constants.robot.DRIVE_PID, 
-    Constants.robot.DRIVE_PID, 
-    new ProfiledPIDController(Constants.robot.TURN_PID.getP() ,Constants.robot.TURN_PID.getI(), Constants.robot.TURN_PID.getD(),
+    new PIDController(Constants.robot.DRIVE_PID.kP,Constants.robot.DRIVE_PID.kI,Constants.robot.DRIVE_PID.kD), 
+    new PIDController(Constants.robot.DRIVE_PID.kP,Constants.robot.DRIVE_PID.kI,Constants.robot.DRIVE_PID.kD), 
+    new ProfiledPIDController(Constants.robot.TURN_PID.kP ,Constants.robot.TURN_PID.kI, Constants.robot.TURN_PID.kD,
     new Constraints(TunerConstants.kSpeedAt12Volts.magnitude(), 12.6)));
 
     private final Trajectory trajectory;
@@ -48,8 +50,9 @@ public class FollowPath extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.runVelocity(controller.calculate(
-      drive.getPose(), trajectory.sample(timer.get()), heading));
+    drive.runVelocity(
+      controller.calculate(drive.getPose(), trajectory.sample(timer.get()), heading)
+    );
   }
 
   // Called once the command ends or is interrupted.

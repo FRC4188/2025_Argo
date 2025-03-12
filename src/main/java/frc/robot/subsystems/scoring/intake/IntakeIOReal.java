@@ -1,75 +1,56 @@
 package frc.robot.subsystems.scoring.intake;
 
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkMax;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Hertz;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.CurrentUnit;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOReal implements IntakeIO {
-    private SparkMax motor;
-
-    private final double appliedVolts;
-    private final double tempC;
-    // private final StatusSignal<Angle> posRads;
-    // private final StatusSignal<AngularVelocity> velRadsPerSec;
-
-    private final VoltageOut voltageOut = new VoltageOut(0.0).withUpdateFreqHz(0.0);
-    private final NeutralOut neutralOut = new NeutralOut();
+    private final TalonFX motor;
+    
+    private final StatusSignal<Voltage> appliedVolts;
+    private final StatusSignal<Temperature> tempC;
 
     public IntakeIOReal(){
-        motor = new SparkMax(Constants.ids.INTAKE, MotorType.kBrushless);
-        SparkMaxConfig sparkconfig = new SparkMaxConfig();
-        //TODO: find actual stall limit
-        sparkconfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+        motor = new TalonFX(Constants.Id.kIntake, Constants.robot.rio);
 
-        // we probably need safe params but not necessarily persist params
-        motor.configure(sparkconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        appliedVolts = motor.getOutputCurrent();
-        tempC = motor.getMotorTemperature();
-        // posRads = encoder.getPosition();
-        // velRadsPerSec = encoder.getVelocity();
+        motor.setNeutralMode(NeutralModeValue.Brake);
+        motor.getConfigurator().apply(IntakeConstants.kMotorConfig);
+        appliedVolts = motor.getMotorVoltage();
+        tempC = motor.getDeviceTemp();
 
-        //signal updates less frequently since intake is less important, and to reduce CAN bus traffic
-        //intake acc doesnt need status signal at all, i included it for options so we can monitor voltage usage
-    
-    
-    // "appliedVolts" and "tempC" both update automatically at 20.0 ms (50 hz)
-    //     BaseStatusSignal.setUpdateFrequencyForAll(
-    //         Frequency.ofRelativeUnits(10.0,
-    //         Units.Hertz), 
-    //         appliedVolts,
-    //         tempC
-    //         // posRads,
-    //         // velRadsPerSec);
-    //     );
-        
-    //     motor.optimizeBusUtilization();
+        appliedVolts.setUpdateFrequency(Hertz.of(50));
+        tempC.setUpdateFrequency(Hertz.of(0.5));
+
+        motor.optimizeBusUtilization();
     }
 
+    // @AutoLogOutput(key = "Intake/Is Stalled")
+    // public boolean isStalled() {
+    //     return motor.getStatorCurrent().getValueAsDouble()
+    // }
 
     @Override
     public void runVolts(double volts) {
-        // motor.set(voltageOut.withOutput(volts));
         motor.setVoltage(volts);
     }
 
-    @Override
-    public void stop() {
-        runVolts(0.0);
-    }
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.appliedVolts = appliedVolts;
-        inputs.tempC = tempC;
-        // inputs.posRads = posRads.getValueAsDouble();
-        // inputs.velRadsPerSec = velRadsPerSec.getValueAsDouble();
+        inputs.appliedVolts = appliedVolts.getValueAsDouble();
+        inputs.tempC = tempC.getValueAsDouble();
     }
     
 }

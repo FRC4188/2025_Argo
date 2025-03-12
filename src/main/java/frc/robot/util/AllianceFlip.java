@@ -7,12 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.DriverStation;
-
 public class AllianceFlip {
 
     public static double flip (double x){
@@ -31,6 +25,14 @@ public class AllianceFlip {
         }
     }
 
+    public static Pose2d flipDS(Pose2d pos){
+        if (canFlip()) {
+            return new Pose2d(flip(pos.getX()), flipY(pos.getY()), apply(pos.getRotation()));
+        } else {
+            return pos;
+        }
+    }
+
     /** Flips a translation to the correct side of the field based on the current alliance color. */
     public static Translation2d apply(Translation2d translation) {
         if (canFlip()) {
@@ -43,7 +45,7 @@ public class AllianceFlip {
     /** Flips a rotation based on the current alliance color. */
     public static Rotation2d apply(Rotation2d rotation) {
         if (canFlip()) {
-            return new Rotation2d(-rotation.getCos(), rotation.getSin());
+            return new Rotation2d(-rotation.getCos(), -rotation.getSin());
         } else {
             return rotation;
         }
@@ -61,13 +63,13 @@ public class AllianceFlip {
     public static Translation3d apply(Translation3d translation3d) {
         if (canFlip()) {
             return new Translation3d(
-                flip(translation3d.getX()), translation3d.getY(), translation3d.getZ());
+                flip(translation3d.getX()), flipY(translation3d.getY()), translation3d.getZ());
         } else {
             return translation3d;
         }
     }
 
     public static boolean canFlip(){
-        return false;//DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+        return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
     }
 }
