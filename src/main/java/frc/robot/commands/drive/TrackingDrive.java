@@ -8,7 +8,7 @@ import frc.robot.Constants;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
-import frc.robot.subsystems.vision.Limelight;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.util.FieldConstant;
 
@@ -35,7 +35,7 @@ public class TrackingDrive extends Command{
 
     @Override
     public void execute(){
-        angle = Limelight.frontTX();
+        angle = Vision.frontTX();
 
         // the isMoving case definitely needs to be changed, look at techno 2024 alignment for reference
         if (isMoving){

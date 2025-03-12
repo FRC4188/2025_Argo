@@ -19,6 +19,14 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Transform3d;
+
+import org.opencv.photo.Photo;
+import org.photonvision.PhotonCamera;
+import org.photonvision.simulation.SimCameraProperties;
 
 public class VisConstants {
   // AprilTag layout
@@ -29,6 +37,8 @@ public class VisConstants {
   public static String frontLL = "front_limelight";
   public static String backLL = "back_limelight";
 
+  // Change this to match the name of your camera on the ui
+  public static PhotonCamera photonCam = new PhotonCamera("objectCam");
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =

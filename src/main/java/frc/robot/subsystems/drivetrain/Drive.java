@@ -60,7 +60,7 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
-import frc.robot.subsystems.vision.Limelight.VisionConsumer;
+import frc.robot.subsystems.vision.Vision.VisionConsumer;
 import frc.robot.util.AllianceFlip;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

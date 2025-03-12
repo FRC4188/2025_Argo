@@ -60,7 +60,7 @@ import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 // import frc.robot.subsystems.scoring.superstructure.Superstructure;
 // import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
-import frc.robot.subsystems.vision.Limelight;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLL;
@@ -173,37 +173,37 @@ public class RobotContainer {
     HashMap<String, Command> EVENTS =
       new HashMap<>(
           Map.ofEntries(            
-            Map.entry("Delay", new WaitCommand(1.5))
-            // Map.entry("Super Start", 
-            //   new SuperToState(superstructure, SuperPreset.START.getState())),
-            // Map.entry("Coral L3", 
-            //   new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
-            // Map.entry("Coral L4", 
-            //   new SuperToState(superstructure, SuperPreset.L4_CORAL.getState())),
-            // Map.entry("Coral L2", 
-            //   new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
-            // Map.entry("Coral Source", 
-            //   new SuperToState(superstructure, SuperPreset.SOURCE_REVERSE.getState())),
-            // Map.entry("Algae L3", 
-            //   new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState())),
-            // Map.entry("Algae L2", 
-            //   new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()))
-            // Map.entry("Score Coral", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(1)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Score Algae", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(1)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Get Coral", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(2.5)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Get Algae", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(2.5)
-            //   .andThen(Commands.run(()-> intake.stop())))
+            Map.entry("Delay", new WaitCommand(1.5)),
+            Map.entry("Super Start", 
+              new SuperToState(superstructure, SuperPreset.START.getState())),
+            Map.entry("Coral L3", 
+              new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
+            Map.entry("Coral L4", 
+              new SuperToState(superstructure, SuperPreset.L4_CORAL.getState())),
+            Map.entry("Coral L2", 
+              new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
+            Map.entry("Coral Source", 
+              new SuperToState(superstructure, SuperPreset.SOURCE_REVERSE.getState())),
+            Map.entry("Algae L3", 
+              new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState())),
+            Map.entry("Algae L2", 
+              new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()))
+            Map.entry("Score Coral", 
+              Commands.run(()-> 
+                intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(1)
+              .andThen(Commands.run(()-> intake.stop()))),
+            Map.entry("Score Algae", 
+              Commands.run(()-> 
+                intake.ingest(Intake.Mode.CORAL, false)).withTimeout(1)
+              .andThen(Commands.run(()-> intake.stop()))),
+            Map.entry("Get Coral", 
+              Commands.run(()-> 
+                intake.ingest(Intake.Mode.CORAL, false)).withTimeout(2.5)
+              .andThen(Commands.run(()-> intake.stop()))),
+            Map.entry("Get Algae", 
+              Commands.run(()-> 
+                intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(2.5)
+              .andThen(Commands.run(()-> intake.stop())))
         )
       );
 
@@ -267,7 +267,7 @@ public class RobotContainer {
     // );
     
     // testing limelight pipeline changing during match
-    controller.a().onTrue(Commands.runOnce(()-> Limelight.changePipe()));
+    controller.a().onTrue(Commands.runOnce(()-> Vision.changePipe()));
 
     //manual controls down here
 
