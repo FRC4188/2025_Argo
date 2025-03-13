@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring.Superstructure;
+package frc.robot.subsystems.scoring.superstructure;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,7 +15,7 @@ import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.util.FieldConstant;
 
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig.*;
+import static frc.robot.subsystems.scoring.superstructure.SuperstructureConfig.*;
 
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;

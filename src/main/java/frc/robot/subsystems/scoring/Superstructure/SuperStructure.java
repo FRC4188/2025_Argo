@@ -1,6 +1,5 @@
 
-package frc.robot.subsystems.scoring.Superstructure;
-
+package frc.robot.subsystems.scoring.superstructure;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -18,13 +17,13 @@ import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
+import frc.robot.subsystems.scoring.superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.ArmFF;
-import frc.robot.subsystems.scoring.Superstructure.SuperState.*;
 import frc.robot.subsystems.scoring.wrist.Wrist;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
 import frc.robot.subsystems.scoring.wrist.WristIOSim;
 
-public class SuperStructure extends SubsystemBase{
+public class Superstructure extends SubsystemBase{
     private final Arm arm;
     private final Elevator elevator;
     private final Wrist wrist;
@@ -61,7 +60,7 @@ public class SuperStructure extends SubsystemBase{
     private SuperState target;
     private SuperState current;
     
-    public SuperStructure(Mode mode){
+    public Superstructure(Mode mode){
         switch (mode) {
             case REAL:
                 this.arm = new Arm(new ArmIOReal());

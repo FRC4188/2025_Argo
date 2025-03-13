@@ -1,7 +1,7 @@
 package frc.robot.subsystems.scoring;
 
 
-import static frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig.*;
+import static frc.robot.subsystems.scoring.superstructure.SuperstructureConfig.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;

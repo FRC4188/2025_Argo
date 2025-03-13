@@ -1,5 +1,5 @@
 
-package frc.robot.subsystems.scoring.Superstructure;
+package frc.robot.subsystems.scoring.superstructure;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;

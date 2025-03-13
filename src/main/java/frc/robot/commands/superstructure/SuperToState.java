@@ -8,20 +8,20 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.superstructure.anglegen.AngleGen;
 import frc.robot.commands.superstructure.anglegen.SuperTraj;
-import frc.robot.subsystems.scoring.Superstructure.SuperState;
-import frc.robot.subsystems.scoring.Superstructure.SuperVisualizer;
-import frc.robot.subsystems.scoring.Superstructure.SuperStructure;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.Superstructure;
+import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 
 public class SuperToState extends Command {
     
-    SuperStructure superstructure;
+    Superstructure superstructure;
     Timer timer;
     Supplier<SuperState> traj_states;
     SuperTraj trajectory;
     TrapezoidProfile tp = new TrapezoidProfile(new Constraints(10, 10));
     SuperState goal;
     
-    public SuperToState(SuperStructure superstruct, SuperState goalState) {
+    public SuperToState(Superstructure superstruct, SuperState goalState) {
         superstructure = superstruct;
         timer = new Timer();
         goal = goalState;

@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig;
-import frc.robot.subsystems.scoring.Superstructure.SuperConstraints.WristConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
 
 public class WristIOSim implements WristIO{
     private final DCMotorSim sim;

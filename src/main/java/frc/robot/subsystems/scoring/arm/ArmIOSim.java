@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig;
-import frc.robot.subsystems.scoring.Superstructure.SuperConstraints.ArmConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ArmConstraints;
 // This is definetly wrong but work in progress I think I got the wrong concept
 public class ArmIOSim implements ArmIO {
     private final DCMotorSim sim;

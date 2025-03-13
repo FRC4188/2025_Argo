@@ -28,15 +28,9 @@ public class Intake extends SubsystemBase{
         return instance;
     }
 
-    private Intake(IntakeIO io){
+    public Intake(IntakeIO io){
         this.io = io;
         inputs = new IntakeIOInputsAutoLogged();
-    }
-
-
-    public static enum GamePieceType {
-        CORAL,
-        ALGAE
     }
 
     public void isSafetyOn(boolean isSafe) {
@@ -51,36 +45,17 @@ public class Intake extends SubsystemBase{
         io.stop();
     }
 
-    //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest() {
         return Commands.run(
             () -> {
-                GamePieceType type = GamePieceType.CORAL;
-                switch (type) {
-                    case CORAL:
-                        io.invertMotor(false);
-                        break;
-                    case ALGAE:
-                        io.invertMotor(true);
-                        break;
-                }
-                runVolts(1);
+                runVolts(3);
             });
     }
 
     public Command eject() {
         return Commands.run(
             () -> {
-                GamePieceType type = GamePieceType.CORAL;
-                switch (type) {
-                    case CORAL:
-                        io.invertMotor(true);
-                        break;
-                    case ALGAE:
-                        io.invertMotor(false);
-                        break;
-                }
-                runVolts(1);
+                runVolts(-3);
             });
     }
 

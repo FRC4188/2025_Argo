@@ -1,5 +1,5 @@
 
-package frc.robot.subsystems.scoring.Superstructure;
+package frc.robot.subsystems.scoring.superstructure;
 
 import java.util.ArrayList;
 
@@ -161,7 +161,10 @@ public class SuperState {
     }
 
     public static enum SuperPreset{
-        
+        //TODO: make an actual net preset PLEASE
+        NET(
+            new SuperState(
+                Units.degreesToRadians(0), Units.degreesToRadians(0), 0)),
         L4_CORAL(
             new SuperState(
                 Units.degreesToRadians(-30), Units.degreesToRadians(-25), Reef.L4_highest_h - Units.inchesToMeters(20))),

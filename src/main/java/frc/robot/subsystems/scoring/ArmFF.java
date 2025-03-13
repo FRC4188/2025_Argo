@@ -10,8 +10,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
-import frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig;
-import frc.robot.subsystems.scoring.Superstructure.SuperstructureConfig.Joint;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig.Joint;
 
 //https://www.chiefdelphi.com/t/whitepaper-two-jointed-arm-dynamics/423060
 public class ArmFF {

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.robot;
-import frc.robot.subsystems.scoring.Superstructure.SuperConstraints.ElevatorConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ElevatorConstraints;
 
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;

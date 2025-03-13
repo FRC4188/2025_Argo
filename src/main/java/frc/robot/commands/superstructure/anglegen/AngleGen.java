@@ -8,9 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.commands.autos.pathgen.PG_math;
-
-import frc.robot.subsystems.scoring.Superstructure.SuperConstraints;
-import frc.robot.subsystems.scoring.Superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
 
 public class AngleGen {
     private static AngleGen instance;
