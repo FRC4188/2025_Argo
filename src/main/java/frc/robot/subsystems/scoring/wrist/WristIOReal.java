@@ -4,37 +4,30 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
+
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 
-import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
-import com.revrobotics.RelativeEncoder;
-
-import static frc.robot.Constants.WristConstants;
+import edu.wpi.first.math.util.Units;
 
 public class WristIOReal implements WristIO {
     private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
-    private final RelativeEncoder encoder;
 
-    private double appliedVolts;
-    private double tempC;
-    private double posRads;
-
-    public WristIOReal(){
+    public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true).idleMode(IdleMode.kBrake);
-        config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
+        config.inverted(true);
         config.idleMode(IdleMode.kBrake);
-        config.smartCurrentLimit(WristConstants.kCurrentLimit);
-        config.absoluteEncoder.apply(new AbsoluteEncoderConfig().zeroOffset(WristConstants.kZero));
-
+        //config.smartCurrentLimit(WristConstants.kCurrentLimit);
+        config.signals
+            .absoluteEncoderPositionAlwaysOn(true)
+            .primaryEncoderPositionAlwaysOn(true);
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        encoder = max.getEncoder();
     }
 
     @Override
@@ -45,17 +38,13 @@ public class WristIOReal implements WristIO {
 
     @Override
     public void updateInputs(WristIOInputs inputs) {
-        appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
-        tempC = max.getMotorTemperature();        
-        posRads = encoder.getPosition() / (2*Math.PI);
-
-        inputs.appliedVolts = appliedVolts;
-        inputs.tempC = tempC;
-        inputs.posRads = posRads;
+        inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
+        inputs.tempC = max.getMotorTemperature();
+        inputs.posRads = Units.rotationsToRadians(max.getAbsoluteEncoder().getPosition()* WristConstants.kGearRatio);
     }
 
     @Override
     public double getAngle() {
-        return posRads;
+        return Units.rotationsToRadians(max.getEncoder().getPosition() * WristConstants.kGearRatio);
     }
 }

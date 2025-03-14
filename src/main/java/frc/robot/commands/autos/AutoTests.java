@@ -1,9 +1,15 @@
 package frc.robot.commands.autos;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.HashMap;
 import java.util.Map;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,20 +20,29 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.FieldConstant;
 
 public final class AutoTests {
-    //runs fine, bit off
-    public static Command twoCoral(){
-        PathPlannerPath a;
-        try{
-            a = PathPlannerPath.fromPathFile("2 Corals");
-            return AutoBuilder.followPath(a);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return new SequentialCommandGroup();
-    }
+    private final static PathConstraints  constraints =  new PathConstraints(
+            TunerConstants.kSpeedAt12Volts,
+            MetersPerSecondPerSecond.of(3.6),
+            DegreesPerSecond.of(TunerConstants.kSpeedAt12Volts.magnitude()),
+            DegreesPerSecondPerSecond.of(862),
+            Volts.of(12),
+            false);
+
+    // //runs fine, bit off
+    // public static Command twoCoral(){
+    //     PathPlannerPath a;
+    //     try{
+    //         a = PathPlannerPath.fromPathFile("2 Corals");
+    //         return AutoBuilder.followPath(a);
+    //     }catch(Exception e){
+    //         e.printStackTrace();
+    //     }
+    //     return new SequentialCommandGroup();
+    // }
 
     public static Command AG2Coral(Drive drive){
         return Commands.sequence(
@@ -52,11 +67,4 @@ public final class AutoTests {
             new DriveToPose(drive, () -> new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))))
         );
     }
-
-    //add cmds for pathplanner events
-    public static final HashMap<String, Command> EVENTS =
-      new HashMap<>(
-          Map.ofEntries(            
-            Map.entry("Delay", new WaitCommand(2.0))
-      ));
 }

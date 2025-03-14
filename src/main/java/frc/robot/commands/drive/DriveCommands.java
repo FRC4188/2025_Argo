@@ -41,7 +41,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.1;
+  private static final double DEADBAND = 0.09;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
@@ -83,25 +83,24 @@ public class DriveCommands {
         //SlewRateLimiter limitX = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
         //SlewRateLimiter limitY = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
 
-        double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
-        double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
-        double theta = MathUtil.applyDeadband(thetaInput.getAsDouble(), DEADBAND);
+        // double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
+        // double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
 
-        double totalSpeed = Math.hypot(x, y);
-        double angle = Math.atan2(y, x);
+        double totalSpeed = Math.hypot(xInput.getAsDouble(), yInput.getAsDouble());
+        double angle = Math.atan2(yInput.getAsDouble(), xInput.getAsDouble());
         double xSpeed = totalSpeed * Math.cos(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
-        double rotSpeed = -theta * 5 * Math.PI;
+        double rotSpeed = -MathUtil.applyDeadband(thetaInput.getAsDouble(), DEADBAND) * 5 * Math.PI;
 
-        // xSpeed = limitX.calculate(xSpeed);
-        // ySpeed = limitY.calculate(ySpeed);
+        //xSpeed = limitX.calculate(xSpeed);
+        //ySpeed = limitY.calculate(ySpeed);
 
 
 
         ChassisSpeeds speeds = 
             ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-              xSpeed * TunerConstants.BackLeft.DriveMotorGearRatio,
-              ySpeed * TunerConstants.BackLeft.DriveMotorGearRatio, 
+              xSpeed,
+              ySpeed, 
               rotSpeed), 
               AllianceFlip.apply(drive.getRotation()));
 

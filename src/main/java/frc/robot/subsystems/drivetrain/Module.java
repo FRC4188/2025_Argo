@@ -22,12 +22,10 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
 
-@SuppressWarnings("rawtypes")
 public class Module {
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final int index;
-    
     private final SwerveModuleConstants constants;
 
     private final Alert driveDisconnectedAlert;

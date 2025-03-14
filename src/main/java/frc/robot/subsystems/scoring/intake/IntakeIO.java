@@ -15,9 +15,7 @@ public interface IntakeIO {
 
     public default void runVolts(double volts) {}
 
-    public default void invertMotor(boolean isInverted) {}
-
-    public default boolean isSafetyOn() {return true;}
+    public default boolean isStalled() {return false;}
 
     public default void stop(){}
 }

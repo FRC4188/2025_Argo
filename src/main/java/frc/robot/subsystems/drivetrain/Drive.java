@@ -16,6 +16,7 @@ package frc.robot.subsystems.drivetrain;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -23,10 +24,14 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -39,10 +44,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -53,7 +61,7 @@ import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
 import frc.robot.subsystems.vision.Limelight.VisionConsumer;
-import frc.robot.util.LocalADStarAK;
+import frc.robot.util.AllianceFlip;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -61,10 +69,35 @@ import java.util.function.Consumer;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-public class Drive extends SubsystemBase implements VisionConsumer {
+public class Drive extends SubsystemBase {
+
+    public PIDController translation =
+     new PIDController(0, 0, 0), 
+     rotation = new PIDController(0, 0, 0);
+
+    private final ProfiledPIDController driveController = new ProfiledPIDController(
+            Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+    private final ProfiledPIDController thetaController = new ProfiledPIDController(
+            Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+
+    LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp");
+    LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti");
+    LoggedNetworkNumber t_d = new LoggedNetworkNumber("DriveTune/td");
+
+    LoggedNetworkNumber r_p = new LoggedNetworkNumber("DriveTune/rp");
+    LoggedNetworkNumber r_i = new LoggedNetworkNumber("DriveTune/ri");
+    LoggedNetworkNumber r_d = new LoggedNetworkNumber("DriveTune/rd");
+
+    LoggedNetworkNumber t_target = new LoggedNetworkNumber("DriveTune/ttarget", 0);
+    LoggedNetworkNumber r_target = new LoggedNetworkNumber("DriveTune/rtarget", 0);
+
+    Field2d field;
+
     // TunerConstants doesn't include these constants, so they are declared locally
     public static final double ODOMETRY_FREQUENCY =
             new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -77,8 +110,8 @@ public class Drive extends SubsystemBase implements VisionConsumer {
                     Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
     // PathPlanner config constants
-    private static final double ROBOT_MASS_KG = 74.088;
-    private static final double ROBOT_MOI = 6.883;
+    private static final double ROBOT_MASS_KG = 54.34;
+    private static final double ROBOT_MOI = 8;
     private static final double WHEEL_COF = 1.2;
     private static final RobotConfig PP_CONFIG = new RobotConfig(
             ROBOT_MASS_KG,
@@ -152,7 +185,6 @@ public class Drive extends SubsystemBase implements VisionConsumer {
                 PP_CONFIG,
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 this);
-        Pathfinding.setPathfinder(new LocalADStarAK());
         PathPlannerLogging.setLogActivePathCallback((activePath) -> {
             Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
         });
@@ -163,12 +195,56 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         // Configure SysId
         sysId = new SysIdRoutine(
                 new SysIdRoutine.Config(
-                        null, null, null, (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                        Volts.of(1).per(Seconds), 
+                        Volts.of(3), 
+                        Seconds.of(2), 
+                        (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+        field = new Field2d();
     }
 
     @Override
     public void periodic() {
+        //manual tuning
+
+        // translation.setP(t_p.get());
+        // translation.setI(t_i.get());
+        // translation.setD(t_d.get());
+
+        
+        // rotation.setP(r_p.get());
+        // rotation.setI(r_i.get());
+        // rotation.setD(r_d.get());
+
+        // Logger.recordOutput("Drive/r_p", rotation.getP());
+
+        // ChassisSpeeds speeds = 
+        //     ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+        //        translation.calculate(Math.hypot(
+        //         getChassisSpeeds().vxMetersPerSecond, 
+        //         getChassisSpeeds().vyMetersPerSecond), t_target.get()),
+        //       0, 
+        //       rotation.calculate(getChassisSpeeds().omegaRadiansPerSecond,r_target.get())), 
+        //       AllianceFlip.apply(getRotation()));
+        
+        // Logger.recordOutput("Drive/tvolts",  translation.calculate(Math.hypot(
+        //         getChassisSpeeds().vxMetersPerSecond, 
+        //         getChassisSpeeds().vyMetersPerSecond), t_target.get()));
+
+        // Logger.recordOutput("Drive/rvolts",  
+        //         rotation.calculate(getChassisSpeeds().omegaRadiansPerSecond,r_target.get()));
+
+        // runVelocity(speeds);
+
+        // Logger.recordOutput("Drive/Speeds", 
+        //         Math.hypot(
+        //         getChassisSpeeds().vxMetersPerSecond, 
+        //         getChassisSpeeds().vyMetersPerSecond));
+
+        // Logger.recordOutput("Drive/Rotations",
+        //         getChassisSpeeds().omegaRadiansPerSecond);
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -221,6 +297,10 @@ public class Drive extends SubsystemBase implements VisionConsumer {
 
         // Update gyro alert
         gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.robot.currMode != Mode.SIM);
+
+        field.setRobotPose(getPose());
+        SmartDashboard.putData("Field", field);
+        Logger.recordOutput("Drive/Speed", getChassisSpeeds().vxMetersPerSecond);
     }
 
     /**
@@ -231,6 +311,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
     public void runVelocity(ChassisSpeeds speeds) {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
+        
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
@@ -242,7 +323,7 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         for (int i = 0; i < 4; i++) {
             modules[i].runSetpoint(setpointStates[i]);
         }
-
+        
         // Log optimized setpoints (runSetpoint mutates each state)
         Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
     }
@@ -336,17 +417,26 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         return getPose().getRotation();
     }
 
+    @AutoLogOutput(key="Odomeetry/Bot Rotation")
+    public double getRotationDegrees() {
+        return getPose().getRotation().getDegrees();
+    }
+
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         resetOdometryCallBack.accept(pose);
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
-    /** Adds a new timestamped vision measurement. */
-    @Override
-    public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
-        poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    public void setPose(){
+        setPose(getPose());
     }
+
+    // /** Adds a new timestamped vision measurement. */
+    // @Override
+    // public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
+    //     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    // }
 
     /** Returns the maximum linear speed in meters per sec. */
     public double getMaxLinearSpeedMetersPerSec() {
@@ -368,28 +458,11 @@ public class Drive extends SubsystemBase implements VisionConsumer {
         };
     }
 
-    public void drive(
-            final double xSpeedMeterPerSec,
-            final double ySpeedMetersPerSec,
-            final double omegaRadsPerSec,
-            final boolean fieldRelative,
-            final boolean invertYaw
-    ) {
-        final ChassisSpeeds speeds;
-        if (fieldRelative) {
-            final Rotation2d poseYaw = getRotation();
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeedMeterPerSec,
-                    ySpeedMetersPerSec,
-                    omegaRadsPerSec,
-                    invertYaw
-                            ? poseYaw.plus(Rotation2d.fromRadians(Math.PI))
-                            : poseYaw
-            );
-        } else {
-            speeds = new ChassisSpeeds(xSpeedMeterPerSec, ySpeedMetersPerSec, omegaRadsPerSec);
-        }
-
-        runVelocity(speeds);
-    }
+   public void followTraj(SwerveSample sample){
+        runVelocity(new ChassisSpeeds(
+            sample.vx + driveController.calculate(getPose().getX(), sample.x),
+            sample.vy + driveController.calculate(getPose().getY(), sample.y),
+            sample.omega + thetaController.calculate(getPose().getRotation().getRadians(), sample.heading)
+        ));
+   }
 }

@@ -15,8 +15,9 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,24 +29,6 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
-    
-    switch(Constants.robot.currMode){
-      case REAL:
-        Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-      case SIM:
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-      case REPLAY:
-        setUseTiming(false);
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-        break;
-    }
-
-    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
     m_robotContainer = new RobotContainer();
 
@@ -65,8 +48,8 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    Logger.start();
-
+    Logger.start();// Start logging! No more data receivers, replay sources, or metadata values may be added.
+    SignalLogger.start();
   }
 
   @Override
@@ -110,16 +93,21 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
 
+    m_robotContainer.teleInit();
+
     cgoals = new LinkedList<Pose2d>(Arrays.asList(
                 alliance_right, alliance_left, left_brg_left, left_brg_right, left_src_left, left_src_right,
-                right_brg_left,right_brg_right, right_src_left, right_src_right));
+                right_brg_left,right_brg_right, right_src_left, right_src_right, mid_brg_left, mid_brg_right));
+    SignalLogger.start();
   }
 
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    SignalLogger.stop();
+  }
 
   @Override
   public void testInit() {
@@ -137,14 +125,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */  
   @Override 
   public void simulationPeriodic() {
-      SimulatedArena.getInstance().simulationPeriodic();
-      m_robotContainer.displaySimFieldToAdvantageScope();
-
-      Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d()});
-      Logger.recordOutput("FinalComponentPoses", 
-        new Pose3d[]{
-          new Pose3d()
-        });
+      // SimulatedArena.getInstance().simulationPeriodic();
+      // m_robotContainer.displaySimFieldToAdvantageScope();
   }
   
 

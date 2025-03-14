@@ -1,8 +1,7 @@
 package frc.robot.subsystems.scoring.elevator;
 
-import static frc.robot.Constants.ElevatorConstants.kDrumeRadius;
+import static edu.wpi.first.units.Units.Hertz;
 import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
-import static frc.robot.Constants.ElevatorConstants.kZero;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -15,6 +14,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.Id;
+import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOReal implements ElevatorIO {
 
@@ -30,8 +31,8 @@ public class ElevatorIOReal implements ElevatorIO {
     public ElevatorIOReal() {
 
         //TODO: Set all the device ids, 0 for now cause idk robot isnt built???
-        leader = new TalonFX(Id.kElevatorLead);
-        follower = new TalonFX(Id.kElevatorFollow);
+        leader = new TalonFX(Id.kElevatorLead, Constants.robot.rio);
+        follower = new TalonFX(Id.kElevatorFollow, Constants.robot.rio);
 
         follower.setControl(new Follower(Id.kElevatorLead, false));
 
@@ -52,6 +53,12 @@ public class ElevatorIOReal implements ElevatorIO {
         tempC = leader.getDeviceTemp();
         appliedVoltsFollow = follower.getMotorVoltage();
         tempCFollow = follower.getDeviceTemp();
+
+        posRads.setUpdateFrequency(Hertz.of(50));
+        appliedVolts.setUpdateFrequency(Hertz.of(50));
+        tempC.setUpdateFrequency(Hertz.of(0.5));
+        appliedVoltsFollow.setUpdateFrequency(Hertz.of(50));
+        tempCFollow.setUpdateFrequency(Hertz.of(0.5));
     }
 
     @Override
@@ -63,7 +70,7 @@ public class ElevatorIOReal implements ElevatorIO {
     
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
         inputs.tempC = tempC.getValueAsDouble();
-        inputs.posRads = posRads.getValueAsDouble();
+        inputs.posMeters = (posRads.getValueAsDouble()) * ElevatorConstants.kConversion;
         
         inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
         inputs.followerTempC = tempCFollow.getValueAsDouble();
@@ -76,6 +83,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public double getHeight(){
-        return posRads.getValueAsDouble() - kZero / 6 * kDrumeRadius * 2; //TODO: test da math
+        return (posRads.getValueAsDouble()) * ElevatorConstants.kConversion; //TODO: test da math
     }
 }

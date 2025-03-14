@@ -39,14 +39,6 @@ public class SuperVisualizer {
                 new Color8Bit(Color.kBlack)
         ));
 
-        armLig = elevatorLig.append(
-            new MechanismLigament2d(
-                "arm",
-                arm.length(),
-                0,
-                4,
-                new Color8Bit(Color.kAliceBlue))
-        );
 
         wristLig = armLig.append(
             new MechanismLigament2d(
@@ -63,7 +55,6 @@ public class SuperVisualizer {
 
     public void update(SuperState state){
 
-        armLig.setAngle(state.getArmAngle());
         wristLig.setAngle(state.getWristAngle());
         elevatorLig.setLength(state.getEleHeight());
         //Logger.recordOutput("Mechanism2d", mainMech);
@@ -76,30 +67,14 @@ public class SuperVisualizer {
             )
         );
 
-        Pose3d armPos = armOrigin.transformBy(
+        Pose3d wristPos = wristOrigin.transformBy(
             new Transform3d(
                 new Translation3d(0, 0, -state.getEleHeight()),
-                new Rotation3d(0, state.getArmAngle(), 0)
+                new Rotation3d(0, state.getWristAngle(), 0)
             )
         );
         
-        Translation2d wrist_rotate = new Translation2d(
-            wristOrigin.getTranslation().getX(),
-            wristOrigin.getTranslation().getZ()
-        ).rotateAround(new Translation2d(
-            armOrigin.getX(),
-            armOrigin.getZ()
-        ), Rotation2d.fromRadians(state.getArmAngle()));
 
-        Pose3d wristPos = new Pose3d(
-                new Translation3d(wrist_rotate.getX(), wristOrigin.getY(), wrist_rotate.getY()),
-                wristOrigin.getRotation()
-        ).transformBy(
-            new Transform3d(
-                new Translation3d(0, 0, -state.getEleHeight()),
-                new Rotation3d(0,state.getGlobalAngle(), 0)
-            )
-        );
         SwerveDriveSimulation driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, FieldConstant.Reef.CoralGoal.alliance_left);
 
         Pose3d endEffectorPos = wristPos.transformBy(
@@ -112,6 +87,6 @@ public class SuperVisualizer {
             ));
 
         
-        Logger.recordOutput("Mechanism3d/" + key, carriage, armPos, wristPos, endEffectorPos);
+        Logger.recordOutput("Mechanism3d/" + key, carriage, wristPos, endEffectorPos);
     }
 }

@@ -26,8 +26,8 @@ public class VisConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String front_limelight = "camera_0";
-  public static String camera1Name = "camera_1";
+  public static String frontLL = "front_limelight";
+  public static String backLL = "back_limelight";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
@@ -57,10 +57,9 @@ public class VisConstants {
   public static double angularStdDevMegatag2Factor =
       Double.POSITIVE_INFINITY; // No rotation data available
 
-  public static int coralDetect = 0; //placeholder
   public static int algaeDetect = 0; //placeholder
-  public static int aprilTagDetect = 0; //placeholder
-  
+  public static int aprilTagDetect = 1; //placeholder 
+  //TODO: WORK ON PIPELINES AND FIND THESE VALUES
   public static double left_region = -10.0; //left region of cam (left side reef)
   public static double right_region = 10.0; //right region of cam (right side reef)
 

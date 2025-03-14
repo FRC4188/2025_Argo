@@ -85,13 +85,13 @@ public class PG_math {
 		System.out.println("(" + p.getX() + ", " + p.getY() + ")");
 	}
 
-	public static void printpose(Translation2d[] t) {
+	public static void printpose(Translation2d... t) {
 		for (Translation2d t2 : t) {
 			printpose(t2);
 		}
 	}
 
-	public static void printpose(Pose2d[] t) {
+	public static void printpose(Pose2d... t) {
 		for (Pose2d t2 : t) {
 			printpose(t2);
 		}

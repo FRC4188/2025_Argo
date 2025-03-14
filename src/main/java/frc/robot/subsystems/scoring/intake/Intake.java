@@ -1,6 +1,8 @@
 package frc.robot.subsystems.scoring.intake;
 
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,14 +10,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
-    public static enum Mode {
-        EMPTY,
-        ALGAE,
-        CORAL
-    }
 
     //I need this to be global value - RN
-    public static Mode intakeState = Mode.EMPTY;
 
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
@@ -26,31 +22,33 @@ public class Intake extends SubsystemBase{
     }
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
-    //TODO: create stall method
-    public Command ingest(Mode intakeMode) {
-        io.invertMotor(intakeMode == Mode.ALGAE);
-        return Commands.run(
+    public Command ingest(boolean isSlow) {
+        double voltage = 2;
+        return Commands.runOnce(
             () -> {
-                io.runVolts(1);
-            }).until(()-> io.isSafetyOn()).withTimeout(2).andThen(() -> intakeState = intakeMode);
+                io.runVolts(voltage);
+                //temporary
+            });
     }
 
     public Command eject() {
-        io.invertMotor(intakeState == Mode.CORAL);
-        return Commands.run(
+        double voltage = -6;
+        return Commands.runOnce(
             () -> {
-                io.runVolts(1);
-                intakeState = Mode.EMPTY;
-            }).withTimeout(0.5).andThen(() -> intakeState = Mode.EMPTY);
+                io.runVolts(voltage);
+            });
     }
 
-    public Mode getState() {
-        return intakeState;
+    public Command stop() {
+        return Commands.runOnce(
+            () -> {
+                io.runVolts(0);
+                //temporary
+            });
     }
 
-    public void setState(Mode state) {
-        intakeState = state;
-    }
+
+
 
     @Override
     public void periodic(){

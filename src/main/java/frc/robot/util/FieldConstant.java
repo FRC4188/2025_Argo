@@ -36,6 +36,10 @@ public class FieldConstant {
     public static double algae_radius = Units.inchesToMeters(8.125);
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
+    public static Pose2d left_start = new Pose2d(7.459, 4.160, Rotation2d.kZero);
+    public static Pose2d mid_start = new Pose2d(7.459, 6.154, Rotation2d.kZero);
+    public static Pose2d right_start = new Pose2d(7.459, 1.836, Rotation2d.kZero);
+
     public class Field {
         public Pose2d innerCageStart = new Pose2d(new Translation2d(8.007, 5.047), new Rotation2d(0.0));
         public Pose2d middleCageStart = new Pose2d(new Translation2d(8.007, 6.164), new Rotation2d(0.0));
@@ -108,12 +112,14 @@ public class FieldConstant {
 
         public class CoralGoal {
             //robot perpendicular distance from the wall
-            public static double score_perp = Constants.robot.A_CROSSLENGTH / 2;
+            public static double score_perp = Constants.robot.B_CROSSLENGTH / 2;
             //robot parallel distance from the center of the wall
             public static double score_parallel = Units.inchesToMeters(6.472);
 
             public static Translation2d score_left = new Translation2d(-score_perp, score_parallel);
             public static Translation2d score_right = new Translation2d(-score_perp, -score_parallel);
+
+            
             //god help us
             //left and right relative to robot facing into the reef
             public static Pose2d alliance_left = new Pose2d(
@@ -166,12 +172,12 @@ public class FieldConstant {
 
             public static List<Pose2d> cgoals = new LinkedList<Pose2d>(Arrays.asList(
                 alliance_right, alliance_left, left_brg_left, left_brg_right, left_src_left, left_src_right,
-                right_brg_left,right_brg_right, right_src_left, right_src_right));
+                right_brg_left,right_brg_right, right_src_left, right_src_right, mid_brg_left, mid_brg_right));
         }
 
         public class AlgaeSource {
             //robot perpendicular distance from the wall
-            public static double src_perp = Constants.robot.A_CROSSLENGTH/2;
+            public static double src_perp = Constants.robot.B_CROSSLENGTH/2;
             //robot parallel distance from the center of the wall
             public static double src_parallel = Units.inchesToMeters(0);
 
@@ -298,7 +304,7 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3 *2, 0);
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_CROSSLENGTH/3 *2, 0);
 
         public static Pose2d processor_wall = new Pose2d(
             field_center_x - Units.inchesToMeters(109.712),
@@ -318,7 +324,15 @@ public class FieldConstant {
 
         // already in meters, okay?
         // thanks - def leo
-        public static Translation2d src_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/3*2, 0);
+        public static Pose2d right_approach_bottom_src = new Pose2d(0.650, 1.410, Rotation2d.fromDegrees(-125));
+        public static Pose2d left_approach_bottom_src = new Pose2d(1.700, 0.650, Rotation2d.fromDegrees(-125));
+        public static Pose2d middle_approach_bottom_src = new Pose2d(1.175, 1.030, Rotation2d.fromDegrees(-125));
+
+        public static Pose2d right_approach_top_src = new Pose2d(1.700, 7.370, Rotation2d.fromDegrees(125));
+        public static Pose2d left_approach_top_src = new Pose2d(0.650, 6.600, Rotation2d.fromDegrees(125));
+        public static Pose2d middle_approach_top_src = new Pose2d(1.175, 6.985, Rotation2d.fromDegrees(125));
+
+        public static Translation2d src_pos = new Translation2d(-Constants.robot.B_CROSSLENGTH/3*2, 0);
 
         public static Translation2d right_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(54.0112 - 90));
         public static Translation2d left_src_off = (new Translation2d(Units.inchesToMeters(8), 0)).rotateBy(Rotation2d.fromDegrees(-54.0112 + 90));

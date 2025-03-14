@@ -22,12 +22,10 @@ public class DriveTo extends Command {
     Drive drive;
 
     public DriveTo(Drive drive, Pose2d goal) {
-        
-
         this.drive = drive;
         config = new TrajectoryConfig(
-            TunerConstants.kSpeedAt12Volts.magnitude(), 
-            Constants.robot.MAX_ACCELERATION.magnitude());
+            TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
+            Constants.robot.MAX_ACCELERATION.magnitude() * 0.5);
 
         timer = new Timer();
 
@@ -47,7 +45,7 @@ public class DriveTo extends Command {
         }
 
         
-
+        
         timer.start();
 
         driving.repeatedly().schedule();
@@ -61,6 +59,8 @@ public class DriveTo extends Command {
 
     @Override
     public void end(boolean interrupted) {
+
+
         if (driving != null) driving.cancel();
     }
 
