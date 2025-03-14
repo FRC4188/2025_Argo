@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase{
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest(boolean isSlow) {
-        double voltage = 3;
+        double voltage = 2;
         return Commands.runOnce(
             () -> {
                 io.runVolts(voltage);
@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase{
     }
 
     public Command eject() {
-        double voltage = -3;
+        double voltage = -6;
         return Commands.runOnce(
             () -> {
                 io.runVolts(voltage);

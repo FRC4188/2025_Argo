@@ -85,16 +85,16 @@ public class Drive extends SubsystemBase {
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
 
-    // LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp", 0.0);
-    // LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti", 0.0);
-    // LoggedNetworkNumber t_d = new LoggedNetworkNumber("DriveTune/td", 0.0);
+    LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp");
+    LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti");
+    LoggedNetworkNumber t_d = new LoggedNetworkNumber("DriveTune/td");
 
-    // LoggedNetworkNumber r_p = new LoggedNetworkNumber("DriveTune/rp", 0.0);
-    // LoggedNetworkNumber r_i = new LoggedNetworkNumber("DriveTune/ri", 0.0);
-    // LoggedNetworkNumber r_d = new LoggedNetworkNumber("DriveTune/rd", 0.0);
+    LoggedNetworkNumber r_p = new LoggedNetworkNumber("DriveTune/rp");
+    LoggedNetworkNumber r_i = new LoggedNetworkNumber("DriveTune/ri");
+    LoggedNetworkNumber r_d = new LoggedNetworkNumber("DriveTune/rd");
 
-    // LoggedNetworkNumber t_target = new LoggedNetworkNumber("DriveTune/ttarget", 0);
-    // LoggedNetworkNumber r_target = new LoggedNetworkNumber("DriveTune/rtarget", 0);
+    LoggedNetworkNumber t_target = new LoggedNetworkNumber("DriveTune/ttarget", 0);
+    LoggedNetworkNumber r_target = new LoggedNetworkNumber("DriveTune/rtarget", 0);
 
     Field2d field;
 
@@ -217,6 +217,8 @@ public class Drive extends SubsystemBase {
         // rotation.setI(r_i.get());
         // rotation.setD(r_d.get());
 
+        // Logger.recordOutput("Drive/r_p", rotation.getP());
+
         // ChassisSpeeds speeds = 
         //     ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
         //        translation.calculate(Math.hypot(
@@ -298,6 +300,7 @@ public class Drive extends SubsystemBase {
 
         field.setRobotPose(getPose());
         SmartDashboard.putData("Field", field);
+        Logger.recordOutput("Drive/Speed", getChassisSpeeds().vxMetersPerSecond);
     }
 
     /**

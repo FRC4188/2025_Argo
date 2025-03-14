@@ -16,7 +16,7 @@ public class SuperConstraints {
 
     public class ElevatorConstraints{
         public final static double LOWEST_H = Units.inchesToMeters(9.13250);
-        public final static double HIGHEST_H = Units.inchesToMeters(9.13250 + 70);
+        public final static double HIGHEST_H = Units.inchesToMeters(9.13250 + 72);
         public final static double RANGE = HIGHEST_H - LOWEST_H;
     }
 

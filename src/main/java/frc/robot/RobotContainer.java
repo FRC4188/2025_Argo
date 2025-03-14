@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import choreo.auto.*;
 import frc.robot.commands.autos.AutoTests;
+import frc.robot.commands.autos.GenAutoChooser;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.commands.scoring.SuperToState;
@@ -217,6 +218,8 @@ public class RobotContainer {
   //need superstructure
   public void teleInit() {
     superstructure.setTarget(new SuperState());
+    superstructure.resetEle();
+    superstructure.resetWrist();
   }
 
   /**
@@ -231,17 +234,17 @@ public class RobotContainer {
 
     superstructure.setDefaultCommand(
       Commands.run(() -> superstructure.manualOverride(
-        () -> 3 * -controller2.getLeftY(), 
-        () -> 3 * ( controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)))
+        () -> -3 * controller2.getLeftY(), 
+        () -> 5 * ( controller2.getRightT(Scale.SQUARED) - controller2.getLeftT(Scale.SQUARED)))
         , superstructure));
     
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
 
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> -controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> -controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> -controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
       
@@ -279,7 +282,11 @@ public class RobotContainer {
 
     controller2.getStartButton().onTrue(new SuperToState(superstructure, SuperPreset.START.getState()));
 
-    controller2.getUpButton().onTrue(
+    controller2.getRightBumperButton().onTrue(
+      new SuperToState(superstructure, SuperPreset.NET.getState()));
+
+    controller2.getUpButton()
+    .onTrue(
       new SuperToState(superstructure, SuperPreset.PROCESSOR.getState()));
 
     controller2.getLeftButton().onTrue(

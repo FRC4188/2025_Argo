@@ -83,11 +83,11 @@ public class DriveCommands {
         //SlewRateLimiter limitX = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
         //SlewRateLimiter limitY = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
 
-        double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
-        double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
+        // double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
+        // double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
 
-        double totalSpeed = Math.hypot(x, y);
-        double angle = Math.atan2(y, x);
+        double totalSpeed = Math.hypot(xInput.getAsDouble(), yInput.getAsDouble());
+        double angle = Math.atan2(yInput.getAsDouble(), xInput.getAsDouble());
         double xSpeed = totalSpeed * Math.cos(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double rotSpeed = -MathUtil.applyDeadband(thetaInput.getAsDouble(), DEADBAND) * 5 * Math.PI;

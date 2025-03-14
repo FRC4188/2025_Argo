@@ -14,8 +14,6 @@
 package frc.robot.subsystems.drivetrain;
 
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -23,28 +21,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Module {
-    private static final LoggedNetworkNumber drivekS =
-      new LoggedNetworkNumber("Drive/Module/DrivekS");
-    private static final LoggedNetworkNumber drivekV =
-      new LoggedNetworkNumber("Drive/Module/DrivekV");
-    private static final LoggedNetworkNumber drivekP =
-      new LoggedNetworkNumber("Drive/Module/DrivekP");
-    private static final LoggedNetworkNumber drivekD =
-      new LoggedNetworkNumber("Drive/Module/DrivekD");
-    private static final LoggedNetworkNumber turnkP = new LoggedNetworkNumber("Drive/Module/TurnkP");
-    private static final LoggedNetworkNumber turnkD = new LoggedNetworkNumber("Drive/Module/TurnkD");
-
-
-
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final int index;
     private final SwerveModuleConstants constants;
 
-    private SimpleMotorFeedforward ffModel;
     private final Alert driveDisconnectedAlert;
     private final Alert turnDisconnectedAlert;
     private final Alert turnEncoderDisconnectedAlert;
@@ -53,16 +36,6 @@ public class Module {
     public Module(ModuleIO io, int index, SwerveModuleConstants constants) {
         this.io = io;
         this.index = index;
-
-        Module.drivekD.setDefault(constants.DriveMotorGains.kD);
-        Module.drivekP.setDefault(constants.DriveMotorGains.kP);
-        Module.drivekS.setDefault(constants.DriveMotorGains.kS);
-        Module.drivekV.setDefault(constants.DriveMotorGains.kV);
-
-        Module.turnkD.setDefault(constants.SteerMotorGains.kD);
-        Module.turnkP.setDefault(constants.SteerMotorGains.kP);
-
-        ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
         this.constants = constants;
         driveDisconnectedAlert =
                 new Alert("Disconnected drive motor on module " + Integer.toString(index) + ".", AlertType.kError);
@@ -75,13 +48,6 @@ public class Module {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
-
-
-        // PID Tuning
-
-        // ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
-        // io.setDrivePID(drivekP.get(), 0, drivekD.get());
-        // io.setTurnPID(turnkP.get(), 0, turnkD.get());
 
         // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
@@ -105,9 +71,7 @@ public class Module {
         state.cosineScale(inputs.turnAbsolutePosition);
 
         // Apply setpoints
-        io.setDriveVelocity(
-            state.speedMetersPerSecond / constants.WheelRadius, 
-            ffModel.calculate(state.speedMetersPerSecond / constants.WheelRadius));
+        io.setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
         io.setTurnPosition(state.angle);
     }
 

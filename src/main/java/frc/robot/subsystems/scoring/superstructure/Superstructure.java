@@ -36,7 +36,7 @@ public class Superstructure extends SubsystemBase{
     private final Elevator elevator;
     private final Wrist wrist;
 
-    private SuperVisualizer sim;
+    // private SuperVisualizer sim;
     
     @AutoLogOutput (key = "Copilot/Elevator Manual Override")
     public boolean eleOverride = false;
@@ -82,7 +82,7 @@ public class Superstructure extends SubsystemBase{
                 this.wrist = new Wrist(new WristIO() {});
                 this.elevator = new Elevator(new ElevatorIO() {});
         }
-        sim = new SuperVisualizer("Superstructure");
+        //sim = new SuperVisualizer("Superstructure");
 
         target = new SuperState(
             wrist.getAngle(),
@@ -121,13 +121,12 @@ public class Superstructure extends SubsystemBase{
         //     w_a.get());
 
         // double wrist_volts = wristPID.calculate(wrist.getAngle(), w_target.get())
-        // + wristFF.calculate(wrist.getAngle() + arm.getAngle() + Math.PI / 2, 0);
+        // + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0);
         // Logger.recordOutput("WristTune/volts", wrist_volts);
 
         // if (!wristOverride) {
         //     wrist.runVolts(
-        //         wristPID.calculate(wrist.getAngle(), w_target.get())
-        //         + wristFF.calculate(wrist.getAngle() + arm.getAngle() + Math.PI / 2, 0)
+        //         wrist_volts
         //         );
         // }
 
@@ -136,7 +135,7 @@ public class Superstructure extends SubsystemBase{
         //     e_i.get(), 
         //     e_d.get());
 
-        // //Logger.recordOutput("pid volts",elePID.calculate(elevator.getHeight(), e_target.get()));
+        // Logger.recordOutput("pid volts",elePID.calculate(elevator.getHeight(), e_target.get()));
 
         // if (!eleOverride) {
         //     elevator.runVolts(
@@ -159,6 +158,7 @@ public class Superstructure extends SubsystemBase{
                 + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0);
         } else {
             wristvolts = MathUtil.clamp(wristinput.getAsDouble(), -12, 12);
+            
             target.setWristAngle(
                 MathUtil.clamp(
                     wrist.getAngle(), 
@@ -167,17 +167,26 @@ public class Superstructure extends SubsystemBase{
         }
 
 
-
         double elevolts = 0;
 
 
         if (Math.abs(eleinput.getAsDouble()) < 0.1  && !eleOverride) {
             elevolts = elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
-            + Constants.ElevatorConstants.kFF;
+                + Constants.ElevatorConstants.kFF;
         } else {
             // if needed, replace the 0 in the clamp of the next commented out line below this one to -12
-            // elevolts = MathUtil.clamp(Constants.ElevatorConstants.kFF - eleinput.getAsDouble(), 0, 12);
-            target.setEleHeight(elevator.getHeight());
+    
+            elevolts = MathUtil.clamp(
+                Constants.ElevatorConstants.kFF - eleinput.getAsDouble(), 
+                0, 
+                (elevator.getHeight() >= SuperConstraints.ElevatorConstraints.RANGE)?
+                    Constants.ElevatorConstants.kFF:12);
+
+            target.setEleHeight(
+                MathUtil.clamp(
+                    elevator.getHeight(), 
+                    0, 
+                    SuperConstraints.ElevatorConstraints.RANGE));
         }
 
         wrist.runVolts(wristvolts);
