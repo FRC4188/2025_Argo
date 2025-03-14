@@ -325,6 +325,21 @@ public class RobotContainer {
     // autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
+    //auto to test ig - AR
+    //already have cmmds and these are just the most efficient of the efficient
+    //all these autos start in between the outside and middle cages of OUR barge
+    autoChooser.addOption("AB-234", new PathPlannerAuto("AB-234"));
+    autoChooser.addOption("AB-243", new PathPlannerAuto("AB-243"));
+    autoChooser.addOption("AB-324", new PathPlannerAuto("AB-324"));
+    autoChooser.addOption("AB-342", new PathPlannerAuto("AB-342"));
+    autoChooser.addOption("AB-423", new PathPlannerAuto("AB-423"));
+    autoChooser.addOption("AB-432", new PathPlannerAuto("AB-432"));
+    autoChooser.addOption("AB-345", new PathPlannerAuto("AB-345"));
+    autoChooser.addOption("AB-354", new PathPlannerAuto("AB-354"));
+    autoChooser.addOption("AB-435", new PathPlannerAuto("AB-435"));
+    autoChooser.addOption("AB-453", new PathPlannerAuto("AB-453"));
+    autoChooser.addOption("AB-534", new PathPlannerAuto("AB-534"));
+    autoChooser.addOption("AB-543", new PathPlannerAuto("AB-543"));
   }
 
   /**

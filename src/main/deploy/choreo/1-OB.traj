@@ -107,9 +107,8 @@
   "splits":[0]
  },
  "events":[
-   {"name":"GetL3Algae", "from":{"target":0, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
-       {"type":"named", "data":{"name":"Algae L3"}},
-       {"type":"named", "data":{"name":"Get Algae"}}]}}},
+   {"name":"Super Start", "from":{"target":0, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
+       {"type":"named", "data":{"name":"Super Start"}}]}}},
    {"name":"ElevatorUpToNet", "from":{"target":2, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":"ElevatorUpToNet"}}]}}},
    {"name":"Score Algae", "from":{"target":3, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
