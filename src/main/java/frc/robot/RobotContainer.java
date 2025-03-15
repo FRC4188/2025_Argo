@@ -328,6 +328,8 @@ public class RobotContainer {
     //auto to test ig - AR
     //already have cmmds and these are just the most efficient of the efficient
     //all these autos start in between the outside and middle cages of OUR barge
+    //all autos start with the robot facing the drivers and with the center of the robot
+    //being on the black starting line
     autoChooser.addOption("AB-234", new PathPlannerAuto("AB-234"));
     autoChooser.addOption("AB-243", new PathPlannerAuto("AB-243"));
     autoChooser.addOption("AB-324", new PathPlannerAuto("AB-324"));
@@ -340,6 +342,28 @@ public class RobotContainer {
     autoChooser.addOption("AB-453", new PathPlannerAuto("AB-453"));
     autoChooser.addOption("AB-534", new PathPlannerAuto("AB-534"));
     autoChooser.addOption("AB-543", new PathPlannerAuto("AB-543"));
+
+    //these autos start in the center of the field
+    autoChooser.addOption("CF-345", new PathPlannerAuto("CF-345"));
+    autoChooser.addOption("CF-354", new PathPlannerAuto("CF-354"));
+    autoChooser.addOption("CF-435", new PathPlannerAuto("CF-435"));
+    autoChooser.addOption("CF-453", new PathPlannerAuto("CF-453"));
+    autoChooser.addOption("CF-534", new PathPlannerAuto("CF-534"));
+    autoChooser.addOption("CF-543", new PathPlannerAuto("CF-543"));
+
+    //these autos start in between the outside and middle cages of the OPPOSING barge
+    autoChooser.addOption("EB-345", new PathPlannerAuto("EB-345"));
+    autoChooser.addOption("EB-354", new PathPlannerAuto("EB-354"));
+    autoChooser.addOption("EB-435", new PathPlannerAuto("EB-435"));
+    autoChooser.addOption("EB-453", new PathPlannerAuto("EB-453")); 
+    autoChooser.addOption("EB-534", new PathPlannerAuto("EB-534"));
+    autoChooser.addOption("EB-543", new PathPlannerAuto("EB-543"));
+    autoChooser.addOption("EB-456", new PathPlannerAuto("EB-456"));
+    autoChooser.addOption("EB-465", new PathPlannerAuto("EB-465"));
+    autoChooser.addOption("EB-546", new PathPlannerAuto("EB-546"));
+    autoChooser.addOption("EB-564", new PathPlannerAuto("EB-564"));
+    autoChooser.addOption("EB-645", new PathPlannerAuto("EB-645"));
+    autoChooser.addOption("EB-654", new PathPlannerAuto("EB-654"));
   }
 
   /**
