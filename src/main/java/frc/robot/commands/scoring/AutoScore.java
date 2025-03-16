@@ -51,13 +51,13 @@ public class AutoScore extends Command{
         public float happy_zone = 2;
 
 
-        public Score(Pose2d goal, SuperState state,Command intakeCommand, Drive drive, Superstructure superstructure) {
+        public Score(Pose2d goal, SuperState state,Command intakeCommand, Drive drive, Superstructure superstructure, double safe) {
             addCommands(
                 new DriveTo(drive, goal).alongWith(
-                    new SuperToState(superstructure, state)
+                    new SuperToState(superstructure, safe, state)
                     .until(() -> drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone)
                     .andThen(new WaitUntilCommand(() -> drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
-                    .andThen(new SuperToState(superstructure, state))),
+                    .andThen(new SuperToState(superstructure,safe, state))),
                 intakeCommand
             );
         }
@@ -94,7 +94,7 @@ public class AutoScore extends Command{
                 scoring = new Command() {};
             }
 
-            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct);
+            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct, 0);
         }
     }
 
@@ -117,7 +117,7 @@ public class AutoScore extends Command{
             preset = SuperPreset.NET;
             
 
-            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct);
+            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct, 0.5);
         }
     }
 }

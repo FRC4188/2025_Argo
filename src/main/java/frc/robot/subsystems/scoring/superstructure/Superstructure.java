@@ -21,12 +21,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.elevator.Elevator;
 import frc.robot.subsystems.scoring.elevator.ElevatorIO;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ElevatorConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
 import frc.robot.subsystems.scoring.wrist.Wrist;
 import frc.robot.subsystems.scoring.wrist.WristIO;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
@@ -87,7 +90,8 @@ public class Superstructure extends SubsystemBase{
         target = new SuperState(
             wrist.getAngle(),
             elevator.getHeight());
-
+        elePID.reset(elevator.getHeight());
+        wristPID.reset(wrist.getAngle());
     }
 
     @Override
@@ -109,6 +113,7 @@ public class Superstructure extends SubsystemBase{
 
         // //PID tuning so ill kill myself later
 
+        
         // wristPID.setPID(
         //     w_p.get(), 
         //     w_i.get(), 
@@ -157,22 +162,30 @@ public class Superstructure extends SubsystemBase{
                 wristPID.calculate(wrist.getAngle(), target.getWristAngle())
                 + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0);
         } else {
-            wristvolts = MathUtil.clamp(wristinput.getAsDouble(), -12, 12);
+            if (!wristOverride) {
+                wristvolts = MathUtil.clamp(wristinput.getAsDouble() + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0), 
+                (wrist.getAngle() < WristConstraints.LOWEST_A)?0:-5, 
+                (wrist.getAngle() > WristConstraints.HIGHEST_A)?0:5);
+            } else {
+                wristvolts = MathUtil.clamp(wristinput.getAsDouble(), 
+                -5, 5);
+            }
             
             target.setWristAngle(
                 MathUtil.clamp(
                     wrist.getAngle(), 
                     SuperConstraints.WristConstraints.LOWEST_A, 
                     SuperConstraints.WristConstraints.HIGHEST_A));
+
+            wristPID.reset(wrist.getAngle());
         }
 
-
         double elevolts = 0;
-
 
         if (Math.abs(eleinput.getAsDouble()) < 0.1  && !eleOverride) {
             elevolts = elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
                 + Constants.ElevatorConstants.kFF;
+            
         } else {
             // if needed, replace the 0 in the clamp of the next commented out line below this one to -12
     
@@ -187,8 +200,10 @@ public class Superstructure extends SubsystemBase{
                     elevator.getHeight(), 
                     0, 
                     SuperConstraints.ElevatorConstraints.RANGE));
+            elePID.reset(elevator.getHeight());
         }
-
+        Logger.recordOutput("Elevator/pid volts", elevolts);
+        Logger.recordOutput("Wrist/pid volts", wristvolts);
         wrist.runVolts(wristvolts);
         elevator.runVolts(elevolts);
     }
@@ -231,10 +246,12 @@ public class Superstructure extends SubsystemBase{
     }  
 
     public void setWrist(double angle) {
+        angle = MathUtil.clamp(angle, WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
         target.setWristAngle(angle);
     }
 
     public void setEle(double height) {
+        height = MathUtil.clamp(height, 0, ElevatorConstraints.RANGE);
         target.setEleHeight(height);
     }
 }

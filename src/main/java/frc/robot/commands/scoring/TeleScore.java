@@ -44,10 +44,10 @@ public class TeleScore extends Command{
 
     public static class Score extends SequentialCommandGroup {
         
-        public Score(Pose2d goal, SuperState state, Drive drive, Superstructure superstructure) {
+        public Score(Pose2d goal, SuperState state, Drive drive, Superstructure superstructure, double safe) {
             addCommands(
                 new DriveToPose(drive, () -> new Pose2d(drive.getPose().getTranslation(), goal.getRotation())),
-                new SuperToState(superstructure, state)
+                new SuperToState(superstructure, safe, state)
             );
         }
     }
@@ -81,7 +81,7 @@ public class TeleScore extends Command{
                 scoring = new Command() {};
             }
 
-            scoring = new Score(correctedgoal, preset.getState(), drive, superstruct);
+            scoring = new Score(correctedgoal, preset.getState(), drive, superstruct, 0);
         }
     }
 
@@ -102,7 +102,7 @@ public class TeleScore extends Command{
             preset = SuperPreset.PROCESSOR;
             
 
-            scoring = new Score(correctedGoal, preset.getState(), drive, superstruct);
+            scoring = new Score(correctedGoal, preset.getState(), drive, superstruct, 0.5);
         }
     }
 }

@@ -12,9 +12,9 @@ import frc.robot.subsystems.scoring.wrist.Wrist;
 public class SuperToState extends SequentialCommandGroup {
 
 
-    public SuperToState(Superstructure superstruct, SuperState state) {
+    public SuperToState(Superstructure superstruct, double safeangle, SuperState state) {
         addCommands(
-            new WristToState(superstruct, SuperPreset.START.getState().getWristAngle()),
+            new WristToState(superstruct, safeangle),
             new EleToState(superstruct, state.getEleHeight()),
             new WristToState(superstruct, state.getWristAngle())
         

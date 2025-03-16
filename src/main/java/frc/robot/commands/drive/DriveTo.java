@@ -4,17 +4,19 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.commands.autos.pathgen.PG_math;
 import frc.robot.commands.autos.pathgen.PathGen;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
 
 public class DriveTo extends Command {
 
-    Timer timer;
+    double start_time = 0;
     Supplier<Pose2d> goalPose;
     Trajectory traj;
     TrajectoryConfig config;
@@ -26,9 +28,6 @@ public class DriveTo extends Command {
         config = new TrajectoryConfig(
             TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
             Constants.robot.MAX_ACCELERATION.magnitude() * 0.5);
-
-        timer = new Timer();
-
         goalPose = () -> goal;
     }
 
@@ -39,34 +38,44 @@ public class DriveTo extends Command {
         if (traj.getStates().isEmpty()) {
             goalPose = () -> drive.getPose();
         } else {
-            goalPose = () -> traj.sample(timer.get()).poseMeters;
+            goalPose = () -> traj.sample(Timer.getFPGATimestamp() - start_time).poseMeters;
 
             driving = new DriveToPose(drive, goalPose);
         }
-
+        System.out.println("trajector:");
+        System.out.println(traj);
         
-        
-        timer.start();
-
         driving.repeatedly().schedule();
+        //driving.initialize();
         System.out.println("Driving ....");
+        start_time = Timer.getFPGATimestamp();
+       
     }
 
     @Override
     public void execute() {
-        
+
+        System.out.print("Set goal ");
+        PG_math.printpose(goalPose.get());
+        System.out.print("current goal ");
+        PG_math.printpose(drive.getPose());
+
+        //driving.execute();
+
+        // if (driving.isFinished()) {
+        //     driving.initialize();
+        // }
     }
 
     @Override
     public void end(boolean interrupted) {
-
-
         if (driving != null) driving.cancel();
+        //driving.end(interrupted);
     }
 
     @Override
     public boolean isFinished() {
-        return timer.hasElapsed(traj.getTotalTimeSeconds() + 1);
+        return Timer.getFPGATimestamp() - start_time > traj.getTotalTimeSeconds()  +1;
     }
 
 

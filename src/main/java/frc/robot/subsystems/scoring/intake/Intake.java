@@ -5,6 +5,7 @@ import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,15 +16,17 @@ public class Intake extends SubsystemBase{
 
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
+    private final DigitalInput breaker;
 
     public Intake(IntakeIO io){
         this.io = io;
+        this.breaker = new DigitalInput(0); //DIO channel
         inputs = new IntakeIOInputsAutoLogged();
     }
 
     //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
     public Command ingest(boolean isSlow) {
-        double voltage = 2;
+        double voltage = isSlow? 6: 12;
         return Commands.runOnce(
             () -> {
                 io.runVolts(voltage);
@@ -47,8 +50,9 @@ public class Intake extends SubsystemBase{
             });
     }
 
-
-
+    public boolean isIn(){
+        return !breaker.get(); //true when laser can hit breaker aka nothing in intake
+    }
 
     @Override
     public void periodic(){

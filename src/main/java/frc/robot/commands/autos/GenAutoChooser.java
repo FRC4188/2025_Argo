@@ -30,7 +30,7 @@ import static frc.robot.util.FieldConstant.Reef.*;
 
 public class GenAutoChooser {
     private final LoggedDashboardChooser<Pose2d> startPose = new LoggedDashboardChooser<>("Dynamic Auto/Starting Position");
-    private final LoggedDashboardChooser<Pose2d> source = new LoggedDashboardChooser<>("Dynamic Auto/Main source");
+    // private final LoggedDashboardChooser<Pose2d> source = new LoggedDashboardChooser<>("Dynamic Auto/Main source");
     private final static LoggedNetworkString goal = new LoggedNetworkString("Dynamic Auto/Goals");
     static List<Pair<Pose2d, SuperPreset>> routine = new ArrayList<>();
     static List<Command> cmds = new ArrayList<>();
@@ -47,16 +47,16 @@ public class GenAutoChooser {
 
     public void init(){
         startPose.addOption("Middle", AllianceFlip.flipDS(new Pose2d(7.459, 4.160, Rotation2d.k180deg)));
-        startPose.addOption("Left", AllianceFlip.flipDS(new Pose2d(7.459, 6.154, Rotation2d.k180deg)));
-        startPose.addOption("Right", AllianceFlip.flipDS(new Pose2d(7.459, 1.836, Rotation2d.k180deg)));
+        startPose.addOption("Left", AllianceFlip.flipDS(new Pose2d(7.180, 7.550, Rotation2d.k180deg)));
+        startPose.addOption("Right", AllianceFlip.flipDS(new Pose2d(7.180, 0.480, Rotation2d.k180deg)));
         startPose.addOption("None", new Pose2d());
                             
-        source.addOption("Left_Far", AllianceFlip.flipDS(Source.left_src_far));
-        source.addOption("Left_Close", AllianceFlip.flipDS(Source.left_src_close));
-        source.addOption("Left_Mid", AllianceFlip.flipDS(Source.left_src_mid));
-        source.addOption("Right_Far", AllianceFlip.flipDS(Source.right_src_far));
-        source.addOption("Right_Close", AllianceFlip.flipDS(Source.right_src_close));
-        source.addOption("Right_Mid", AllianceFlip.flipDS(Source.right_src_mid));
+        // source.addOption("Left_Far", AllianceFlip.flipDS(Source.left_src_far));
+        // source.addOption("Left_Close", AllianceFlip.flipDS(Source.left_src_close));
+        // source.addOption("Left_Mid", AllianceFlip.flipDS(Source.left_src_mid));
+        // source.addOption("Right_Far", AllianceFlip.flipDS(Source.right_src_far));
+        // source.addOption("Right_Close", AllianceFlip.flipDS(Source.right_src_close));
+        // source.addOption("Right_Mid", AllianceFlip.flipDS(Source.right_src_mid));
                                     
     }
                             
@@ -77,7 +77,7 @@ public class GenAutoChooser {
                 drive, superstructure, intake)
         );
                         
-        //algae/coral -> close/far -> location -> level
+        //close/far -> location
         for(int i = 1; i < ree.length; i ++){
             cmds.add(new algaeScore(drive, superstructure, intake));
             cmds.add(new algaeSource(

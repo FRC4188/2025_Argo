@@ -44,7 +44,18 @@ public final class AutoTests {
     //     return new SequentialCommandGroup();
     // }
 
+    public static Command test1(Drive drive) {
+        drive.setPose(new Pose2d(7.459, 4.160, Rotation2d.k180deg));
+        return new DriveToPose(drive, () -> FieldConstant.Reef.AlgaeSource.mid_brg_src);
+    }
+
+    public static Command test2(Drive drive) {
+        drive.setPose(new Pose2d(7.180, 7.550, Rotation2d.k180deg));
+        return new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src);
+    }
+
     public static Command AG2Coral(Drive drive){
+        drive.setPose(new Pose2d(7.459, 4.160, Rotation2d.k180deg));
         return Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
             new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),

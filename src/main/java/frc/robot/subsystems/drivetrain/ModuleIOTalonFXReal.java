@@ -17,9 +17,11 @@ package frc.robot.subsystems.drivetrain;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.PhoenixOdometryThread;
 
 import java.util.Queue;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and CANcoder.
@@ -49,8 +51,9 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
         inputs.odometryTimestamps =
                 timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
         inputs.odometryDrivePositionsRad = drivePositionQueue.stream()
-                .mapToDouble(Units::rotationsToRadians)
+                .mapToDouble((Double value) -> Units.rotationsToRadians(value) / TunerConstants.kDriveGearRatio)
                 .toArray();
+
         inputs.odometryTurnPositions =
                 turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
         timestampQueue.clear();

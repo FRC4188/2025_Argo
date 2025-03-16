@@ -47,24 +47,29 @@ public class SuperState {
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                Units.degreesToRadians(0), Reef.L3_highest_h - Units.inchesToMeters(20))),
+                0.6077, 0.8713)),
  
         L2_ALGAE(
             new SuperState(
-                Units.degreesToRadians(0),Reef.L2_highest_h - Units.inchesToMeters(20))),
+                0.7386, 0.4719)),
     
         NET(
             new SuperState(
-                Units.degreesToRadians(0),Reef.L4_highest_h - Units.inchesToMeters(20))),
+                Units.degreesToRadians(0), SuperConstraints.ElevatorConstraints.RANGE)),
         PROCESSOR(
             new SuperState(
-                Units.degreesToRadians(0),0)),
+                0.31789,0)),
 
         ALGAE_GROUND(
-             new SuperState( Units.degreesToRadians(45), 0)),
+             new SuperState(1.1593, 0)),
         
         START(
-            new SuperState(0, 0));
+            new SuperState(0, 0)),
+
+        ALGAE_STOW(
+            new SuperState(0.31789, 0)
+        );
+        
                 
         private final SuperState state;
 

@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.util.AllianceFlip;
 
 /**
@@ -25,9 +26,15 @@ import frc.robot.util.AllianceFlip;
  */
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(
+                TunerConstants.kSpeedAt12Volts.magnitude() * 0.8, 
+                Constants.robot.MAX_ACCELERATION.magnitude() * 0.5), 0.02);
+
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(
+                TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
+                Constants.robot.MAX_ACCELERATION.magnitude() * 0.3), 0.02);
+
     private Drive driveSubsystem;
     private Supplier<Pose2d> poseSupplier;
     private Translation2d lastSetpointTranslation;

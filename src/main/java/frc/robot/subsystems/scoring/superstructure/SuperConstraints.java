@@ -10,7 +10,7 @@ import frc.robot.commands.autos.pathgen.PG_math;
 public class SuperConstraints {
     
     public class WristConstraints{
-        public final static double LOWEST_A = Units.degreesToRadians(0);
+        public final static double LOWEST_A = 0.15;
         public final static double HIGHEST_A = Units.degreesToRadians(90);
     }
 
@@ -22,7 +22,7 @@ public class SuperConstraints {
 
     public static SuperState clamp(SuperState state) {
         double result_w = MathUtil.clamp(state.getWristAngle(), WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
-        double result_e = MathUtil.clamp(state.getEleHeight(), ElevatorConstraints.LOWEST_H, ElevatorConstraints.HIGHEST_H);
+        double result_e = MathUtil.clamp(state.getEleHeight(), 0, ElevatorConstraints.RANGE);
 
         return new SuperState(result_w, result_e);
     }

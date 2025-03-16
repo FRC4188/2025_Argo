@@ -127,7 +127,8 @@ public class PathGen {
             config);
 
         for (State states : result.getStates()) {
-            states.poseMeters = AllianceFlip.flipDS(new Pose2d(
+            states.poseMeters = AllianceFlip.flipDS(
+                new Pose2d(
                 states.poseMeters.getTranslation(), 
                 PG_math.interpolate_mod(start.getRotation(), end.getRotation(), states.timeSeconds / result.getTotalTimeSeconds()) 
             ));

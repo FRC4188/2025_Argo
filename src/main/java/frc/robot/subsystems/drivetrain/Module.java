@@ -20,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import frc.robot.subsystems.generated.TunerConstants;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -49,14 +51,18 @@ public class Module {
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
+        Logger.recordOutput("Drive/Module" + Integer.toString(index) + "/turnanglerads", inputs.turnAbsolutePosition.getRadians());
+
         // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
         odometryPositions = new SwerveModulePosition[sampleCount];
         for (int i = 0; i < sampleCount; i++) {
-            double positionMeters = inputs.odometryDrivePositionsRad[i] * constants.WheelRadius;
+            double positionMeters = inputs.odometryDrivePositionsRad[i] * constants.WheelRadius;// / TunerConstants.kDriveGearRatio;
             Rotation2d angle = inputs.odometryTurnPositions[i];
             odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
         }
+
+        
 
         // Update alerts
         driveDisconnectedAlert.set(!inputs.driveConnected);
