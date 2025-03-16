@@ -364,6 +364,17 @@ public class RobotContainer {
     autoChooser.addOption("EB-564", new PathPlannerAuto("EB-564"));
     autoChooser.addOption("EB-645", new PathPlannerAuto("EB-645"));
     autoChooser.addOption("EB-654", new PathPlannerAuto("EB-654"));
+
+    //one drivetrain trajectory auto
+    autoChooser.addOption("Drivetrain Choreo Trajectory Test", 
+    new PathPlannerAuto("Test(AB-3-IB)"));
+
+    //five autos we could test for commands
+    autoChooser.addOption("L2 Test", new PathPlannerAuto("Test for L2+Intake (AB)"));
+    autoChooser.addOption("L3 Test", new PathPlannerAuto("Test for L3+Intake (AB)"));
+    autoChooser.addOption("Barge Test", new PathPlannerAuto("Test for Barge+Score (4)"));
+    autoChooser.addOption("L3+Barge", new PathPlannerAuto("Test-L3+Barge (AB)"));
+    autoChooser.addOption("L2+Barge", new PathPlannerAuto("Test-L2+Barge (AB)"));
   }
 
   /**
