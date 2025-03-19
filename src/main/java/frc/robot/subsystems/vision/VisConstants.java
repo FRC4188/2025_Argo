@@ -41,8 +41,8 @@ public class VisConstants {
   public static double maxZError = 0.75;
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static double linearStdDevBaseline = 0.0001; // Meters 0.02 default
+  public static double angularStdDevBaseline = 0.0002; // Radians 0.06 default
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)

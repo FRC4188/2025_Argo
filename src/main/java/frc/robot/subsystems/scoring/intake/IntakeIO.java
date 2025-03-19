@@ -10,10 +10,16 @@ public interface IntakeIO {
         public double appliedVolts = 0.0;
         public double tempC = 0.0;
     }
+   
+
 
     public default void updateInputs(IntakeIOInputs inputs) {}
 
     public default void runVolts(double volts) {}
+
+    public default boolean isIn(){
+        return false;
+    }
 
     public default boolean isStalled() {return false;}
 

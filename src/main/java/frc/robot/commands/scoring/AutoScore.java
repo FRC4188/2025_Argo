@@ -94,7 +94,7 @@ public class AutoScore extends Command{
                 scoring = new Command() {};
             }
 
-            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct, 0);
+            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest().withTimeout(1.5), drive, superstruct, 0);
         }
     }
 
@@ -117,7 +117,7 @@ public class AutoScore extends Command{
             preset = SuperPreset.NET;
             
 
-            scoring = new Score(correctedGoal, preset.getState(), intake.ingest(false).withTimeout(1.5), drive, superstruct, 0.5);
+            scoring = new Score(correctedGoal, preset.getState(), intake.ingest().withTimeout(1.5), drive, superstruct, 0.5);
         }
     }
 }

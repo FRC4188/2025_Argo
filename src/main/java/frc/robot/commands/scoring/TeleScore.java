@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveToPose;
 import frc.robot.subsystems.drivetrain.Drive;
+import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
@@ -50,6 +51,13 @@ public class TeleScore extends Command{
                 new SuperToState(superstructure, safe, state)
             );
         }
+
+        public Score(SuperState state, Superstructure superstructure, Command intake, double safe){
+            addCommands(
+                new SuperToState(superstructure, safe, state),
+                intake
+            );
+        }
     }
 
     public static class algaeSource extends TeleScore {
@@ -85,13 +93,37 @@ public class TeleScore extends Command{
         }
     }
 
+    public static class algaeReef extends TeleScore {
+        Intake intake;
+        int level;
+
+        public algaeReef(int level, Superstructure superstructure, Intake intake) {
+            this.superstruct = superstructure;
+            this.intake = intake;
+            this.level = level;
+        }
+        
+        @Override
+        public void factory() {
+            preset = level == 2? SuperPreset.L2_ALGAE : SuperPreset.L3_ALGAE;
+            scoring = new Score(preset.getState(), superstruct, intake.ingest(), 0);
+        }
+    }
+
 
     public static class algaeScore extends TeleScore {
+        Intake intake;
 
         public algaeScore(Drive drive, Superstructure superstructure) {
             this.drive = drive;
             this.superstruct = superstructure;
             goal = FieldConstant.Processor.processor_goal;
+        }
+
+        public algaeScore(Superstructure superstructure, Intake intake, double safe){
+            this.superstruct = superstructure;
+            this.intake = intake;
+            preset = SuperPreset.PROCESSOR;
         }
 
         
@@ -102,7 +134,8 @@ public class TeleScore extends Command{
             preset = SuperPreset.PROCESSOR;
             
 
-            scoring = new Score(correctedGoal, preset.getState(), drive, superstruct, 0.5);
+            if(correctedGoal != null) scoring = new Score(correctedGoal, preset.getState(), drive, superstruct, 0.5);
+            else scoring = new Score(preset.getState(), superstruct,intake.eject(), 1);
         }
     }
 }

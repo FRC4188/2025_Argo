@@ -3,6 +3,9 @@ package frc.robot.subsystems.scoring.wrist;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -18,6 +21,7 @@ import edu.wpi.first.math.util.Units;
 
 public class WristIOReal implements WristIO {
     private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
+    private final CANcoder canCoder = new CANcoder(Constants.Id.kWristCANCoder);
 
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
@@ -28,6 +32,11 @@ public class WristIOReal implements WristIO {
             .absoluteEncoderPositionAlwaysOn(true)
             .primaryEncoderPositionAlwaysOn(true);
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
+        CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
+        cancoderConfig.MagnetSensor.MagnetOffset = WristConstants.kZero;
+        cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        canCoder.getConfigurator().apply(cancoderConfig);
     }
 
     @Override

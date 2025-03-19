@@ -22,6 +22,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -40,6 +41,7 @@ public final class Constants {
   }
 
   public static class robot {
+
     public static final String rio = "rio";
     public static final String canivore = "canivore";
     public static final double loopPeriodSecs = 0.02;
@@ -61,6 +63,8 @@ public final class Constants {
 
     public static final Matrix<N3, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.001);
     public static final Matrix<N3, N1> VISION_STD_DEVS = VecBuilder.fill(0.020, 0.020, 0.264);
+
+    public static final PIDController CORRECTION_PID = new PIDController(0.1, 0.0, 0.006);
   }
 
   public static enum Mode {
@@ -75,6 +79,7 @@ public final class Constants {
     //DT ids are 1->12
     public static final int kElevatorLead = 13;
     public static final int kElevatorFollow = 14;
+    public static final int kWristCANCoder = 15;
     public static final int kWrist = 17;   
     public static final int kIntake = 18;
   }
@@ -93,7 +98,7 @@ public final class Constants {
     public static final double kP = 25;
     public static final double kI = 0.0;  
     public static final double kD = 0.05;
-    public static final double kFF = 0.18;
+    public static final double kFF = 0.19;
     
     public static final ProfiledPIDController ElePID = new ProfiledPIDController(kP, kI, kD, kConstraints);
 
@@ -102,7 +107,7 @@ public final class Constants {
       );
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
-      .withStatorCurrentLimit(100)
+      .withStatorCurrentLimit(80)
       .withSupplyCurrentLimit(60)
       .withStatorCurrentLimitEnable(true);
 
@@ -134,22 +139,24 @@ public final class Constants {
   public static class WristConstants {
     public static final double koffsetFromCenter = Units.inchesToMeters(2.668); //inches
     public static final double kTolerance = 0.1;
-    public static final double kGearRatio = 1.0 / 16.0;
+    public static final double kGearRatio = 1.0 / 25.0;
     public static final int kCurrentLimit = 0; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
+    public static final double kZero = 0.0;
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 2.5;
-    public static final double kI = 0.5;
+    public static final double kP = 4.0;
+    public static final double kI = 0.3;
     public static final double kD = 0.2;
     public static final double kF = 0.0;
     public static final double kS = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
-    public static final double kG = 1.2;
+    public static final double kG = 1.0;
+
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
@@ -165,8 +172,8 @@ public final class Constants {
     public static double voltStall = Amp.of(257).magnitude(); //rpm threshold to consider for stalling
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
-      .withStatorCurrentLimit(80)
-      .withSupplyCurrentLimit(50)
+      .withStatorCurrentLimit(60)
+      .withSupplyCurrentLimit(40)
       .withStatorCurrentLimitEnable(true);
 
       public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()

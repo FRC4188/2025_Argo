@@ -241,6 +241,14 @@ public class Superstructure extends SubsystemBase{
         return elevator.atGoal(target.getEleHeight());
     }
 
+    public double getWristAngle() {
+        return wrist.getAngle();
+    }  
+
+    public double getEleHeight() {
+        return elevator.getHeight();
+    }
+
     public void setTarget(SuperState goal) {
         target = SuperConstraints.clamp(goal);
     }  

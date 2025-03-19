@@ -40,6 +40,7 @@ import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.autos.GenAutoChooser;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.scoring.ScoreNet;
 import frc.robot.commands.scoring.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
@@ -248,7 +249,7 @@ public class RobotContainer {
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
       () -> -controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
       () -> -controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> controller.getRightX(controller.getRightBumperButton().getAsBoolean()? Scale.LINEAR :Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
       
@@ -261,14 +262,18 @@ public class RobotContainer {
 
     //outtake
     controller.getLeftTButton().onTrue(
-        intake.ingest(true
-        )).onFalse(intake.stop());
+        new ConditionalCommand(intake.ingest(), new ScoreNet(intake), () -> superstructure.getEleHeight() > 1.6)
+      ).onFalse(intake.stop());
 
-    controller.getLeftBumperButton().whileTrue(
-      intake.ingest(false)).onFalse(intake.stop());
+    controller.getAButton().onTrue(
+      new SuperToState(superstructure, 0, SuperPreset.ALGAE_GROUND.getState())
+    ).onFalse(
+      new SuperToState(superstructure, 0, SuperPreset.ALGAE_STOW.getState())
+    );
+
     //intake
     controller.getRightTButton().onTrue(
-      intake.eject()).onFalse(intake.stop());
+      new ConditionalCommand(intake.eject(), intake.ingest(), () -> superstructure.getEleHeight() > 1.6)).onFalse(intake.stop());
 
     // controller.a().onTrue(
     //   new DriveToPose(drive, ()-> drive.getPose().nearest(Source.csources))
@@ -290,13 +295,13 @@ public class RobotContainer {
     controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.ALGAE_STOW.getState()));
 
     controller2.getRightBumperButton().onTrue(
-      new SuperToState(superstructure,0.5,  SuperPreset.NET.getState()));
+      new SuperToState(superstructure,1,  SuperPreset.NET.getState()));
 
     controller2.getLeftBumperButton().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
 
     controller2.getUpButton()
     .onTrue(
-      new SuperToState(superstructure, 0.5, SuperPreset.PROCESSOR.getState()));
+      new SuperToState(superstructure, 1, SuperPreset.PROCESSOR.getState()));
 
     controller2.getLeftButton().onTrue(
       new SuperToState(superstructure, 0, SuperPreset.L2_ALGAE.getState()));

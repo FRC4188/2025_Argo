@@ -55,19 +55,19 @@ public class SuperState {
     
         NET(
             new SuperState(
-                Units.degreesToRadians(0), SuperConstraints.ElevatorConstraints.RANGE)),
+                0.8, SuperConstraints.ElevatorConstraints.RANGE)),
         PROCESSOR(
             new SuperState(
-                0.31789,0)),
+                0.5,0)),
 
         ALGAE_GROUND(
-             new SuperState(1.1593, 0)),
+             new SuperState(1.2, 0)),
         
         START(
             new SuperState(0, 0)),
 
         ALGAE_STOW(
-            new SuperState(0.31789, 0)
+            new SuperState(0.5, 0)
         );
         
                 

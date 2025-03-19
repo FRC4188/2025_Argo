@@ -76,7 +76,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Drive extends SubsystemBase implements VisionConsumer{
     @AutoLogOutput(key = "Drive/vision?")
-    public boolean vision_accept = false;
+    public boolean vision_accept = true;
 
 
     public PIDController translation =
@@ -87,6 +87,8 @@ public class Drive extends SubsystemBase implements VisionConsumer{
             Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+
+    private final PIDController correctionPID = Constants.robot.CORRECTION_PID;
 
     LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp");
     LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti");
@@ -205,6 +207,9 @@ public class Drive extends SubsystemBase implements VisionConsumer{
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
         field = new Field2d();
+
+        correctionPID.enableContinuousInput(-180, 180);
+        correctionPID.setTolerance(1.0);
     }
 
     @Override
@@ -312,6 +317,13 @@ public class Drive extends SubsystemBase implements VisionConsumer{
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
+        if (speeds.omegaRadiansPerSecond != 0.0) {
+            correctionPID.setSetpoint(getRotationDegrees());
+        } else if (speeds.vxMetersPerSecond != 0.0 || speeds.vyMetersPerSecond != 0.0) {
+            double correction = correctionPID.calculate(getRotationDegrees());
+            speeds.omegaRadiansPerSecond = correctionPID.atSetpoint() ? 0.0 : correction;
+        }
+
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
         
@@ -438,7 +450,8 @@ public class Drive extends SubsystemBase implements VisionConsumer{
     // /** Adds a new timestamped vision measurement. */
     @Override
     public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
-        if (vision_accept)poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+        Pose2d t_only = new Pose2d(visionRobotPoseMeters.getTranslation(), getRotation());
+        if (vision_accept)poseEstimator.addVisionMeasurement(t_only, timestampSeconds, visionMeasurementStdDevs);
     }
 
     /** Returns the maximum linear speed in meters per sec. */
