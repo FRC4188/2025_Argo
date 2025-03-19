@@ -6,6 +6,7 @@ import static frc.robot.Constants.ElevatorConstants.kMotorConfig;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -78,7 +79,11 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void runVolts(double volts){
-        leader.setControl(new VoltageOut(volts));
+        if(ElevatorConstants.isPro)
+            leader.setControl(new TorqueCurrentFOC(volts));
+        else
+            leader.setControl(new VoltageOut(volts));
+        
     }
 
     @Override

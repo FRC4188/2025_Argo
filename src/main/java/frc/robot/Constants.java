@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -88,6 +89,8 @@ public final class Constants {
     public static final double kGearRatio = 30.0;
     public static final double kPitchRadius = 0.04475 / 2; //TODO: fix this
     public static final double kTolerance = 0.05;
+
+    public static final boolean isPro = false;
 
     public static final double kConversion = 3 * 2 * Math.PI * kPitchRadius; 
 
