@@ -28,6 +28,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -47,6 +48,7 @@ public final class Constants {
     public static final String canivore = "canivore";
     public static final double loopPeriodSecs = 0.02;
 
+    public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;
 
     public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(8); // 12.6

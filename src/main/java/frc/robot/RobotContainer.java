@@ -40,8 +40,7 @@ import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.autos.GenAutoChooser;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveToPose;
-import frc.robot.commands.scoring.ScoreNet;
-import frc.robot.commands.scoring.SuperToState;
+import frc.robot.commands.superstructure.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -91,7 +90,8 @@ public class RobotContainer {
   private final Drive drive;
   private Superstructure superstructure;
   private Intake intake;
-  private Limelight vis;
+
+  private boolean isBarge = true;
 
   // private final Limelight vis;
   private SwerveDriveSimulation driveSim;
@@ -118,8 +118,8 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.BackRight),
                 (pose) -> {});
         
-        vis = new Limelight(drive, 
-            new VisionIOLL("limelight-left", drive::getRotation));        
+        // vis = new Limelight(drive, 
+        //     new VisionIOLL("limelight-back", drive::getRotation));        
         superstructure = new Superstructure(Mode.REAL);
 
         intake = new Intake(new IntakeIOReal());
@@ -165,65 +165,46 @@ public class RobotContainer {
     }
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
     resetGyro = 
-    Constants.robot.currMode == Constants.Mode.SIM? 
-      () -> drive.setPose(
-                driveSim
-                  .getSimulatedDriveTrainPose()): // reset odometry to actual robot pose during simulation
+    // Constants.robot.currMode == Constants.Mode.SIM? 
+    //   () -> drive.setPose(
+    //             driveSim
+    //               .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
 
-       //() -> drive.setPose(new Pose2d(7.180, 7.550, Rotation2d.k180deg)); // zero gyro
-       () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
+       () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
 
     //add cmds for pathplanner events
     HashMap<String, Command> EVENTS =
       new HashMap<>(
           Map.ofEntries(            
-            Map.entry("Delay", new WaitCommand(1.5))
-            // Map.entry("Super Start", 
-            //   new SuperToState(superstructure, SuperPreset.START.getState())),
-            // Map.entry("Coral L3", 
-            //   new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
-            // Map.entry("Coral L4", 
-            //   new SuperToState(superstructure, SuperPreset.L4_CORAL.getState())),
-            // Map.entry("Coral L2", 
-            //   new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
-            // Map.entry("Coral Source", 
-            //   new SuperToState(superstructure, SuperPreset.SOURCE_REVERSE.getState())),
-            // Map.entry("Algae L3", 
-            //   new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState())),
-            // Map.entry("Algae L2", 
-            //   new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()))
-            // Map.entry("Score Coral", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(1)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Score Algae", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(1)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Get Coral", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(2.5)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Get Algae", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(2.5)
-            //   .andThen(Commands.run(()-> intake.stop())))
-        )
-      );
+            Map.entry("Delay", new WaitCommand(1.5)),
+            Map.entry("Super Start", 
+              new SuperToState(superstructure, SuperPreset.START.getState())),
+            Map.entry("Algae L3", 
+              new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState())),
+            Map.entry("Algae L2", 
+              new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState())),
+            Map.entry("Score Algae", 
+              Commands.run(()->
+                intake.eject()).withTimeout(1)
+              .andThen(Commands.run(()-> intake.stop()))),
+            Map.entry("Get Algae", 
+              Commands.run(()-> 
+                intake.ingest()).withTimeout(2.5)
+              .andThen(Commands.run(()-> intake.stop()))), 
+            Map.entry("ElevatorUpToNet", 
+              new SuperToState(superstructure, SuperPreset.NET.getState())))
+        );
 
     NamedCommands.registerCommands(EVENTS);
 
     configureDashboard();
     // Configure the button bindings
     configureButtonBindings();
-    teleInit();
   }
 
   //need superstructure
   public void teleInit() {
     superstructure.setTarget(new SuperState());
-    superstructure.resetEle();
-    superstructure.resetWrist();
   }
 
   /**
@@ -234,13 +215,12 @@ public class RobotContainer {
    */
   public void configureButtonBindings() {
     // Default command, normal field-relative drive
-
     drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
 
     superstructure.setDefaultCommand(
       Commands.run(() -> superstructure.manualOverride(
-        () -> 2 * controller2.getLeftY(), 
-        () -> 7 * (-controller2.getRightY(Scale.SQUARED)))
+        () ->  -controller2.getCorrectedLeft().getY(), 
+        () -> 3 * controller2.getCorrectedRight().getY())
         , superstructure));
     
 
@@ -249,7 +229,7 @@ public class RobotContainer {
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
       () -> -controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
       () -> -controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getRightX(controller.getRightBumperButton().getAsBoolean()? Scale.LINEAR :Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> -controller.getRightX(Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
       
@@ -262,18 +242,11 @@ public class RobotContainer {
 
     //outtake
     controller.getLeftTButton().onTrue(
-        new ConditionalCommand(intake.ingest(), new ScoreNet(intake), () -> superstructure.getEleHeight() > 1.6)
-      ).onFalse(intake.stop());
-
-    controller.getAButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.ALGAE_GROUND.getState())
-    ).onFalse(
-      new SuperToState(superstructure, 0, SuperPreset.ALGAE_STOW.getState())
-    );
+        intake.ingest(controller.getLeftBumperButton().getAsBoolean())).onFalse(intake.stop());
 
     //intake
     controller.getRightTButton().onTrue(
-      new ConditionalCommand(intake.eject(), intake.ingest(), () -> superstructure.getEleHeight() > 1.6)).onFalse(intake.stop());
+      intake.eject()).onFalse(intake.stop());
 
     // controller.a().onTrue(
     //   new DriveToPose(drive, ()-> drive.getPose().nearest(Source.csources))
@@ -282,7 +255,7 @@ public class RobotContainer {
     // );
     
     // testing limelight pipeline changing during match
-    controller2.a().onTrue(superstructure.resetWrist());
+    controller.a().onTrue(Commands.runOnce(()-> Limelight.changePipe()));
 
     //manual controls down here
 
@@ -291,27 +264,30 @@ public class RobotContainer {
     controller2.y().onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
 
     controller2.x().onTrue(superstructure.resetEle());
+    controller2.a().onTrue(superstructure.resetWrist());
 
-    controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.ALGAE_STOW.getState()));
+    controller2.getStartButton().onTrue(new SuperToState(superstructure, SuperPreset.START.getState()));
 
-    controller2.getRightBumperButton().onTrue(
-      new SuperToState(superstructure,1,  SuperPreset.NET.getState()));
+    controller2.getLeftBumperButton().onTrue(
+      Commands.runOnce(()-> isBarge = !isBarge)
+    );
 
-    controller2.getLeftBumperButton().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
-
-    controller2.getUpButton()
-    .onTrue(
-      new SuperToState(superstructure, 1, SuperPreset.PROCESSOR.getState()));
+    controller2.getUpButton().onTrue(
+      new ConditionalCommand(
+        new SuperToState(superstructure, SuperPreset.NET.getState()),
+        new SuperToState(superstructure, SuperPreset.PROCESSOR.getState()),
+        ()-> isBarge));
+      
 
     controller2.getLeftButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.L2_ALGAE.getState()));
+      new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()));
 
     
     controller2.getRightButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.L3_ALGAE.getState()));
+      new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState()));
       
     controller2.getDownButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.ALGAE_GROUND.getState()));
+      new SuperToState(superstructure, SuperPreset.ALGAE_GROUND.getState()));
 
   }
 
@@ -337,10 +313,8 @@ public class RobotContainer {
     // autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
     autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
     autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
-    
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
-    autoChooser.addOption("test2", AutoTests.test2(drive));
 
     // autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
     // autoChooser.addOption("right source coral", AutoFactory.rightL4CoralGen(drive, superstructure, intake));
@@ -352,6 +326,56 @@ public class RobotContainer {
     // autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
+    //auto to test ig - AR
+    //already have cmmds and these are just the most efficient of the efficient
+    //all these autos start in between the outside and middle cages of OUR barge
+    //all autos start with the robot facing the drivers and with the center of the robot
+    //being on the black starting line
+    autoChooser.addOption("AB-234", new PathPlannerAuto("AB-234"));
+    autoChooser.addOption("AB-243", new PathPlannerAuto("AB-243"));
+    autoChooser.addOption("AB-324", new PathPlannerAuto("AB-324"));
+    autoChooser.addOption("AB-342", new PathPlannerAuto("AB-342"));
+    autoChooser.addOption("AB-423", new PathPlannerAuto("AB-423"));
+    autoChooser.addOption("AB-432", new PathPlannerAuto("AB-432"));
+    autoChooser.addOption("AB-345", new PathPlannerAuto("AB-345"));
+    autoChooser.addOption("AB-354", new PathPlannerAuto("AB-354"));
+    autoChooser.addOption("AB-435", new PathPlannerAuto("AB-435"));
+    autoChooser.addOption("AB-453", new PathPlannerAuto("AB-453"));
+    autoChooser.addOption("AB-534", new PathPlannerAuto("AB-534"));
+    autoChooser.addOption("AB-543", new PathPlannerAuto("AB-543"));
+
+    //these autos start in the center of the field
+    autoChooser.addOption("CF-345", new PathPlannerAuto("CF-345"));
+    autoChooser.addOption("CF-354", new PathPlannerAuto("CF-354"));
+    autoChooser.addOption("CF-435", new PathPlannerAuto("CF-435"));
+    autoChooser.addOption("CF-453", new PathPlannerAuto("CF-453"));
+    autoChooser.addOption("CF-534", new PathPlannerAuto("CF-534"));
+    autoChooser.addOption("CF-543", new PathPlannerAuto("CF-543"));
+
+    //these autos start in between the outside and middle cages of the OPPOSING barge
+    autoChooser.addOption("EB-345", new PathPlannerAuto("EB-345"));
+    autoChooser.addOption("EB-354", new PathPlannerAuto("EB-354"));
+    autoChooser.addOption("EB-435", new PathPlannerAuto("EB-435"));
+    autoChooser.addOption("EB-453", new PathPlannerAuto("EB-453")); 
+    autoChooser.addOption("EB-534", new PathPlannerAuto("EB-534"));
+    autoChooser.addOption("EB-543", new PathPlannerAuto("EB-543"));
+    autoChooser.addOption("EB-456", new PathPlannerAuto("EB-456"));
+    autoChooser.addOption("EB-465", new PathPlannerAuto("EB-465"));
+    autoChooser.addOption("EB-546", new PathPlannerAuto("EB-546"));
+    autoChooser.addOption("EB-564", new PathPlannerAuto("EB-564"));
+    autoChooser.addOption("EB-645", new PathPlannerAuto("EB-645"));
+    autoChooser.addOption("EB-654", new PathPlannerAuto("EB-654"));
+
+    //one drivetrain trajectory auto
+    autoChooser.addOption("Drivetrain Choreo Trajectory Test", 
+    new PathPlannerAuto("Test(AB-3-IB)"));
+
+    //five autos we could test for commands
+    autoChooser.addOption("L2 Test", new PathPlannerAuto("Test for L2+Intake (AB)"));
+    autoChooser.addOption("L3 Test", new PathPlannerAuto("Test for L3+Intake (AB)"));
+    autoChooser.addOption("Barge Test", new PathPlannerAuto("Test for Barge+Score (4)"));
+    autoChooser.addOption("L3+Barge", new PathPlannerAuto("Test-L3+Barge (AB)"));
+    autoChooser.addOption("L2+Barge", new PathPlannerAuto("Test-L2+Barge (AB)"));
   }
 
   /**
