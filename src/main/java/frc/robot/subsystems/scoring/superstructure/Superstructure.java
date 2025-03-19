@@ -1,265 +1,152 @@
+
 package frc.robot.subsystems.scoring.superstructure;
 
-
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.scoring.arm.Arm;
+import frc.robot.subsystems.scoring.arm.ArmIOReal;
+import frc.robot.subsystems.scoring.arm.ArmIOSim;
 import frc.robot.subsystems.scoring.elevator.Elevator;
-import frc.robot.subsystems.scoring.elevator.ElevatorIO;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
 import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
-import frc.robot.subsystems.scoring.intake.Intake;
-import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ElevatorConstraints;
-import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
+import frc.robot.subsystems.scoring.superstructure.SuperState.*;
+import frc.robot.subsystems.scoring.ArmFF;
 import frc.robot.subsystems.scoring.wrist.Wrist;
-import frc.robot.subsystems.scoring.wrist.WristIO;
 import frc.robot.subsystems.scoring.wrist.WristIOReal;
 import frc.robot.subsystems.scoring.wrist.WristIOSim;
 
 public class Superstructure extends SubsystemBase{
+    private final Arm arm;
     private final Elevator elevator;
     private final Wrist wrist;
 
-    // private SuperVisualizer sim;
-    
-    @AutoLogOutput (key = "Copilot/Elevator Manual Override")
-    public boolean eleOverride = false;
+    private SuperVisualizer sim;
 
-    @AutoLogOutput (key = "Copilot/Wrist Manual Override")
-    public boolean wristOverride = false;
+    ArmFF ff = new ArmFF();
 
-    private ProfiledPIDController elePID = Constants.ElevatorConstants.ElePID; //Constants.ElevatorConstants.SimElePID
-    private ProfiledPIDController wristPID = Constants.WristConstants.WristPID; //Constants.WristConstants.SimWristPID
-    private ArmFeedforward wristFF = Constants.WristConstants.WristFF; //Constants.WristConstants.SimWristFF
+    private final Constraints constraints = new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0));
 
+    private ProfiledPIDController armPID = 
+        new ProfiledPIDController(
+            0.1, 0.0, 0.0, 
+            constraints);
+
+    private ProfiledPIDController wristPID = 
+        new ProfiledPIDController(
+            2, 0, 3,
+            constraints);
+
+
+    private ProfiledPIDController elePID = 
+        new ProfiledPIDController(
+            1, 0.0, 0.0, 
+            constraints);
+
+    private ElevatorFeedforward eleff =
+        new ElevatorFeedforward(
+            0.1, 0, 0);
+
+    private ArmFeedforward wristff = 
+        new ArmFeedforward(0.1, 0, 0);
+        
     private SuperState target;
-
-    private boolean pidOverride = false;
-
-    // LoggedNetworkNumber w_target = new LoggedNetworkNumber("WristTune/target", 0);
-    // LoggedNetworkNumber w_p = new LoggedNetworkNumber("WristTune/p", 0);
-    // LoggedNetworkNumber w_i = new LoggedNetworkNumber("WristTune/i", 0);
-    // LoggedNetworkNumber w_d = new LoggedNetworkNumber("WristTune/d", 0);
-    // LoggedNetworkNumber w_s = new LoggedNetworkNumber("WristTune/s", 0);
-    // LoggedNetworkNumber w_g = new LoggedNetworkNumber("WristTune/g", 0);
-    // LoggedNetworkNumber w_v = new LoggedNetworkNumber("WristTune/v", 0);
-    // LoggedNetworkNumber w_a = new LoggedNetworkNumber("WristTune/a", 0);
-
-    // LoggedNetworkNumber e_target = new LoggedNetworkNumber("EleTune/target", 0);
-    // LoggedNetworkNumber e_p = new LoggedNetworkNumber("EleTune/p", 0);
-    // LoggedNetworkNumber e_i = new LoggedNetworkNumber("EleTune/i", 0);
-    // LoggedNetworkNumber e_d = new LoggedNetworkNumber("EleTune/d", 0);
-    // LoggedNetworkNumber e_ff = new LoggedNetworkNumber("EleTune/ff", 0);
-
+    private SuperState current;
     
     public Superstructure(Mode mode){
         switch (mode) {
             case REAL:
+                this.arm = new Arm(new ArmIOReal());
                 this.wrist = new Wrist(new WristIOReal());
                 this.elevator = new Elevator(new ElevatorIOReal());
                 break;
             case SIM: 
+                this.arm = new Arm(new ArmIOSim());
                 this.wrist = new Wrist(new WristIOSim());
                 this.elevator = new Elevator(new ElevatorIOSim());
                 break;
             default: 
-                this.wrist = new Wrist(new WristIO() {});
-                this.elevator = new Elevator(new ElevatorIO() {});
+                this.arm = new Arm(new ArmIOSim());
+                this.wrist = new Wrist(new WristIOSim());
+                this.elevator = new Elevator(new ElevatorIOSim());
         }
-        //sim = new SuperVisualizer("Superstructure");
+        sim = new SuperVisualizer("Superstructure");
 
-        target = new SuperState(
+        target = SuperPreset.START.getState();
+
+       
+
+        this.current = new SuperState(
             wrist.getAngle(),
+            arm.getAngle(),
             elevator.getHeight());
-        elePID.reset(elevator.getHeight());
-        wristPID.reset(wrist.getAngle());
     }
+
+    public void setgoal(SuperState goal){
+        target = goal;
+
+    }
+
 
     @Override
     public void periodic(){
-        //sim stuff
-        // SuperState current = new SuperState(
-        //     wrist.getAngle(),
-        //     arm.getAngle(),
-        //     elevator.getHeight());
 
-        // sim.update(current);
+        current = new SuperState(
+            wrist.getAngle(),
+            arm.getAngle(),
+            elevator.getHeight());
 
-        Logger.recordOutput("SuperStruct/Wrist target",target.getWristAngle());
-        Logger.recordOutput("SuperStruct/Elevator target", target.getEleHeight());
+        sim.update(current);
 
-        Logger.recordOutput("SuperStruct/At Target", atTarget());
-        Logger.recordOutput("SuperStruct/Wrist At Target", wrist.atGoal(target.getWristAngle()));
-        Logger.recordOutput("SuperStruct/Elevator At Target", elevator.atGoal(target.getEleHeight()));
+        var ffVolt = ff.calculate(
+            VecBuilder.fill(target.getArmAngle(), target.getWristAngle())
+        );
 
-        // //PID tuning so ill kill myself later
+        arm.runVolt(
+            armPID.calculate(arm.getAngle(), target.getArmAngle())
+            //+ ffVolt.get(0, 0)
+            //^- until singlejointedarmsim gets workin, using for other stuff like autos
+        );
 
+        elevator.runVolts(
+            elePID.calculate(Units.metersToInches(elevator.getHeight()), Units.metersToInches(target.getEleHeight())) + eleff.calculate(20)
+        );
+
+        wrist.runVolts(
+            wristPID.calculate(wrist.getAngle(), target.getWristAngle())       
+            + wristff.calculate(target.getGlobalAngle() + Math.PI/2, 0)
+        );
         
-        // wristPID.setPID(
-        //     w_p.get(), 
-        //     w_i.get(), 
-        //     w_d.get());
+        wrist.periodic();
+        arm.periodic();
+        elevator.periodic();
+        Logger.recordOutput("Arm setpoint", target.getArmAngle());
+        Logger.recordOutput("wrist setpoint", target.getWristAngle());
+        Logger.recordOutput("ele setpoint", target.getEleHeight());
 
-        // wristFF = new ArmFeedforward(
-        //     w_s.get(), 
-        //     w_g.get(), 
-        //     w_v.get(), 
-        //     w_a.get());
-
-        // double wrist_volts = wristPID.calculate(wrist.getAngle(), w_target.get())
-        // + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0);
-        // Logger.recordOutput("WristTune/volts", wrist_volts);
-
-        // if (!wristOverride) {
-        //     wrist.runVolts(
-        //         wrist_volts
-        //         );
-        // }
-
-        // elePID.setPID(
-        //     e_p.get(), 
-        //     e_i.get(), 
-        //     e_d.get());
-
-        // Logger.recordOutput("pid volts",elePID.calculate(elevator.getHeight(), e_target.get()));
-
-        // if (!eleOverride) {
-        //     elevator.runVolts(
-        //         elePID.calculate(elevator.getHeight(), e_target.get()) 
-        //         + e_ff.get()
-        //     );
-        // }
-
-        // sim.update(new SuperState(wrist.getAngle(), arm.getAngle(), elevator.getHeight()));
-    }
-
-    public void manualOverride(DoubleSupplier wristinput, DoubleSupplier eleinput) {
-        if (pidOverride) return;
-
-        double wristvolts = 0;
-
-        if (Math.abs(wristinput.getAsDouble()) < 0.1 && !wristOverride) {
-            wristvolts = 
-                wristPID.calculate(wrist.getAngle(), target.getWristAngle())
-                + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0);
-        } else {
-            if (!wristOverride) {
-                wristvolts = MathUtil.clamp(wristinput.getAsDouble() + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0), 
-                (wrist.getAngle() < WristConstraints.LOWEST_A)?0:-5, 
-                (wrist.getAngle() > WristConstraints.HIGHEST_A)?0:5);
-            } else {
-                wristvolts = MathUtil.clamp(wristinput.getAsDouble(), 
-                -5, 5);
-            }
-            
-            target.setWristAngle(
-                MathUtil.clamp(
-                    wrist.getAngle(), 
-                    SuperConstraints.WristConstraints.LOWEST_A, 
-                    SuperConstraints.WristConstraints.HIGHEST_A));
-
-            wristPID.reset(wrist.getAngle());
-        }
-
-        double elevolts = 0;
-
-        if (Math.abs(eleinput.getAsDouble()) < 0.1  && !eleOverride) {
-            elevolts = elePID.calculate(elevator.getHeight(), target.getEleHeight()) 
-                + Constants.ElevatorConstants.kFF;
-            
-        } else {
-            // if needed, replace the 0 in the clamp of the next commented out line below this one to -12
-    
-            elevolts = MathUtil.clamp(
-                Constants.ElevatorConstants.kFF - eleinput.getAsDouble(), 
-                0, 
-                (elevator.getHeight() >= SuperConstraints.ElevatorConstraints.RANGE)?
-                    Constants.ElevatorConstants.kFF:12);
-
-            target.setEleHeight(
-                MathUtil.clamp(
-                    elevator.getHeight(), 
-                    0, 
-                    SuperConstraints.ElevatorConstraints.RANGE));
-            elePID.reset(elevator.getHeight());
-        }
-        Logger.recordOutput("Elevator/pid volts", elevolts);
-        Logger.recordOutput("Wrist/pid volts", wristvolts);
-        wrist.runVolts(wristvolts);
-        elevator.runVolts(elevolts);
-    }
-
-    public Command wristSysId() {
-        return wrist.runSysId();
-    }
-
-    public Command elevatorSysId() {
-        return elevator.runSysId();
-    }
- 
-    public Command resetEle() {
-        return Commands.runOnce(() -> elevator.setZero());
-    }
-
-    public Command resetWrist() {
-        return Commands.runOnce(() -> wrist.setZero());
     }
 
     public SuperState getState() {
-        return new SuperState(wrist.getAngle(), elevator.getHeight());
-    }
-
-
-    public boolean atTarget() {
-        return wrist.atGoal(target.getWristAngle()) && elevator.atGoal(target.getEleHeight());
-    }
-
-    public boolean wristAtTarget() {
-        return  wrist.atGoal(target.getWristAngle());
-    }
-
-    public boolean eleAtTarget() {
-        return elevator.atGoal(target.getEleHeight());
-    }
-
-    public double getWristAngle() {
-        return wrist.getAngle();
-    }  
-
-    public double getEleHeight() {
-        return elevator.getHeight();
+        return current;
     }
 
     public void setTarget(SuperState goal) {
-        target = SuperConstraints.clamp(goal);
-    }  
+        target = goal;
+    } 
 
-    public void setWrist(double angle) {
-        angle = MathUtil.clamp(angle, WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
-        target.setWristAngle(angle);
-    }
-
-    public void setEle(double height) {
-        height = MathUtil.clamp(height, 0, ElevatorConstraints.RANGE);
-        target.setEleHeight(height);
-    }
+    private static double applyKs(double volts, double kS, double kSDeadband) {
+        if (Math.abs(volts) < kSDeadband) {
+          return volts;
+        }
+        return volts + Math.copySign(kS, volts);
+      }
+    
+    
 }

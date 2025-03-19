@@ -1,56 +1,62 @@
-package frc.robot.commands.superstructure;
+package frc.robot.commands.scoring;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.superstructure.anglegen.AngleGen;
-import frc.robot.commands.superstructure.anglegen.SuperTraj;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
-import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
+import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
+import frc.robot.subsystems.scoring.wrist.Wrist;
 
-public class SuperToState extends Command {
-    
-    Superstructure superstructure;
-    Timer timer;
-    Supplier<SuperState> traj_states;
-    SuperTraj trajectory;
-    TrapezoidProfile tp = new TrapezoidProfile(new Constraints(10, 10));
-    SuperState goal;
-    
-    public SuperToState(Superstructure superstruct, SuperState goalState) {
-        superstructure = superstruct;
-        timer = new Timer();
-        goal = goalState;
-        traj_states = () -> goal;
+public class SuperToState extends SequentialCommandGroup {
+
+
+    public SuperToState(Superstructure superstruct, double safeangle, SuperState state) {
+        //addRequirements(superstruct);
+
+        addCommands(
+            new WristToState(superstruct, safeangle),
+            new EleToState(superstruct, state.getEleHeight()),
+            new WristToState(superstruct, state.getWristAngle())
+        
+        );
     }
 
-    public void initialize() {
-        trajectory = AngleGen.getInstance().generateTrajectory(superstructure.getState(), goal, tp);
+    public static class EleToState extends Command {
+        private Superstructure superstructure;
+        private double height;
 
-        System.out.println(trajectory);
-
-        if (trajectory.getStates().isEmpty()) {
-            traj_states = () -> superstructure.getState();
-        } else {
-            traj_states = () -> trajectory.sample(timer.get());
+        public EleToState(Superstructure superstructure, double height) {
+            this.superstructure = superstructure;
+            this.height = MathUtil.clamp(height,0,  SuperConstraints.ElevatorConstraints.RANGE);
         }
 
-        timer.start();
+        public void initialize(){
+            superstructure.setEle(height);
+        }
+
+        public boolean isFinished() {
+            return superstructure.eleAtTarget();
+        }
     }
 
-    public void execute() {
-        superstructure.setTarget(traj_states.get());
-    }
+    public static class WristToState extends Command {
+        private Superstructure superstructure;
+        private double angle;
 
-    public boolean isFinished() {
-        return timer.hasElapsed(trajectory.getTotalTimeSeconds());
-    }
+        public WristToState(Superstructure superstructure, double angle) {
+            this.superstructure = superstructure;
+            this.angle = MathUtil.clamp(angle,SuperConstraints.WristConstraints.LOWEST_A, SuperConstraints.WristConstraints.HIGHEST_A);
+        }
 
-    public void end(boolean interrupted) {
-        superstructure.setTarget(goal);
+        public void initialize(){
+            superstructure.setWrist(angle);
+        }
+
+        public boolean isFinished() {
+            return superstructure.wristAtTarget();
+        }
     }
+    
 }
