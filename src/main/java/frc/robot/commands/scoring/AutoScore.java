@@ -64,6 +64,7 @@ public class AutoScore extends Command{
     }
 
     public static class algaeSource extends AutoScore {
+        int level; 
 
         public algaeSource(Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
@@ -78,17 +79,26 @@ public class AutoScore extends Command{
             goal = pose;
             presetGoal = true;
         }
+
+        public algaeSource(int level, Pose2d pose, Drive drive, Superstructure superstructure, Intake intake){
+            this.drive = drive;
+            this.superstruct = superstructure;
+            this.intake = intake;
+            goal = pose;
+            presetGoal = true;
+            this.level = level;
+        }
         
         @Override
         public void factory() {
             if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
             
-            int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
+            int height = level == 0? FieldConstant.Reef.AlgaeSource.algaeHeight(goal): this.level;
             Pose2d correctedgoal = goal;
             
-            if (height == 1) {
+            if (height == 3) {
                 preset = SuperPreset.L3_ALGAE;
-            } else if(height == 0) {
+            } else if(height == 2) {
                 preset = SuperPreset.L2_ALGAE;
             } else {
                 scoring = new Command() {};
@@ -114,7 +124,7 @@ public class AutoScore extends Command{
         public void factory() {
             Pose2d correctedGoal = goal;
 
-            preset = SuperPreset.NET;
+            preset = SuperPreset.PROCESSOR;
             
 
             scoring = new Score(correctedGoal, preset.getState(), intake.ingest().withTimeout(1.5), drive, superstruct, 0.5);

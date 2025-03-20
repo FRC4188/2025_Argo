@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring.wrist;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -18,10 +19,13 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 
 public class WristIOReal implements WristIO {
     private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
     private final CANcoder canCoder = new CANcoder(Constants.Id.kWristCANCoder);
+
+    private final StatusSignal<Angle> posRads;
 
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
@@ -36,7 +40,11 @@ public class WristIOReal implements WristIO {
         CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
         cancoderConfig.MagnetSensor.MagnetOffset = WristConstants.kZero;
         cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+
         canCoder.getConfigurator().apply(cancoderConfig);
+
+        posRads = canCoder.getAbsolutePosition();
+        posRads.setUpdateFrequency(50);
     }
 
     @Override
@@ -47,13 +55,15 @@ public class WristIOReal implements WristIO {
 
     @Override
     public void updateInputs(WristIOInputs inputs) {
+        posRads.refresh();
         inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
         inputs.tempC = max.getMotorTemperature();
-        inputs.posRads = Units.rotationsToRadians(max.getAbsoluteEncoder().getPosition()* WristConstants.kGearRatio);
+        inputs.posRots = posRads.getValueAsDouble();
     }
 
     @Override
     public double getAngle() {
-        return Units.rotationsToRadians(max.getEncoder().getPosition() * WristConstants.kGearRatio);
+        return Units.rotationsToRadians(max.getEncoder().getPosition() * 1/25.0);
+        //return Units.rotationsToRadians(posRads.getValueAsDouble());
     }
 }

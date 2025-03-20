@@ -1,5 +1,7 @@
 package frc.robot.commands.autos;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +13,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.scoring.AutoScore.algaeScore;
 import frc.robot.commands.scoring.AutoScore.algaeSource;
 import frc.robot.commands.scoring.SuperToState;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.scoring.intake.Intake;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.util.AllianceFlip;
@@ -65,15 +69,41 @@ public final class AutoFactory {
     // }
 
     public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake){
-        drive.setPose(starting);
-        return Commands.runOnce(() -> timer.start()).andThen(
-            new algaeSource(drive, superstructure, intake)
-            .andThen(new algaeScore(drive, superstructure, intake)).andThen(
-        Commands.repeatingSequence(
-            new algaeSource(drive, superstructure, intake),
-            new algaeScore(drive, superstructure, intake)
-        ).until(() -> timer.hasElapsed(14)).andThen(
-            new SuperToState(superstructure, 0, SuperPreset.START.getState())
+        return 
+            Commands.parallel(
+                Commands.runOnce(()-> timer.start()), 
+                Commands.runOnce(()-> drive.setPose(starting)))
+            .andThen(new algaeSource(drive, superstructure, intake)
+            .andThen(new algaeScore(drive, superstructure, intake))
+            .andThen(
+                Commands.repeatingSequence(
+                    new algaeSource(drive, superstructure, intake),
+                    new algaeScore(drive, superstructure, intake))
+                .until(() -> timer.hasElapsed(14))
+                .andThen(new SuperToState(superstructure, 0, SuperPreset.START.getState())
         )));
+    }
+
+    public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake, Pose2d... goals){
+        
+        List<Pose2d> curr = Arrays.asList(goals);
+        Timer time = new Timer();
+
+        SequentialCommandGroup c = new SequentialCommandGroup(); 
+
+        curr.forEach(
+            (pose) -> 
+                c.addCommands(
+                    new algaeSource(pose, drive, superstructure, intake),
+                    new algaeScore(drive, superstructure, intake)
+                )
+        );
+        return Commands
+            .parallel(
+                Commands.runOnce(()-> time.reset()),
+                Commands.runOnce(()-> drive.setPose(starting))
+            ).andThen(c).until(()-> time.hasElapsed(13))
+            .andThen(Commands.runOnce(()-> intake.eject()).until(()-> !intake.isIn()))
+            .andThen(new SuperToState(superstructure, 0, SuperState.SuperPreset.START.getState()));
     }
 }

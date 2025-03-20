@@ -18,7 +18,7 @@ public interface IntakeIO {
     public default void runVolts(double volts) {}
 
     public default boolean isIn(){
-        return false;
+        return true;
     }
 
     public default boolean isStalled() {return false;}

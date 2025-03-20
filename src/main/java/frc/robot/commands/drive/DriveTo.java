@@ -7,6 +7,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.commands.autos.pathgen.PG_math;
@@ -49,7 +51,6 @@ public class DriveTo extends Command {
         //driving.initialize();
         System.out.println("Driving ....");
         start_time = Timer.getFPGATimestamp();
-       
     }
 
     @Override

@@ -110,8 +110,8 @@ public final class Constants {
       );
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
-      .withStatorCurrentLimit(80)
-      .withSupplyCurrentLimit(60)
+      .withStatorCurrentLimit(100)
+      .withSupplyCurrentLimit(80)
       .withStatorCurrentLimitEnable(true);
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
@@ -145,7 +145,7 @@ public final class Constants {
     public static final double kGearRatio = 1.0 / 25.0;
     public static final int kCurrentLimit = 0; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
-    public static final double kZero = 0.0;
+    public static final double kZero = 0.0395507;
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
@@ -175,8 +175,8 @@ public final class Constants {
     public static double voltStall = Amp.of(257).magnitude(); //rpm threshold to consider for stalling
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
-      .withStatorCurrentLimit(60)
-      .withSupplyCurrentLimit(40)
+      .withStatorCurrentLimit(80)
+      .withSupplyCurrentLimit(60)
       .withStatorCurrentLimitEnable(true);
 
       public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()

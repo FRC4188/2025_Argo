@@ -79,10 +79,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void runVolts(double volts){
-        if(ElevatorConstants.isPro)
-            leader.setControl(new TorqueCurrentFOC(volts));
-        else
-            leader.setControl(new VoltageOut(volts));
+        leader.setControl(new VoltageOut(volts));
         
     }
 

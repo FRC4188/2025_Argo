@@ -46,7 +46,7 @@ public class GenAutoChooser {
     }
 
     public void init(){
-        startPose.addOption("Middle", AllianceFlip.flipDS(new Pose2d(7.459, 4.160, Rotation2d.k180deg)));
+        startPose.addOption("Middle", AllianceFlip.flipDS(new Pose2d(7.180, 4.019563674926758, Rotation2d.k180deg)));
         startPose.addOption("Left", AllianceFlip.flipDS(new Pose2d(7.180, 7.550, Rotation2d.k180deg)));
         startPose.addOption("Right", AllianceFlip.flipDS(new Pose2d(7.180, 0.480, Rotation2d.k180deg)));
         startPose.addOption("None", new Pose2d());

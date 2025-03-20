@@ -50,8 +50,13 @@ public final class AutoTests {
     }
 
     public static Command test2(Drive drive) {
-        drive.setPose(new Pose2d(7.180, 7.550, Rotation2d.k180deg));
-        return new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src);
+        return Commands.sequence(
+            Commands.runOnce( ()->drive.setPose(new Pose2d(7.180, 7.550, Rotation2d.k180deg))),
+            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_right),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
+            new DriveTo(drive, new Pose2d(7, 5, new Rotation2d()))
+        );
     }
 
     public static Command AG2Coral(Drive drive){
@@ -67,6 +72,7 @@ public final class AutoTests {
         );
         
     }
+
 
     //literally FLAWLESS
     public static Command drive2Corals(Drive drive){

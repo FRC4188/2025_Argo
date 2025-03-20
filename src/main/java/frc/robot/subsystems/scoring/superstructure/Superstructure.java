@@ -221,7 +221,7 @@ public class Superstructure extends SubsystemBase{
     }
 
     public Command resetWrist() {
-        return Commands.runOnce(() -> wrist.setZero());
+        return Commands.runOnce(() -> wrist.resetZero());
     }
 
     public SuperState getState() {

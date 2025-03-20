@@ -211,11 +211,11 @@ public class FieldConstant {
 
             public static int algaeHeight(Pose2d algae_src) {
                 if (algae_src == alliance_src || algae_src == left_brg_src || algae_src == right_brg_src) {
-                    return 1;
+                    return 3;
                 } else if (algae_src == left_src_src || algae_src == right_src_src || algae_src == mid_brg_src) {
-                    return 0;
+                    return 2;
                 } else {
-                    return -1;
+                    return 0;
                 }
             }
         }

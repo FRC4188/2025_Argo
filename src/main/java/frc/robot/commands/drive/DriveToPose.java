@@ -120,7 +120,7 @@ public class DriveToPose extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        driveSubsystem.stopWithX();
+        //driveSubsystem.stopWithX();
     }
 
     @Override
