@@ -144,7 +144,7 @@ public final class Constants {
     public static final double koffsetFromCenter = Units.inchesToMeters(2.668); //inches
     public static final double kTolerance = 0.1;
     public static final double kGearRatio = 1.0 / 25.0;
-    public static final int kCurrentLimit = 0; //int for some reason
+    public static final int kCurrentLimit = 60; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
     public static final double kZero = 0.0395507;
 

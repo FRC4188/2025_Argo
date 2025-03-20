@@ -48,7 +48,7 @@ public class WristIOSim implements WristIO{
         }
         sim.update(Constants.robot.loopPeriodSecs);
         inputs.appliedVolts = appliedVolts;
-        inputs.posRots = wSim.getAngleRads();
+        inputs.posRads = wSim.getAngleRads();
     }
 
     @Override

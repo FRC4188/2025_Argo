@@ -178,7 +178,6 @@ public class RobotContainer {
                 driveSim
                   .getSimulatedDriveTrainPose()): // reset odometry to actual robot pose during simulation
 
-       //() -> drive.setPose(new Pose2d(7.180, 7.550, Rotation2d.k180deg)); // zero gyro
        () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
 
     //add cmds for pathplanner events
@@ -274,18 +273,11 @@ public class RobotContainer {
         new ConditionalCommand(intake.ingest(), intake.eject(), () -> superstructure.getEleHeight() < 1.6)
       ).onFalse(intake.stop());
 
-    // controller.getLeftTButton().onTrue(
-    //      intake.ingest()).onFalse(intake.stop());
-
-    // controller.getRightTButton().onTrue(
-    //      intake.eject()).onFalse(intake.stop());
-
-    controller.getAButton().onTrue(
+    controller.a().onTrue(
       new SuperToState(superstructure, 0, SuperPreset.ALGAE_GROUND.getState())
     ).onFalse(
       new SuperToState(superstructure, 0, SuperPreset.ALGAE_STOW.getState())
     );
-
     //intake
     controller.getRightTButton().onTrue(
       new ConditionalCommand(intake.eject(), intake.ingest(), () -> superstructure.getEleHeight() < 1.6)).onFalse(intake.stop());
@@ -312,7 +304,7 @@ public class RobotContainer {
     controller2.getRightBumperButton().onTrue(
       new SuperToState(superstructure,1,  SuperPreset.NET.getState()));
 
-    controller2.getLeftBumperButton().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
+    //controller2.getLeftBumperButton().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
 
     controller2.getUpButton()
     .onTrue(
@@ -358,6 +350,7 @@ public class RobotContainer {
     //drive to pose cmmd test
     autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
     autoChooser.addOption("test2", AutoTests.test2(drive));
+    
     autoChooser.addOption("Full gen algae left", AutoFactory.algaeGen(LEFT, drive, superstructure, intake));
     autoChooser.addOption("Full gen algae right", AutoFactory.algaeGen(RIGHT, drive, superstructure, intake));
     autoChooser.addOption("Full gen algae middle", AutoFactory.algaeGen(MIDDLE, drive, superstructure, intake));

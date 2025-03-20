@@ -15,12 +15,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.scoring.SuperToState;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.subsystems.scoring.intake.Intake;
+import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.Superstructure;
+import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.util.FieldConstant;
 
 public final class AutoTests {
@@ -56,6 +62,28 @@ public final class AutoTests {
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
             new DriveTo(drive, new Pose2d(7, 5, new Rotation2d()))
+        );
+    }
+
+    public static Command test3(Drive drive, Superstructure superstruct, Intake intake) {
+        return Commands.sequence(
+            Commands.runOnce( ()->drive.setPose(new Pose2d(7.180, 7.550, Rotation2d.k180deg))),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
+            new SuperToState(superstruct, 0, SuperState.SuperPreset.L3_ALGAE.getState()),
+            intake.ingest().withTimeout(1.5),
+            new ParallelCommandGroup(
+                new DriveTo(drive, FieldConstant.Processor.processor_goal),
+                new WaitCommand(1).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
+            ),
+            intake.eject().withTimeout(2),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
+            new SuperToState(superstruct, 0, SuperState.SuperPreset.L2_ALGAE.getState()),
+            intake.ingest().withTimeout(1.5),
+            new ParallelCommandGroup(
+                new DriveTo(drive, FieldConstant.Processor.processor_goal),
+                new WaitCommand(1).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
+            ),
+            intake.eject().withTimeout(2)
         );
     }
 

@@ -10,7 +10,7 @@ import frc.robot.commands.autos.pathgen.PG_math;
 public class SuperConstraints {
     
     public class WristConstraints{
-        public final static double LOWEST_A = 0.15;
+        public final static double LOWEST_A = 0.05;
         public final static double HIGHEST_A = Units.degreesToRadians(80);
     }
 

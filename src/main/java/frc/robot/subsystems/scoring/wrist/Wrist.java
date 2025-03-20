@@ -22,17 +22,17 @@ public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-  public double wristZero = 0;
+  public double relativeZero = 0;
 
   //here cause relative encoder
 
   public Wrist(WristIO io){
     this.io = io;
-    wristZero = io.getAngle();
+    relativeZero = io.getAngle();
   }
 
   public void resetZero() {
-    wristZero = io.getAngle();
+    relativeZero = io.getAngle();
   }
 
   @Override
@@ -50,7 +50,7 @@ public class Wrist extends SubsystemBase {//J.C
    */
   @AutoLogOutput(key = "Wrist/Angle Radians")
   public double getAngle(){
-    return io.getAngle() - wristZero;
+    return io.getAngle() - relativeZero;
   }
 
   public boolean atGoal(double target) {

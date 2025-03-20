@@ -41,10 +41,10 @@ public class Superstructure extends SubsystemBase{
 
     // private SuperVisualizer sim;
     
-    @AutoLogOutput (key = "Copilot/Elevator Manual Override")
+    @AutoLogOutput (key = "Copilot/Elevator PID Override")
     public boolean eleOverride = false;
 
-    @AutoLogOutput (key = "Copilot/Wrist Manual Override")
+    @AutoLogOutput (key = "Copilot/Wrist PID Override")
     public boolean wristOverride = false;
 
     private ProfiledPIDController elePID = Constants.ElevatorConstants.ElePID; //Constants.ElevatorConstants.SimElePID

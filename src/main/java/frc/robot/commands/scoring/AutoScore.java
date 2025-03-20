@@ -54,7 +54,7 @@ public class AutoScore extends Command{
         public Score(Pose2d goal, SuperState state,Command intakeCommand, Drive drive, Superstructure superstructure, double safe) {
             addCommands(
                 new DriveTo(drive, goal).alongWith(
-                    new SuperToState(superstructure, safe, state)
+                    new SuperToState(superstructure, 0.5, SuperState.SuperPreset.ALGAE_STOW.getState())
                     .until(() -> drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone)
                     .andThen(new WaitUntilCommand(() -> drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
                     .andThen(new SuperToState(superstructure,safe, state))),
@@ -93,7 +93,7 @@ public class AutoScore extends Command{
         public void factory() {
             if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
             
-            int height = level == 0? FieldConstant.Reef.AlgaeSource.algaeHeight(goal): this.level;
+            int height = level == 0 ? FieldConstant.Reef.AlgaeSource.algaeHeight(goal): this.level;
             Pose2d correctedgoal = goal;
             
             if (height == 3) {
@@ -126,7 +126,6 @@ public class AutoScore extends Command{
 
             preset = SuperPreset.PROCESSOR;
             
-
             scoring = new Score(correctedGoal, preset.getState(), intake.ingest().withTimeout(1.5), drive, superstruct, 0.5);
         }
     }

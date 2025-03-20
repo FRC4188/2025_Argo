@@ -80,6 +80,7 @@ public final class AutoFactory {
                     new algaeSource(drive, superstructure, intake),
                     new algaeScore(drive, superstructure, intake))
                 .until(() -> timer.hasElapsed(14))
+                .andThen(Commands.runOnce(()-> intake.eject()).until(()-> !intake.isIn()))
                 .andThen(new SuperToState(superstructure, 0, SuperPreset.START.getState())
         )));
     }

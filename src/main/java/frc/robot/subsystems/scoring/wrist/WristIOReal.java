@@ -25,7 +25,7 @@ public class WristIOReal implements WristIO {
     private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
     private final CANcoder canCoder = new CANcoder(Constants.Id.kWristCANCoder);
 
-    private final StatusSignal<Angle> posRads;
+    private final StatusSignal<Angle> posRots;
 
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
@@ -43,8 +43,8 @@ public class WristIOReal implements WristIO {
 
         canCoder.getConfigurator().apply(cancoderConfig);
 
-        posRads = canCoder.getAbsolutePosition();
-        posRads.setUpdateFrequency(50);
+        posRots = canCoder.getAbsolutePosition();
+        posRots.setUpdateFrequency(50);
     }
 
     @Override
@@ -55,15 +55,15 @@ public class WristIOReal implements WristIO {
 
     @Override
     public void updateInputs(WristIOInputs inputs) {
-        posRads.refresh();
+        posRots.refresh();
         inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
         inputs.tempC = max.getMotorTemperature();
-        inputs.posRots = posRads.getValueAsDouble();
+        inputs.posRads = Units.rotationsToRadians(posRots.getValueAsDouble());
     }
 
     @Override
     public double getAngle() {
-        return Units.rotationsToRadians(max.getEncoder().getPosition() * 1/25.0);
+        return Units.rotationsToRadians(max.getEncoder().getPosition() * WristConstants.kGearRatio);
         //return Units.rotationsToRadians(posRads.getValueAsDouble());
     }
 }

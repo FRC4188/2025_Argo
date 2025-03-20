@@ -10,7 +10,7 @@ public interface WristIO {//J.C
         public boolean connected = true;
         public double appliedVolts = 0.0;
         public double tempC = 0.0;
-        public double posRots = 0.0;
+        public double posRads = 0.0;
     }
     default void updateInputs(WristIOInputs inputs) {}
     default void runVolts(double volts) {}
