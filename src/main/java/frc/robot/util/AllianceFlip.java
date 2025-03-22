@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class AllianceFlip {
 
-    public static double flip (double x){
+    public static double flipX(double x){
         if (canFlip()) {
             return FieldConstant.field_length - x;
         } else {
@@ -27,18 +27,9 @@ public class AllianceFlip {
 
     public static Pose2d flipDS(Pose2d pos){
         if (canFlip()) {
-            return new Pose2d(flip(pos.getX()), flipY(pos.getY()), apply(pos.getRotation()));
+            return new Pose2d(flipX(pos.getX()), flipY(pos.getY()), apply(pos.getRotation()));
         } else {
             return pos;
-        }
-    }
-
-    /** Flips a translation to the correct side of the field based on the current alliance color. */
-    public static Translation2d apply(Translation2d translation) {
-        if (canFlip()) {
-            return new Translation2d(flip(translation.getX()), translation.getY());
-        } else {
-            return translation;
         }
     }
 
@@ -48,24 +39,6 @@ public class AllianceFlip {
             return new Rotation2d(-rotation.getCos(), -rotation.getSin());
         } else {
             return rotation;
-        }
-    }
-
-  /** Flips a pose to the correct side of the field based on the current alliance color. */
-    public static Pose2d apply(Pose2d pose) {
-        if (canFlip()) {
-            return new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()));
-        } else {
-            return pose;
-        }
-    }
-
-    public static Translation3d apply(Translation3d translation3d) {
-        if (canFlip()) {
-            return new Translation3d(
-                flip(translation3d.getX()), flipY(translation3d.getY()), translation3d.getZ());
-        } else {
-            return translation3d;
         }
     }
 

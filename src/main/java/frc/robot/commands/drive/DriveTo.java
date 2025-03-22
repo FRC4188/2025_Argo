@@ -15,6 +15,7 @@ import frc.robot.commands.autos.pathgen.PG_math;
 import frc.robot.commands.autos.pathgen.PathGen;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.util.AllianceFlip;
 
 public class DriveTo extends Command {
 
@@ -25,6 +26,7 @@ public class DriveTo extends Command {
     DriveToPose driving;
     Drive drive;
 
+    //flipped drive, unflipped goal
     public DriveTo(Drive drive, Pose2d goal) {
         this.drive = drive;
         config = new TrajectoryConfig(
@@ -35,17 +37,17 @@ public class DriveTo extends Command {
 
     @Override
     public void initialize() {
-        traj = PathGen.getInstance().generateTrajectory(drive.getPose(), goalPose.get(), config);
+        traj = PathGen.getInstance().generateTrajectory(AllianceFlip.flipDS(drive.getPose()),goalPose.get(), config);
 
         if (traj.getStates().isEmpty()) {
             goalPose = () -> drive.getPose();
         } else {
-            goalPose = () -> traj.sample(Timer.getFPGATimestamp() - start_time).poseMeters;
+            goalPose = () -> AllianceFlip.flipDS(traj.sample(Timer.getFPGATimestamp() - start_time).poseMeters);
 
             driving = new DriveToPose(drive, goalPose);
         }
         System.out.println("trajector:");
-        System.out.println(traj);
+        // System.out.println(traj);
         
         driving.repeatedly().schedule();
         //driving.initialize();
@@ -56,10 +58,10 @@ public class DriveTo extends Command {
     @Override
     public void execute() {
 
-        System.out.print("Set goal ");
-        PG_math.printpose(goalPose.get());
-        System.out.print("current goal ");
-        PG_math.printpose(drive.getPose());
+        // System.out.print("Set goal ");
+        // PG_math.printpose(goalPose.get());
+        // System.out.print("current goal ");
+        // PG_math.printpose(drive.getPose());
 
         //driving.execute();
 
@@ -72,6 +74,7 @@ public class DriveTo extends Command {
     public void end(boolean interrupted) {
         if (driving != null) driving.cancel();
         //driving.end(interrupted);
+        drive.stopWithX();
     }
 
     @Override

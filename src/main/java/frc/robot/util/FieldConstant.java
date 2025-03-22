@@ -177,7 +177,7 @@ public class FieldConstant {
 
         public class AlgaeSource {
             //robot perpendicular distance from the wall
-            public static double src_perp = Constants.robot.B_CROSSLENGTH/2;
+            public static double src_perp = Constants.robot.A_LENGTH/2;
             //robot parallel distance from the center of the wall
             public static double src_parallel = Units.inchesToMeters(0);
 
@@ -304,7 +304,7 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.A_CROSSLENGTH/2 + 10, 0);
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(5), 0.2);
 
         public static Pose2d processor_wall = new Pose2d(
             field_center_x - Units.inchesToMeters(109.712),

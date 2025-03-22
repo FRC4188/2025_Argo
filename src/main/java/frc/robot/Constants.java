@@ -52,12 +52,12 @@ public final class Constants {
 
     public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(8); // 12.6
 
-    public static final double A_LENGTH = Units.inchesToMeters(30); //inches
-    public static final double A_WIDTH = Units.inchesToMeters(29); //inches
+    public static final double A_LENGTH = Units.inchesToMeters(29); //inches
+    public static final double A_WIDTH = Units.inchesToMeters(30); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3.2) * 2;
-    public static final double B_WIDTH = Units.inchesToMeters(3.2) * 2;
+    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3.5) * 2;
+    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(3.5) * 2;
     public static final double B_CROSSLENGTH = Math.hypot(B_LENGTH, B_WIDTH);
 
     public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
@@ -142,11 +142,11 @@ public final class Constants {
 
   public static class WristConstants {
     public static final double koffsetFromCenter = Units.inchesToMeters(2.668); //inches
-    public static final double kTolerance = 0.1;
+    public static final double kTolerance = 0.05;
     public static final double kGearRatio = 1.0 / 25.0;
     public static final int kCurrentLimit = 60; //int for some reason
     public static final double kDegree_per_rads = (360 / kGearRatio);
-    public static final double kZero = 0.0395507;
+    public static final double kZero = 0;
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
     public static final double kMax_Accel = Units.degreesToRadians(720.0);

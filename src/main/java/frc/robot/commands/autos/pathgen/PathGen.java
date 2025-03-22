@@ -99,9 +99,8 @@ public class PathGen {
         }
     }
 
+    //raw unflipped poses
     public Trajectory generateTrajectory(Pose2d start, Pose2d end, TrajectoryConfig config) {
-        start = AllianceFlip.flipDS(start);
-        end = AllianceFlip.flipDS(end);
 
         start = new Pose2d(
             MathUtil.clamp(start.getX(), 0, FieldConstant.field_length),
@@ -127,10 +126,10 @@ public class PathGen {
             config);
 
         for (State states : result.getStates()) {
-            states.poseMeters = AllianceFlip.flipDS(
+            states.poseMeters = (
                 new Pose2d(
                 states.poseMeters.getTranslation(), 
-                PG_math.interpolate_mod(start.getRotation(), end.getRotation(), states.timeSeconds / result.getTotalTimeSeconds()) 
+                PG_math.interpolate_mod(start.getRotation(), end.getRotation(), states.timeSeconds / (result.getTotalTimeSeconds()) * 3.0/2.0) 
             ));
         }
         
@@ -154,6 +153,8 @@ public class PathGen {
 	    while (curIndex < backward_nodes.size() - 1) {
 
 		    curNode = backward_nodes.get(curIndex).parent;
+
+            if (curNode == null) break;
 
 		    if (FOHandler.getInstance().shortest_from_line(
                 a_star.node_to_t2d(backward_nodes.get(curIndex)), 

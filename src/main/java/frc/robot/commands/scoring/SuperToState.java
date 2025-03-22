@@ -2,7 +2,10 @@ package frc.robot.commands.scoring;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
@@ -15,13 +18,17 @@ public class SuperToState extends SequentialCommandGroup {
     public static Command currentRun = null;
 
     public SuperToState(Superstructure superstruct, double safeangle, SuperState state) {
-        if (currentRun != null) currentRun.cancel();
-        currentRun = this;
-        
+          
         addCommands(
+            Commands.runOnce(
+                () -> {
+                    if (currentRun != null) currentRun.cancel();
+                    currentRun = this;
+                }),
             new WristToState(superstruct, safeangle),
             new EleToState(superstruct, state.getEleHeight()),
-            new WristToState(superstruct, state.getWristAngle())
+            new WristToState(superstruct, state.getWristAngle()),
+            Commands.runOnce(() -> currentRun = null)
         );
     }
 
@@ -35,11 +42,12 @@ public class SuperToState extends SequentialCommandGroup {
         }
 
         public void initialize(){
+        
             superstructure.setEle(height);
         }
 
         public boolean isFinished() {
-            return superstructure.eleAtTarget();
+            return Constants.robot.currMode == Mode.SIM? true: superstructure.eleAtTarget();
         }
     }
 
@@ -57,7 +65,7 @@ public class SuperToState extends SequentialCommandGroup {
         }
 
         public boolean isFinished() {
-            return superstructure.wristAtTarget();
+            return Constants.robot.currMode == Mode.SIM? true: superstructure.wristAtTarget();
         }
     }
     

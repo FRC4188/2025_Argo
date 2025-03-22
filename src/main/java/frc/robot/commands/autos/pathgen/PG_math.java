@@ -1,5 +1,6 @@
 package frc.robot.commands.autos.pathgen;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -68,7 +69,7 @@ public class PG_math {
 			orig_mod -= 360;
 		}
 
-		double result = t * (goal_mod - orig_mod) + orig_mod;
+		double result = MathUtil.clamp(t,0,1) * (goal_mod - orig_mod) + orig_mod;
 
 		return Rotation2d.fromDegrees(result);
 	}

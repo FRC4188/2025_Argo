@@ -40,11 +40,6 @@ public class IntakeIOReal implements IntakeIO {
         motor.optimizeBusUtilization();
     }
 
-    // @AutoLogOutput(key = "Intake/Is Stalled")
-    // public boolean isStalled() {
-    //     return motor.getStatorCurrent().getValueAsDouble()
-    // }
-
     @Override
     public void runVolts(double volts) {
         motor.setVoltage(volts);

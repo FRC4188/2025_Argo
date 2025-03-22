@@ -106,7 +106,7 @@ public class TeleScore extends Command{
         @Override
         public void factory() {
             preset = level == 2? SuperPreset.L2_ALGAE : SuperPreset.L3_ALGAE;
-            scoring = new Score(preset.getState(), superstruct, intake.ingest(), 0);
+            scoring = new Score(preset.getState(), superstruct, intake.ingest(()-> 1), 0);
         }
     }
 
@@ -135,7 +135,7 @@ public class TeleScore extends Command{
             
 
             if(correctedGoal != null) scoring = new Score(correctedGoal, preset.getState(), drive, superstruct, 0.5);
-            else scoring = new Score(preset.getState(), superstruct,intake.eject(), 1);
+            else scoring = new Score(preset.getState(), superstruct,intake.eject(() -> 1), 1);
         }
     }
 }

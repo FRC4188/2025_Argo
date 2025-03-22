@@ -68,23 +68,33 @@ public final class AutoFactory {
     //     )));
     // }
 
+    /***
+     * 
+     * @param starting unflipped
+     * @param drive
+     * @param superstructure
+     * @param intake
+     * @return
+     */
     public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake){
         return 
             Commands.parallel(
                 Commands.runOnce(()-> timer.start()), 
-                Commands.runOnce(()-> drive.setPose(starting)))
+                Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))))
             .andThen(new algaeSource(drive, superstructure, intake)
             .andThen(new algaeScore(drive, superstructure, intake))
             .andThen(
                 Commands.repeatingSequence(
+                    Commands.runOnce(()-> System.out.println("sequence loop")),
                     new algaeSource(drive, superstructure, intake),
                     new algaeScore(drive, superstructure, intake))
                 .until(() -> timer.hasElapsed(14))
-                .andThen(Commands.runOnce(()-> intake.eject()).until(()-> !intake.isIn()))
+                .andThen(Commands.runOnce(()-> intake.eject(()->1)).until(()-> !intake.isIn()))
                 .andThen(new SuperToState(superstructure, 0, SuperPreset.START.getState())
         )));
     }
 
+    //input raw pose
     public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake, Pose2d... goals){
         
         List<Pose2d> curr = Arrays.asList(goals);
@@ -104,7 +114,7 @@ public final class AutoFactory {
                 Commands.runOnce(()-> time.reset()),
                 Commands.runOnce(()-> drive.setPose(starting))
             ).andThen(c).until(()-> time.hasElapsed(13))
-            .andThen(Commands.runOnce(()-> intake.eject()).until(()-> !intake.isIn()))
+            .andThen(Commands.runOnce(()-> intake.eject(()->1)).until(()-> !intake.isIn()))
             .andThen(new SuperToState(superstructure, 0, SuperState.SuperPreset.START.getState()));
     }
 }

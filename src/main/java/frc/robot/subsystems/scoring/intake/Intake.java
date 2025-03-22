@@ -2,6 +2,7 @@ package frc.robot.subsystems.scoring.intake;
 
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -11,45 +12,45 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 public class Intake extends SubsystemBase{
 
-    //I need this to be global value - RN
-
     private final IntakeIO io;
     private final IntakeIOInputsAutoLogged inputs;
-   
 
     public Intake(IntakeIO io){
         this.io = io;
-        //DIO channel
         inputs = new IntakeIOInputsAutoLogged();
     }
 
-    //TODO: fix inverted for coral/algae ingest/eject (don't know which is inverted and which one isn't)
-    public Command ingest() {
-        double voltage = 9;
-        return Commands.runOnce(
-            () -> {
-                io.runVolts(voltage);
-                //temporary
-            });
+    //scale is 0 to 1
+    public Command ingest(DoubleSupplier scale) {
+        return Commands.runEnd(
+            () -> 
+                io.runVolts(7 * scale.getAsDouble()),
+            ()-> io.stop()
+            ,this);
     }
 
-    public Command eject() {
-        double voltage = -9;
-        return Commands.runOnce(
+    //scale is 0 to 1
+    public Command eject(DoubleSupplier scale) {
+        return Commands.runEnd(
             () -> {
-                io.runVolts(voltage);
-            });
+                io.runVolts(-5 * scale.getAsDouble());
+            },
+            () -> io.stop()
+            ,this);
     }
 
     public Command stop() {
         return Commands.runOnce(
             () -> {
                 io.runVolts(0);
-            });
+            }
+            ,this);
     }
 
     @AutoLogOutput(key = "Intake/Algae is In?")

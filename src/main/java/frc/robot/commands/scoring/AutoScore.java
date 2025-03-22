@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
@@ -15,7 +16,10 @@ import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.FieldConstant;
+
+import static frc.robot.util.FieldConstant.Reef.AlgaeSource.*;
 
 public class AutoScore extends Command{
     protected Drive drive;
@@ -50,21 +54,20 @@ public class AutoScore extends Command{
     public static class Score extends SequentialCommandGroup {
         public float happy_zone = 2;
 
-
+        //input raw pose
         public Score(Pose2d goal, SuperState state,Command intakeCommand, Drive drive, Superstructure superstructure, double safe) {
             addCommands(
                 new DriveTo(drive, goal).alongWith(
-                    new SuperToState(superstructure, 0.5, SuperState.SuperPreset.ALGAE_STOW.getState())
-                    .until(() -> drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone)
-                    .andThen(new WaitUntilCommand(() -> drive.getPose().getTranslation().getDistance(goal.getTranslation()) <= happy_zone))
+
+                    new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) <= happy_zone)
                     .andThen(new SuperToState(superstructure,safe, state))),
                 intakeCommand
+
             );
         }
     }
 
     public static class algaeSource extends AutoScore {
-        int level; 
 
         public algaeSource(Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
@@ -72,6 +75,7 @@ public class AutoScore extends Command{
             this.intake = intake;
         }
 
+        //input raw pose
         public algaeSource(Pose2d pose, Drive drive, Superstructure superstructure, Intake intake) {
             this.drive = drive;
             this.superstruct = superstructure;
@@ -79,21 +83,16 @@ public class AutoScore extends Command{
             goal = pose;
             presetGoal = true;
         }
-
-        public algaeSource(int level, Pose2d pose, Drive drive, Superstructure superstructure, Intake intake){
-            this.drive = drive;
-            this.superstruct = superstructure;
-            this.intake = intake;
-            goal = pose;
-            presetGoal = true;
-            this.level = level;
-        }
         
         @Override
         public void factory() {
-            if (!presetGoal) goal = drive.getPose().nearest(FieldConstant.Reef.AlgaeSource.asources);
-            
-            int height = level == 0 ? FieldConstant.Reef.AlgaeSource.algaeHeight(goal): this.level;
+            //revert to original unflipped pos
+            if (!presetGoal) {
+                goal = (AllianceFlip.flipDS(drive.getPose())).nearest(FieldConstant.Reef.AlgaeSource.asources);
+                asources.remove(goal);
+            }
+
+            int height = FieldConstant.Reef.AlgaeSource.algaeHeight(goal);
             Pose2d correctedgoal = goal;
             
             if (height == 3) {
@@ -101,10 +100,11 @@ public class AutoScore extends Command{
             } else if(height == 2) {
                 preset = SuperPreset.L2_ALGAE;
             } else {
-                scoring = new Command() {};
+                scoring = (new Command() {}).withTimeout(0);
+                return;
             }
 
-            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest().withTimeout(1.5), drive, superstruct, 0);
+            scoring = new Score(correctedgoal,  preset.getState(), intake.ingest(()-> 1).andThen(new WaitCommand(1.5)), drive, superstruct, 0);
         }
     }
 
@@ -122,11 +122,10 @@ public class AutoScore extends Command{
         
         @Override
         public void factory() {
-            Pose2d correctedGoal = goal;
 
             preset = SuperPreset.PROCESSOR;
             
-            scoring = new Score(correctedGoal, preset.getState(), intake.ingest().withTimeout(1.5), drive, superstruct, 0.5);
+            scoring = new Score(goal, preset.getState(), intake.ingest(()-> 1).andThen(new WaitCommand(1.5)), drive, superstruct, 0.5);
         }
     }
 }

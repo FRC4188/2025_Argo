@@ -21,7 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import static frc.robot.util.FieldConstant.Reef.CoralGoal.*;
+import static frc.robot.util.FieldConstant.Reef.AlgaeSource.*;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -95,9 +95,12 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer.teleInit();
 
-    cgoals = new LinkedList<Pose2d>(Arrays.asList(
-                alliance_right, alliance_left, left_brg_left, left_brg_right, left_src_left, left_src_right,
-                right_brg_left,right_brg_right, right_src_left, right_src_right, mid_brg_left, mid_brg_right));
+    //TODO: fix after further autonomization
+    // asources = new LinkedList<Pose2d>(Arrays.asList(
+    //   alliance_src, left_brg_src, left_src_src, right_brg_src, right_src_src, mid_brg_src
+    // ));
+
+
     SignalLogger.start();
   }
 
@@ -112,7 +115,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-
     
   }
 

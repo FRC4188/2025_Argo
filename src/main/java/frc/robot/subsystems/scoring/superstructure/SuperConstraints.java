@@ -10,13 +10,13 @@ import frc.robot.commands.autos.pathgen.PG_math;
 public class SuperConstraints {
     
     public class WristConstraints{
-        public final static double LOWEST_A = 0.05;
+        public final static double LOWEST_A = -0.3;
         public final static double HIGHEST_A = Units.degreesToRadians(80);
     }
 
     public class ElevatorConstraints{
         public final static double LOWEST_H = Units.inchesToMeters(9.13250);
-        public final static double HIGHEST_H = Units.inchesToMeters(9.13250 + 72);
+        public final static double HIGHEST_H = Units.inchesToMeters(9.13250 + 71);
         public final static double RANGE = HIGHEST_H - LOWEST_H;
     }
 

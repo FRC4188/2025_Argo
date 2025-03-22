@@ -76,7 +76,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Drive extends SubsystemBase implements VisionConsumer{
     @AutoLogOutput(key = "Drive/vision?")
-    public boolean vision_accept = true;
+    public boolean vision_accept = false;
 
 
     public PIDController translation =

@@ -104,7 +104,7 @@ public class Superstructure extends SubsystemBase{
 
         // sim.update(current);
 
-        Logger.recordOutput("SuperStruct/Wrist target",target.getWristAngle());
+        Logger.recordOutput("SuperStruct/Wrist target", target.getWristAngle());
         Logger.recordOutput("SuperStruct/Elevator target", target.getEleHeight());
 
         Logger.recordOutput("SuperStruct/At Target", atTarget());
