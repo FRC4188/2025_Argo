@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.scoring.AutoScore;
 import frc.robot.commands.scoring.SuperToState;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
@@ -40,151 +41,18 @@ public final class AutoTests {
             Volts.of(12),
             false);
 
-    // //runs fine, bit off
-    // public static Command twoCoral(){
-    //     PathPlannerPath a;
-    //     try{
-    //         a = PathPlannerPath.fromPathFile("2 Corals");
-    //         return AutoBuilder.followPath(a);
-    //     }catch(Exception e){
-    //         e.printStackTrace();
-    //     }
-    //     return new SequentialCommandGroup();
-    // }
-
-    public static Command test1(Drive drive) {
-        drive.setPose(new Pose2d(7.459, 4.160, Rotation2d.k180deg));
-        return new DriveToPose(drive, () -> FieldConstant.Reef.AlgaeSource.mid_brg_src);
-    }
-
-    public static Command test2(Drive drive) {
+    public static Command extreme(Pose2d starting, Drive drive, Superstructure superstruct) {
         return Commands.sequence(
-            Commands.runOnce( ()->drive.setPose(RobotContainer.LEFT)),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_right),
+            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))),
+            Commands.runOnce(()-> superstruct.resetEle()),
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
-            new DriveTo(drive, new Pose2d(7, 5, new Rotation2d()))
-        );
-    }
-
-    //unflippe goal
-    public static Command test3Left(Drive drive, Superstructure superstruct, Intake intake) {
-        return Commands.sequence(
-            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(RobotContainer.LEFT))),
-            Commands.runOnce(()-> superstruct.resetEle()),
-
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src), //TODO: switch to right later?
-            new SuperToState(superstruct, 0, SuperState.SuperPreset.L3_ALGAE.getState()),
-            //new WaitCommand(1),
-            intake.ingest(() -> 0.5).withTimeout(1.5),
-            new ParallelCommandGroup(
-                new DriveTo(drive, FieldConstant.Processor.processor_goal),
-                new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
-            ),
-            intake.eject(()->1).withTimeout(1.5)
-            // new WaitCommand(1.5),
-            // intake.stop(),
-            // new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
-            // new SuperToState(superstruct, 0, SuperState.SuperPreset.L2_ALGAE.getState()),
-            // // new WaitCommand(1),
-            // intake.ingest().withTimeout(0.8),
-            // new ParallelCommandGroup(
-            //     new DriveTo(drive, FieldConstant.Processor.processor_goal),
-            //     new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
-            // ),
-            // intake.eject(),
-            // new WaitCommand(1.5),
-            // intake.stop(),
-            // Commands.runOnce(() -> drive.stopWithX())
-        );
-    }
-
-    public static Command test3Mid(Drive drive, Superstructure superstruct, Intake intake) {
-        return Commands.sequence(
-            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(RobotContainer.MIDDLE))),
-            Commands.runOnce(()-> superstruct.resetEle()),
-
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src), //TODO: switch to right later?
-            new SuperToState(superstruct, 0, SuperState.SuperPreset.L3_ALGAE.getState()),
-            //new WaitCommand(1),
-            intake.ingest(() -> 0.5).withTimeout(1.5),
-            new ParallelCommandGroup(
-                new DriveTo(drive, FieldConstant.Processor.processor_goal),
-                new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
-            ),
-            intake.eject(()->1).withTimeout(1.5)
-            // new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
-            // new SuperToState(superstruct, 0, SuperState.SuperPreset.L2_ALGAE.getState()),
-            // // new WaitCommand(1),
-            // intake.ingest().withTimeout(0.8),
-            // new ParallelCommandGroup(
-            //     new DriveTo(drive, FieldConstant.Processor.processor_goal),
-            //     new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
-            // ),
-            // intake.eject(),
-            // new WaitCommand(1.5),
-            // intake.stop(),
-            // Commands.runOnce(() -> drive.stopWithX())
-        );
-    }
-
-
-    public static Command test3Right(Drive drive, Superstructure superstruct, Intake intake) {
-        return Commands.sequence(
-            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(RobotContainer.RIGHT))),
-            Commands.runOnce(()-> superstruct.resetEle()),
-
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src), //TODO: switch to right later?
-            new SuperToState(superstruct, 0, SuperState.SuperPreset.L3_ALGAE.getState()),
-            //new WaitCommand(1),
-            intake.ingest(() -> 0.5).withTimeout(1.5),
-            new ParallelCommandGroup(
-                new DriveTo(drive, FieldConstant.Processor.processor_goal),
-                new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
-            ),
-            intake.eject(()->1).withTimeout(1.5)
-            // new WaitCommand(1.5),
-            // intake.stop(),
-            // new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
-            // new SuperToState(superstruct, 0, SuperState.SuperPreset.L2_ALGAE.getState()),
-            // // new WaitCommand(1),
-            // intake.ingest().withTimeout(0.8),
-            // new ParallelCommandGroup(
-            //     new DriveTo(drive, FieldConstant.Processor.processor_goal),
-            //     new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState()))
-            // ),
-            // intake.eject(),
-            // new WaitCommand(1.5),
-            // intake.stop(),
-            // Commands.runOnce(() -> drive.stopWithX())
-        );
-    }
-
-    
-
-    public static Command AG2Coral(Drive drive){
-        drive.setPose(new Pose2d(7.459, 4.160, Rotation2d.k180deg));
-        return Commands.sequence(
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),
-            new DriveTo(drive, FieldConstant.Source.left_src_mid),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.mid_brg_right),
-            new DriveTo(drive, FieldConstant.Source.right_src_mid),
-            new DriveTo(drive, FieldConstant.Reef.CoralGoal.left_brg_left),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
             new DriveTo(drive, FieldConstant.Processor.processor_goal)
-        );
-        
-    }
-
-
-    //literally FLAWLESS
-    public static Command drive2Corals(Drive drive){
-        return Commands.sequence(
-            new DriveToPose(drive, () -> new Pose2d(5.245, 5.276, new Rotation2d(Degrees.of(-120)))),
-            new WaitCommand(0.5),
-            // new DriveToPose(drive, () -> new Pose2d(1.383,7.039, new Rotation2d(Degrees.of(-55)))),
-            // new WaitCommand(0.5),
-            new DriveToPose(drive, () -> new Pose2d(3.765,5.240, new Rotation2d(Degrees.of(-60))))
         );
     }
 }

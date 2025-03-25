@@ -14,25 +14,24 @@ import frc.robot.subsystems.scoring.wrist.Wrist;
 
 public class SuperToState extends SequentialCommandGroup {
 
-    //do not remove, i know its jank...
-    public static Command currentRun = null;
-
     public SuperToState(Superstructure superstruct, double safeangle, SuperState state) {
-          
+        addRequirements(superstruct);
+
         addCommands(
-            Commands.runOnce(
-                () -> {
-                    if (currentRun != null) currentRun.cancel();
-                    currentRun = this;
-                }),
             new WristToState(superstruct, safeangle),
             new EleToState(superstruct, state.getEleHeight()),
-            new WristToState(superstruct, state.getWristAngle()),
-            Commands.runOnce(() -> currentRun = null)
+            new WristToState(superstruct, state.getWristAngle())
         );
     }
 
-    public static class EleToState extends Command {
+    public SuperToState(Superstructure superstruct, double wrist_angle) {
+        addRequirements(superstruct);
+        addCommands(
+            new WristToState(superstruct, wrist_angle)
+        );
+    }
+
+    private static class EleToState extends Command {
         private Superstructure superstructure;
         private double height;
 
@@ -51,7 +50,7 @@ public class SuperToState extends SequentialCommandGroup {
         }
     }
 
-    public static class WristToState extends Command {
+    private static class WristToState extends Command {
         private Superstructure superstructure;
         private double angle;
 

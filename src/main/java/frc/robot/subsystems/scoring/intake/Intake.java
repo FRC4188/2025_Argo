@@ -26,20 +26,18 @@ public class Intake extends SubsystemBase{
         inputs = new IntakeIOInputsAutoLogged();
     }
 
-    //scale is 0 to 1
-    public Command ingest(DoubleSupplier scale) {
+    public Command ingest(DoubleSupplier volts) {
         return Commands.runEnd(
             () -> 
-                io.runVolts(7 * scale.getAsDouble()),
+                io.runVolts(volts.getAsDouble()),
             ()-> io.stop()
             ,this);
     }
 
-    //scale is 0 to 1
-    public Command eject(DoubleSupplier scale) {
+    public Command eject(DoubleSupplier volts) {
         return Commands.runEnd(
             () -> {
-                io.runVolts(-5 * scale.getAsDouble());
+                io.runVolts(-volts.getAsDouble());
             },
             () -> io.stop()
             ,this);
@@ -49,8 +47,7 @@ public class Intake extends SubsystemBase{
         return Commands.runOnce(
             () -> {
                 io.runVolts(0);
-            }
-            ,this);
+            },this);
     }
 
     @AutoLogOutput(key = "Intake/Algae is In?")

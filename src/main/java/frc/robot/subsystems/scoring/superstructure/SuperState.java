@@ -1,17 +1,8 @@
 package frc.robot.subsystems.scoring.superstructure;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import frc.robot.commands.autos.pathgen.PG_math;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ElevatorConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
-import frc.robot.util.FieldConstant.Reef;
-
 
 public class SuperState {
 
@@ -36,18 +27,18 @@ public class SuperState {
     }
 
     public void setWristAngle(double angle) {
-        wrist_angle = angle;
+        wrist_angle = MathUtil.clamp(angle, WristConstraints.LOWEST_A, WristConstraints.HIGHEST_A);
     }
 
 
     public void setEleHeight(double height) {
-        elevator_height = height;
+        elevator_height = MathUtil.clamp(height, 0, ElevatorConstraints.RANGE);
     }
 
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                0.6077, 0.8713)),
+                0.6577, 0.8913)),
  
         L2_ALGAE(
             new SuperState(
@@ -56,20 +47,21 @@ public class SuperState {
         NET(
             new SuperState(
                 0.8, SuperConstraints.ElevatorConstraints.RANGE)),
-                
-        PROCESSOR(
-            new SuperState(
-                0.5,0)),
 
         ALGAE_GROUND(
-             new SuperState(1.2, 0)),
+             new SuperState(1.3, 0)),
         
         START(
             new SuperState(0, 0)),
 
-        ALGAE_STOW(
+        PROCESSOR(
             new SuperState(0.5, 0)
+        ),
+
+        ALGAE_STOW(
+            PROCESSOR.getState()
         );
+        //Note that processor and stow are the same thing, just separate variables for naming purposes
         
                 
         private final SuperState state;

@@ -20,8 +20,6 @@ public interface ElevatorIO {
     public default void updateInputs(ElevatorIOInputs inputs) {}
 
     public default void runVolts(double volts) {}
-
-    public default void runPos(double pos){}
-
+    
     public default double getHeight(){return 0;}
 }

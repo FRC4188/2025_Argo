@@ -36,31 +36,42 @@ public class CSP_Controller extends CommandXboxController {
    */
   private double getOutput(double input, Scale scale) {
     if (Math.abs(input) > Constants.controller.DEADBAND) {
-      if (scale == Scale.SQUARED) return Math.signum(input) * Math.pow(input, 2);
-      else if (scale == Scale.CUBED) return Math.pow(input, 3);
-      else if (scale == Scale.QUARTIC) return Math.signum(input) * Math.pow(input, 4);
-      else return input;
+      return scaleValue(input, scale);
     } else {
       return 0;
     }
   }
 
-  public Translation2d getCorrectedRight() {
+  private double scaleValue(double input, Scale scale) {
+    switch(scale) {
+      case LINEAR: return input;
+      case SQUARED: return Math.signum(input) * Math.pow(input, 2);
+      case CUBED: return Math.pow(input, 3);
+      case QUARTIC: return Math.signum(input) * Math.pow(input, 4);
+      default: return input;
+    }
+  }
+
+  public Translation2d getCorrectedRight(Scale scale) {
     Translation2d input = new Translation2d(super.getRightY(), super.getRightX());
     if (input.getNorm() < Constants.controller.DEADBAND) {
       return new Translation2d();
     }
 
-    return new Translation2d((input.getNorm() - Constants.controller.DEADBAND) / (1.0 - Constants.controller.DEADBAND), input.getAngle());
+    Translation2d corrected = new Translation2d((input.getNorm() - Constants.controller.DEADBAND) / (1.0 - Constants.controller.DEADBAND), input.getAngle());
+
+    return new Translation2d(scaleValue(corrected.getX(), scale), scaleValue(corrected.getY(), scale));
   }
 
-  public Translation2d getCorrectedLeft() {
+  public Translation2d getCorrectedLeft(Scale scale) {
     Translation2d input = new Translation2d(super.getLeftY(), super.getLeftX());
     if (input.getNorm() < Constants.controller.DEADBAND) {
       return new Translation2d();
     }
 
-    return new Translation2d((input.getNorm() - Constants.controller.DEADBAND) / (1.0 - Constants.controller.DEADBAND), input.getAngle()); 
+    Translation2d corrected = new Translation2d((input.getNorm() - Constants.controller.DEADBAND) / (1.0 - Constants.controller.DEADBAND), input.getAngle());
+
+    return new Translation2d(scaleValue(corrected.getX(), scale), scaleValue(corrected.getY(), scale));
   }
 
   /**
@@ -68,7 +79,7 @@ public class CSP_Controller extends CommandXboxController {
    * @return
    */
   public double getRightY(Scale scale) {
-    return -getOutput(this.getRightY(), scale);
+    return getOutput(this.getRightY(), scale);
   }
 
   public double getRightX(Scale scale) {
@@ -76,11 +87,11 @@ public class CSP_Controller extends CommandXboxController {
   }
 
   public double getLeftY(Scale scale) {
-    return -getOutput(this.getLeftY(), scale);
+    return getOutput(this.getLeftY(), scale);
   }
 
   public double getLeftX(Scale scale) {
-    return -getOutput(this.getLeftX(), scale);
+    return getOutput(this.getLeftX(), scale);
   }
 
   public Trigger getLeftS() {

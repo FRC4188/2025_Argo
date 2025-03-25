@@ -45,13 +45,13 @@ public class IntakeIOReal implements IntakeIO {
         motor.setVoltage(volts);
     }
 
- public boolean isIn(){
+    public boolean isIn(){
         return !breaker.get(); //true when laser can hit breaker aka nothing in intake
     }
 
     @Override
     public boolean isStalled() {
-        return  (Math.abs(motor.getStatorCurrent().getValueAsDouble()) > 35);
+        return  (Math.abs(motor.getStatorCurrent().getValueAsDouble()) > IntakeConstants.kStallCurrent);
     }
 
     @Override

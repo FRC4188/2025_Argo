@@ -30,6 +30,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.scoring.ScoreNet;
 import frc.robot.commands.scoring.SuperToState;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
@@ -40,6 +41,7 @@ import frc.robot.subsystems.drivetrain.ModuleIOTalonFXReal;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
+import frc.robot.subsystems.scoring.climber.Climber;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
@@ -71,14 +73,11 @@ public class RobotContainer {
   private Superstructure superstructure;
   private Intake intake;
   private Limelight vis;
-
-  // private final Limelight vis;
+  private Climber climb;
+  //sim
   private SwerveDriveSimulation driveSim;
-  private  Runnable resetGyro;
 
-  public static final Pose2d MIDDLE = new Pose2d(7.180, 4.020, Rotation2d.k180deg);
-  public static final Pose2d LEFT = new Pose2d(7.180, 7.5750, Rotation2d.k180deg);
-  public static final Pose2d RIGHT = new Pose2d(7.180, 0.480, Rotation2d.k180deg);
+  private Runnable resetGyro;
 
   // Controller
   private final CSP_Controller controller = new CSP_Controller(0);
@@ -100,9 +99,9 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                 new ModuleIOTalonFXReal(TunerConstants.BackRight),
                 (pose) -> {});
-        
-        vis = new Limelight(drive, 
-            new VisionIOLL("limelight-left", drive::getRotation));        
+
+            
+
         superstructure = new Superstructure(Mode.REAL);
 
         intake = new Intake(new IntakeIOReal());
@@ -112,9 +111,7 @@ public class RobotContainer {
         //maple sim
         
         // Sim robot, instantiate physics sim IO implementations
-        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(8.251, 5.991, new Rotation2d(Degrees.of(-178.059))));
         driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(7.459, 5.991, Rotation2d.k180deg));
-        // driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
@@ -214,74 +211,60 @@ public class RobotContainer {
    */
   public void configureButtonBindings() {
     // Default command, normal field-relative drive
-
     drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
 
-    superstructure.setDefaultCommand(
-      Commands.run(() -> superstructure.manualOverride(
-        () -> 3 * controller2.getLeftY(), 
-        () -> 7 * (-controller2.getRightY(Scale.SQUARED)))
-      , superstructure));
-    
+    Commands.run(() -> superstructure.manualOverride(
+        () -> controller2.getCorrectedLeft(Scale.LINEAR).getY(), 
+        () -> controller2.getCorrectedRight(Scale.LINEAR).getY()
+      )).schedule();
+    //default command without requiremnets ^
 
-    Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft().getNorm() != 0.0 || controller.getCorrectedRight().getX() != 0.0));
+    Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
 
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getCorrectedLeft().getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> -controller.getCorrectedLeft().getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getRightX(controller.getRightBumperButton().getAsBoolean()? Scale.LINEAR :Scale.SQUARED) * 0.7 * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> controller.getCorrectedLeft(Scale.LINEAR).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> controller.getCorrectedLeft(Scale.LINEAR).getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
 
     // Reset gyro to 0° when start button is pressed
-      
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
-    // controller.a().onTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // controller.b().onTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // controller.x().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // controller.y().onTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    //TODO: ask and replace
     controller.getLeftTButton().whileTrue(
-        intake.ingest(()-> ((controller.getLeftTriggerAxis() >= 0.5)?1:0.5)));
-      controller.getRightTButton().whileTrue(
-        intake.eject(()-> controller.getRightTriggerAxis()));
+      intake.ingest(()-> ((controller.getLeftTriggerAxis() >= 0.75)?10:4)))
+        .onFalse(intake.stop());
+      
+    controller.getRightTButton().whileTrue(
+      intake.eject(()-> controller.getRightTriggerAxis() * 5))
+        .onFalse(intake.stop());
 
-    controller.a().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.ALGAE_GROUND.getState())
-    ).onFalse(
-      new SuperToState(superstructure, 0, SuperPreset.ALGAE_STOW.getState())
-    );
-    
-    controller2.b().onTrue(Commands.runOnce(() -> superstructure.wristOverride = !superstructure.wristOverride));
-    controller2.y().onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
+    //emergency cases
+    controller2.x().and(controller.leftBumper()).onTrue(superstructure.resetEle());
+    controller2.b().and(controller.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.wristOverride = !superstructure.wristOverride));
+    controller2.y().and(controller.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
+    controller2.a().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
 
-    controller2.x().onTrue(superstructure.resetEle());
-    controller2.a().onTrue(superstructure.resetWrist());
+    controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
 
-    controller2.getStartButton().onTrue(new SuperToState(superstructure, 0.5, SuperPreset.ALGAE_STOW.getState()));
+    // controller2.getRightBumperButton().onTrue(
+    //   new SuperToState(superstructure,1,  SuperPreset.NET.getState()));
 
     controller2.getRightBumperButton().onTrue(
-      new SuperToState(superstructure,1,  SuperPreset.NET.getState()));
-
-    controller2.getLeftBumperButton().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
+      new ScoreNet(superstructure, intake));
 
     controller2.getUpButton().onTrue(
-      new SuperToState(superstructure, 1, SuperPreset.PROCESSOR.getState()));
+      new SuperToState(superstructure, 0.5, SuperPreset.PROCESSOR.getState()));
 
     controller2.getLeftButton().onTrue(
       new SuperToState(superstructure, 0, SuperPreset.L2_ALGAE.getState()));
 
-    
     controller2.getRightButton().onTrue(
       new SuperToState(superstructure, 0, SuperPreset.L3_ALGAE.getState()));
       
     controller2.getDownButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.ALGAE_GROUND.getState()));
-
+      new SuperToState(superstructure, SuperPreset.ALGAE_GROUND.getState().getWristAngle()));
   }
 
   private void configureDashboard() {
-
     
     // Set up SysId routines
     // autoChooser.addOption(
@@ -297,42 +280,10 @@ public class RobotContainer {
     autoChooser.addDefaultOption(
         "Drive SysId (Dynamic Forward)", 
         Commands.runOnce(() -> superstructure.resetEle()).andThen(drive.sysIdDynamic(SysIdRoutine.Direction.kForward)));
-    // autoChooser.addDefaultOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        //pathplanner pathfinding + following
-    // autoChooser.addOption("Mid to 2 corals gui", AutoTests.twoCoral());
+
     autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
     autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
-    
-    //drive to pose cmmd test
-    autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
-    autoChooser.addOption("test3 mid", AutoTests.test3Mid(drive, superstructure, intake));
-    autoChooser.addOption("test3 left", AutoTests.test3Left(drive, superstructure, intake));
-    autoChooser.addOption("test3 right", AutoTests.test3Right(drive, superstructure, intake));
-    
-    autoChooser.addOption("Full gen algae left", AutoFactory.algaeGen(LEFT, drive, superstructure, intake));
-    autoChooser.addOption("Full gen algae right", AutoFactory.algaeGen(RIGHT, drive, superstructure, intake));
-    autoChooser.addOption("Full gen algae middle", AutoFactory.algaeGen(MIDDLE, drive, superstructure, intake));
 
-    autoChooser.addOption("Custom gen algae", 
-      AutoFactory.algaeGen(
-        LEFT, 
-        drive, 
-        superstructure, 
-        intake,
-          AlgaeSource.alliance_src,
-          AlgaeSource.left_brg_src
-        ));
-
-    // autoChooser.addOption("left source coral", AutoFactory.leftL4CoralGen(drive, superstructure, intake));
-    // autoChooser.addOption("right source coral", AutoFactory.rightL4CoralGen(drive, superstructure, intake));
-    // autoChooser.addOption("algae middle", AutoFactory.algaeGen(FieldConstant.mid_start, drive, superstructure, intake));
-    // autoChooser.addOption("algae left", AutoFactory.algaeGen(FieldConstant.left_start, drive, superstructure, intake));
-    // autoChooser.addOption("algae Right", AutoFactory.algaeGen(FieldConstant.right_start, drive, superstructure, intake));
-
-    //drive to pose cmmd test
-    // autoChooser.addOption("2 corals drive", AutoTests.drive2Corals(drive));
-    autoChooser.addOption("pathgen", AutoTests.AG2Coral(drive));
 
   }
 
@@ -348,9 +299,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    // drive.setPose(new Pose2d(7.459, 5.991, new Rotation2d()));
-    // drive.setPose(new Pose2d(0, 0, new Rotation2d(Degrees.of(0))));
-    drive.setPose(FieldConstant.Source.left_src_mid);
+    drive.setPose(new Pose2d(7.459, 5.991, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 

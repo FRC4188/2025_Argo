@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
-import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -39,11 +38,9 @@ public final class Constants {
     public static final int PILOT = 0;
     public static final int COPILOT = 1;
     public static final double DEADBAND = 0.2;
-    public static final double TRIGGER_THRESHOLD = 0.6;
   }
 
   public static class robot {
-
     public static final String rio = "rio";
     public static final String canivore = "canivore";
     public static final double loopPeriodSecs = 0.02;
@@ -82,21 +79,22 @@ public final class Constants {
     public static final int kElevatorLead = 13;
     public static final int kElevatorFollow = 14;
     public static final int kWristCANCoder = 15;
+    public static final int kClimber = 16;
     public static final int kWrist = 17;   
     public static final int kIntake = 18;
   }
 
   public static class ElevatorConstants{    
     public static final double kGearRatio = 30.0;
-    public static final double kPitchRadius = 0.04475 / 2; //TODO: fix this
+    public static final double kPitchRadius = 0.04475 / 2; //sproket size
     public static final double kTolerance = 0.05;
 
     public static final boolean isPro = false;
 
-    public static final double kConversion = 3 * 2 * Math.PI * kPitchRadius; 
+    public static final double kConversion = kGearRatio / (3 * kPitchRadius);//should i kill myself
 
-    public static final double kMax_Vel = 3;
-    public static final double kMax_Accel = 2;
+    public static final double kMax_Vel = 5;
+    public static final double kMax_Accel = 5;
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
     public static final double kP = 25;
@@ -106,17 +104,13 @@ public final class Constants {
     
     public static final ProfiledPIDController ElePID = new ProfiledPIDController(kP, kI, kD, kConstraints);
 
-    public static final ProfiledPIDController SimElePID = new ProfiledPIDController(
-      10, 0, 0, new Constraints(20, 20)
-      );
-
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(100)
       .withSupplyCurrentLimit(80)
       .withStatorCurrentLimitEnable(true);
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
-      .withSensorToMechanismRatio(kGearRatio);
+      .withSensorToMechanismRatio(kConversion);
     
     private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
       .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))
@@ -128,8 +122,10 @@ public final class Constants {
       .withKP(kP)
       .withKD(kD);
 
-    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
-    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
+    private static final OpenLoopRampsConfigs kOpenLoopRampsConfigs = 
+      new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(0.5);
+    private static final ClosedLoopRampsConfigs kClosedLoopRampsConfigs = 
+      new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.5);
 
     public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
       .withCurrentLimits(kCurrentLimitsConfigs)
@@ -141,12 +137,9 @@ public final class Constants {
   }
 
   public static class WristConstants {
-    public static final double koffsetFromCenter = Units.inchesToMeters(2.668); //inches
     public static final double kTolerance = 0.05;
-    public static final double kGearRatio = 1.0 / 25.0;
-    public static final int kCurrentLimit = 60; //int for some reason
-    public static final double kDegree_per_rads = (360 / kGearRatio);
-    public static final double kZero = 0;
+    public static final double kGearRatio = 25.0;//TODO: soon to change
+    public static final int kCurrentLimit = 60; 
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
@@ -155,35 +148,49 @@ public final class Constants {
     public static final double kP = 4.0;
     public static final double kI = 0.3;
     public static final double kD = 0.2;
-    public static final double kF = 0.0;
     public static final double kS = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double kG = 1.0;
 
-
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
-
-    //sim
-    public static final ProfiledPIDController SimWristPID = new ProfiledPIDController(3, 0.0, 6, new Constraints(Units.degreesToRadians(960.0), Units.degreesToRadians(720.0)));
-    public static final ArmFeedforward SimWristFF = new ArmFeedforward(0.1, 0, 0, 0);
-
-    
   }
 
   public static class IntakeConstants {
-    public static double voltStall = Amp.of(257).magnitude(); //rpm threshold to consider for stalling
+    public static final double kStallCurrent = 35;
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(80)
       .withSupplyCurrentLimit(60)
       .withStatorCurrentLimitEnable(true);
 
-      public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
-        .withCurrentLimits(kCurrentLimitsConfigs)
-        .withMotorOutput(
-          new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)
-        );
+    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
+      .withCurrentLimits(kCurrentLimitsConfigs)
+      .withMotorOutput(
+        new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)
+      );
+  }
+
+  public static class ClimberConstants {
+
+    private static final double kGearRatio = 1.0;
+    public static final double kTolerance = 0.1;
+
+
+    private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
+    .withSensorToMechanismRatio(kGearRatio);
+
+    private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(80)
+      .withSupplyCurrentLimit(60)
+      .withStatorCurrentLimitEnable(true);
+
+    public static final TalonFXConfiguration kMotorConfig = new TalonFXConfiguration()
+      .withCurrentLimits(kCurrentLimitsConfigs)
+      .withFeedback(kFeedbackConfigs)
+      .withMotorOutput(
+        new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)
+      );
   }
 }

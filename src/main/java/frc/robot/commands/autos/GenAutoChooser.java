@@ -79,7 +79,7 @@ public class GenAutoChooser {
                         
         //close/far -> location
         for(int i = 1; i < ree.length; i ++){
-            cmds.add(new algaeScore(drive, superstructure, intake));
+            cmds.add(new algaeProcess(drive, superstructure, intake));
             cmds.add(new algaeSource(
                 getAlgaePos(ree[i].charAt(2), ree[i].charAt(1)), 
                 drive, superstructure, intake));

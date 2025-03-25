@@ -48,7 +48,6 @@ public class Elevator extends SubsystemBase{
         return io.getHeight() - kZero;
     }
 
-    //TODO: add autologoutput
     public boolean atGoal(double target) {
         return Math.abs(getHeight() - target) < ElevatorConstants.kTolerance;
     }

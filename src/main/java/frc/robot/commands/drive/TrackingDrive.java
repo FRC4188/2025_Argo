@@ -50,7 +50,7 @@ public class TrackingDrive extends Command{
                 drive, 
                 ()-> 0.0, 
                 ()-> 0.0, 
-                ()-> rotPID.calculate(drive.getPose().getRotation().getRadians(), angle));
+                ()-> rotPID.calculate(drive.getPose().getRotation().getDegrees(), angle));
         }
     }
 

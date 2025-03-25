@@ -26,13 +26,13 @@ import frc.robot.subsystems.generated.TunerConstants;
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(
-                TunerConstants.kSpeedAt12Volts.magnitude() * 0.8, 
-                Constants.robot.MAX_ACCELERATION.magnitude() * 0.5), 0.02);
+                TunerConstants.kSpeedAt12Volts.magnitude(),
+                Constants.robot.MAX_ACCELERATION.magnitude()), 0.02);
 
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(
-                TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
-                Constants.robot.MAX_ACCELERATION.magnitude() * 0.3), 0.02);
+                TunerConstants.kSpeedAt12Volts.magnitude(), 
+                Constants.robot.MAX_ACCELERATION.magnitude()), 0.02);
 
     private Drive driveSubsystem;
     private Supplier<Pose2d> poseSupplier;

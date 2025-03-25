@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.scoring.AutoScore.algaeScore;
+import frc.robot.commands.scoring.AutoScore.algaeProcess;
 import frc.robot.commands.scoring.AutoScore.algaeSource;
 import frc.robot.commands.scoring.SuperToState;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -82,14 +82,14 @@ public final class AutoFactory {
                 Commands.runOnce(()-> timer.start()), 
                 Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))))
             .andThen(new algaeSource(drive, superstructure, intake)
-            .andThen(new algaeScore(drive, superstructure, intake))
+            .andThen(new algaeProcess(drive, superstructure, intake))
             .andThen(
                 Commands.repeatingSequence(
                     Commands.runOnce(()-> System.out.println("sequence loop")),
                     new algaeSource(drive, superstructure, intake),
-                    new algaeScore(drive, superstructure, intake))
+                    new algaeProcess(drive, superstructure, intake))
                 .until(() -> timer.hasElapsed(14))
-                .andThen(Commands.runOnce(()-> intake.eject(()->1)).until(()-> !intake.isIn()))
+                .andThen(Commands.runOnce(()-> intake.eject(()->5)).until(()-> !intake.isIn()))
                 .andThen(new SuperToState(superstructure, 0, SuperPreset.START.getState())
         )));
     }
@@ -106,7 +106,7 @@ public final class AutoFactory {
             (pose) -> 
                 c.addCommands(
                     new algaeSource(pose, drive, superstructure, intake),
-                    new algaeScore(drive, superstructure, intake)
+                    new algaeProcess(drive, superstructure, intake)
                 )
         );
         return Commands
@@ -114,7 +114,7 @@ public final class AutoFactory {
                 Commands.runOnce(()-> time.reset()),
                 Commands.runOnce(()-> drive.setPose(starting))
             ).andThen(c).until(()-> time.hasElapsed(13))
-            .andThen(Commands.runOnce(()-> intake.eject(()->1)).until(()-> !intake.isIn()))
+            .andThen(Commands.runOnce(()-> intake.eject(()->5)).until(()-> !intake.isIn()))
             .andThen(new SuperToState(superstructure, 0, SuperState.SuperPreset.START.getState()));
     }
 }

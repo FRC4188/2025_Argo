@@ -27,11 +27,6 @@ public class Wrist extends SubsystemBase {//J.C
 
   public Wrist(WristIO io){
     this.io = io;
-    io.setZero(0);
-  }
-
-  public void resetZero() {
-    io.setZero(0);
   }
 
   @Override

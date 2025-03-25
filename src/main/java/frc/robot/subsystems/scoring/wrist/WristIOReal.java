@@ -30,11 +30,7 @@ public class WristIOReal implements WristIO {
     private final SparkMax max = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);
     private final CANcoder canCoder = new CANcoder(Constants.Id.kWristCANCoder);
 
-    
-
     private final StatusSignal<Angle> posRots;
-    private final StatusSignal<MagnetHealthValue> magnetHealth;
-    private double relativeZero = 0;
 
     public WristIOReal() {  
         SparkMaxConfig config = new SparkMaxConfig();
@@ -50,15 +46,12 @@ public class WristIOReal implements WristIO {
         max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
-        cancoderConfig.MagnetSensor.MagnetOffset = WristConstants.kZero;
         cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 
         canCoder.getConfigurator().apply(cancoderConfig);
 
         posRots = canCoder.getAbsolutePosition();
         posRots.setUpdateFrequency(50);
-        magnetHealth = canCoder.getMagnetHealth();
-        magnetHealth.setUpdateFrequency(30);
     }
 
     @Override
@@ -67,28 +60,16 @@ public class WristIOReal implements WristIO {
         max.setVoltage(volts);
     }
 
-    public void setZero(double curPos) {
-        relativeZero = Units.rotationsToRadians(max.getEncoder().getPosition() * WristConstants.kGearRatio) - curPos;
-    }
-
     @Override
     public void updateInputs(WristIOInputs inputs) {
         posRots.refresh();
-        magnetHealth.refresh();
         inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
         inputs.tempC = max.getMotorTemperature();
         inputs.posRads = Units.rotationsToRadians(posRots.getValueAsDouble());
-
-        Logger.recordOutput("Wrist/Magnet Green?", magnetHealth.getValue() == MagnetHealthValue.Magnet_Green);
-        
-        if (magnetHealth.getValue() == MagnetHealthValue.Magnet_Green) setZero(getAngle());
     }
-
 
     @Override
     public double getAngle() {
-        return (magnetHealth.getValue() != MagnetHealthValue.Magnet_Green)? 
-            Units.rotationsToRadians(max.getEncoder().getPosition() * WristConstants.kGearRatio) - relativeZero: 
-            Units.rotationsToRadians(posRots.getValueAsDouble());
+        return Units.rotationsToRadians(posRots.getValueAsDouble());
     }
 }

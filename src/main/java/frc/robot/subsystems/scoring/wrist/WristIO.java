@@ -14,8 +14,6 @@ public interface WristIO {//J.C
     }
     default void updateInputs(WristIOInputs inputs) {}
     default void runVolts(double volts) {}
-
-    default void setZero(double curPos) {}
     default double getAngle() {return 0;}
 
 }

@@ -19,25 +19,26 @@ import frc.robot.util.AllianceFlip;
 
 public class DriveTo extends Command {
 
-    double start_time = 0;
-    Supplier<Pose2d> goalPose;
-    Trajectory traj;
-    TrajectoryConfig config;
-    DriveToPose driving;
-    Drive drive;
+    private double start_time = 0;
+    private Supplier<Pose2d> goalPose;
+    private Trajectory traj;
+    private TrajectoryConfig config;
+    private DriveToPose driving;
+    private Drive drive;
+    private Pose2d end_goal;
 
     //flipped drive, unflipped goal
     public DriveTo(Drive drive, Pose2d goal) {
         this.drive = drive;
         config = new TrajectoryConfig(
-            TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
-            Constants.robot.MAX_ACCELERATION.magnitude() * 0.5);
-        goalPose = () -> goal;
+            TunerConstants.kSpeedAt12Volts.magnitude() * 0.8, 
+            Constants.robot.MAX_ACCELERATION.magnitude() * 0.8);
+        end_goal = goal;
     }
 
     @Override
     public void initialize() {
-        traj = PathGen.getInstance().generateTrajectory(AllianceFlip.flipDS(drive.getPose()),goalPose.get(), config);
+        traj = PathGen.getInstance().generateTrajectory(AllianceFlip.flipDS(drive.getPose()),end_goal, config);
 
         if (traj.getStates().isEmpty()) {
             goalPose = () -> drive.getPose();
@@ -46,40 +47,25 @@ public class DriveTo extends Command {
 
             driving = new DriveToPose(drive, goalPose);
         }
-        System.out.println("trajector:");
-        // System.out.println(traj);
         
         driving.repeatedly().schedule();
-        //driving.initialize();
-        System.out.println("Driving ....");
         start_time = Timer.getFPGATimestamp();
     }
 
     @Override
     public void execute() {
 
-        // System.out.print("Set goal ");
-        // PG_math.printpose(goalPose.get());
-        // System.out.print("current goal ");
-        // PG_math.printpose(drive.getPose());
-
-        //driving.execute();
-
-        // if (driving.isFinished()) {
-        //     driving.initialize();
-        // }
     }
 
     @Override
     public void end(boolean interrupted) {
         if (driving != null) driving.cancel();
-        //driving.end(interrupted);
         drive.stopWithX();
     }
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - start_time > traj.getTotalTimeSeconds()  +1;
+        return AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= 0.05;
     }
 
 

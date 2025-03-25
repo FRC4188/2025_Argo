@@ -36,15 +36,18 @@ public class FieldConstant {
     public static double algae_radius = Units.inchesToMeters(8.125);
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
-    public static Pose2d left_start = new Pose2d(7.459, 4.160, Rotation2d.kZero);
-    public static Pose2d mid_start = new Pose2d(7.459, 6.154, Rotation2d.kZero);
-    public static Pose2d right_start = new Pose2d(7.459, 1.836, Rotation2d.kZero);
+    //starting positions
+    public static Pose2d start_mid = new Pose2d(7.180, FieldConstant.Reef.Base.mid_brg_wall.getY(), Rotation2d.k180deg);
+    public static Pose2d start_left = new Pose2d(7.180, 7.5750, Rotation2d.k180deg);
+    public static Pose2d start_right = new Pose2d(7.180, 0.480, Rotation2d.k180deg);
 
     public class Field {
-        public Pose2d innerCageStart = new Pose2d(new Translation2d(8.007, 5.047), new Rotation2d(0.0));
-        public Pose2d middleCageStart = new Pose2d(new Translation2d(8.007, 6.164), new Rotation2d(0.0));
-        public Pose2d outterCageStart = new Pose2d(new Translation2d(8.007, 7.261), new Rotation2d(0.0));
+        //idk what these are for
+        public static Pose2d innerCageStart = new Pose2d(new Translation2d(8.007, 5.047), new Rotation2d(0.0));
+        public static Pose2d middleCageStart = new Pose2d(new Translation2d(8.007, 6.164), new Rotation2d(0.0));
+        public static Pose2d outterCageStart = new Pose2d(new Translation2d(8.007, 7.261), new Rotation2d(0.0));
 
+        //path gen obstacles
         public static double brg_length = Units.inchesToMeters(23);
         public static double brg_width = Units.inchesToMeters(23);
 
@@ -59,6 +62,19 @@ public class FieldConstant {
         public static Translation2d mid_right_wall = new Translation2d(field_center_x, 0);
     }
 
+    public class Net {
+        public static final double line = 8.027;
+        public static Pose2d left_score = new Pose2d(line, field_center_y + Units.inchesToMeters(127.375), Rotation2d.k180deg);
+        public static Pose2d mid_score = new Pose2d(line, field_center_y + Units.inchesToMeters(84.375), Rotation2d.k180deg);
+        public static Pose2d right_score = new Pose2d(line, field_center_y + Units.inchesToMeters(41.5), Rotation2d.k180deg);
+
+        public static List<Pose2d> nscores = new LinkedList<Pose2d>(Arrays.asList(left_score,mid_score,right_score));
+
+        public static void reloadNscores() {
+            nscores = new LinkedList<Pose2d>(Arrays.asList(left_score,mid_score,right_score));
+        }
+    }
+
     public class Cage {
         //dimensions
         public static double cage_height = Units.inchesToMeters(24);
@@ -67,7 +83,6 @@ public class FieldConstant {
         //height from bottom of cage to carpet
         public static double deep_height = Units.inchesToMeters(3.125);
         public static double shallow_height = Units.inchesToMeters(30.125);
-
 
         //ordered in distance to scoring table; 0 - closest, 5 - farthest
         public static Translation3d[] cage_positions = new Translation3d[6];
@@ -80,21 +95,10 @@ public class FieldConstant {
             cage_positions[4] = new Translation3d(field_center_x, field_center_y + Units.inchesToMeters(84.375), shallow_height);
             cage_positions[5] = new Translation3d(field_center_x, field_center_y + Units.inchesToMeters(127.375), shallow_height);            
         }
-
-        //i feel like this doesn't matter because who pushes code in that short of time unless we have a preconfig set up in smart dashboard - RN
-        public static void setDeep(int location, boolean isDeep){
-            Translation3d cage = cage_positions[location];
-
-            if(isDeep)
-                cage_positions[location] = new Translation3d(cage.getX(), cage.getY(), deep_height);
-            else
-                cage_positions[location] = new Translation3d(cage.getX(), cage.getY(), shallow_height);
-        }
     }
 
     //i hate hexagons - RN
     public class Reef{
-        
         public static double center_x = field_center_x - Units.inchesToMeters(168.692);
         public static double center_y = field_width/2;
         public static double from_reef = Units.inchesToMeters(65.5 / 2); 
@@ -118,7 +122,6 @@ public class FieldConstant {
 
             public static Translation2d score_left = new Translation2d(-score_perp, score_parallel);
             public static Translation2d score_right = new Translation2d(-score_perp, -score_parallel);
-
             
             //god help us
             //left and right relative to robot facing into the reef
@@ -209,6 +212,10 @@ public class FieldConstant {
                 
             public static List<Pose2d> asources = new LinkedList<Pose2d>(Arrays.asList(alliance_src, left_brg_src, right_brg_src, left_src_src, right_src_src, mid_brg_src));
 
+            public static void reloadAsources() {
+                asources = new LinkedList<Pose2d>(Arrays.asList(alliance_src, left_brg_src, right_brg_src, left_src_src, right_src_src, mid_brg_src));
+            }
+
             public static int algaeHeight(Pose2d algae_src) {
                 if (algae_src == alliance_src || algae_src == left_brg_src || algae_src == right_brg_src) {
                     return 3;
@@ -279,10 +286,10 @@ public class FieldConstant {
                 center_y + from_reef * Math.sin(Units.degreesToRadians(-120)), 
                 new Rotation2d(Degrees.of(-120)));
             
-            
         }
     }
 
+    //TODO: double check these poses
     public class Elem_Locations{
         public static double distance_x = Units.inchesToMeters(48);
         public static double distance_apart = Units.inchesToMeters(72);
@@ -317,13 +324,13 @@ public class FieldConstant {
         );
     }
 
+
+
     public class Source{
         public static Pose2d right_src_wall = new Pose2d(Units.inchesToMeters(31.863), Units.inchesToMeters(23.8725), Rotation2d.fromDegrees(54.0112));
         public static Pose2d left_src_wall = new Pose2d(Units.inchesToMeters(31.863), field_width - Units.inchesToMeters(23.8725), Rotation2d.fromDegrees(-54.0112));
         public static double src_length = Units.inchesToMeters(79.268);
 
-        // already in meters, okay?
-        // thanks - def leo
         public static Pose2d right_approach_bottom_src = new Pose2d(0.650, 1.410, Rotation2d.fromDegrees(-125));
         public static Pose2d left_approach_bottom_src = new Pose2d(1.700, 0.650, Rotation2d.fromDegrees(-125));
         public static Pose2d middle_approach_bottom_src = new Pose2d(1.175, 1.030, Rotation2d.fromDegrees(-125));

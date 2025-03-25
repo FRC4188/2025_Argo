@@ -79,22 +79,12 @@ public class DriveCommands {
   public static Command TeleDrive(Drive drive, DoubleSupplier xInput, DoubleSupplier yInput, DoubleSupplier thetaInput){
     return Commands.run(
       () -> {
-        //SlewRateLimiter limitX = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
-        //SlewRateLimiter limitY = new SlewRateLimiter(Constants.robot.MAX_ACCELERATION.magnitude());
-
-        // double x = MathUtil.applyDeadband(xInput.getAsDouble(), DEADBAND);
-        // double y = MathUtil.applyDeadband(yInput.getAsDouble(), DEADBAND);
 
         double totalSpeed = Math.hypot(xInput.getAsDouble(), yInput.getAsDouble());
         double angle = Math.atan2(yInput.getAsDouble(), xInput.getAsDouble());
         double xSpeed = totalSpeed * Math.cos(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
         double ySpeed = totalSpeed * Math.sin(angle) * TunerConstants.kSpeedAt12Volts.magnitude();
-        double rotSpeed = -MathUtil.applyDeadband(thetaInput.getAsDouble(), DEADBAND) * 5 * Math.PI;
-
-        //xSpeed = limitX.calculate(xSpeed);
-        //ySpeed = limitY.calculate(ySpeed);
-
-
+        double rotSpeed = thetaInput.getAsDouble() * 5 * Math.PI;
 
         ChassisSpeeds speeds = 
             ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
