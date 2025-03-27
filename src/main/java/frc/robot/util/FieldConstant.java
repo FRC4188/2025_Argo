@@ -180,7 +180,7 @@ public class FieldConstant {
 
         public class AlgaeSource {
             //robot perpendicular distance from the wall
-            public static double src_perp = Constants.robot.A_LENGTH/2;
+            public static double src_perp = Constants.robot.B_CROSSLENGTH/2;
             //robot parallel distance from the center of the wall
             public static double src_parallel = Units.inchesToMeters(0);
 

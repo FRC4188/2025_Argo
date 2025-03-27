@@ -17,6 +17,15 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.config.PIDConstants;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig;
+import com.revrobotics.spark.config.MAXMotionConfig;
+import com.revrobotics.spark.config.SignalsConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -155,6 +164,27 @@ public final class Constants {
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
+
+    public static final SignalsConfig signal = new SignalsConfig()
+      .absoluteEncoderPositionAlwaysOn(true)
+      .primaryEncoderPositionAlwaysOn(true);
+
+    private static final ClosedLoopConfig tune = new ClosedLoopConfig()
+      .pidf(0.0, 0.0, 0.0, 0.0)
+      .apply(new MAXMotionConfig()
+        .maxVelocity(kMax_Vel)
+        .maxAcceleration(kMax_Accel)
+        .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal));
+
+    public static final SparkMaxConfig config = (SparkMaxConfig) new SparkMaxConfig()
+      .inverted(true)
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(kCurrentLimit)
+      .closedLoopRampRate(0.01)
+      .apply(signal);
+      // .apply(tune);
+    
+    
   }
 
   public static class IntakeConstants {
@@ -174,9 +204,9 @@ public final class Constants {
 
   public static class ClimberConstants {
 
-    private static final double kGearRatio = 1.0;
+    public static final double kGearRatio = 1.0;
     public static final double kTolerance = 0.1;
-
+    public static final boolean isFOC = false;
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
     .withSensorToMechanismRatio(kGearRatio);

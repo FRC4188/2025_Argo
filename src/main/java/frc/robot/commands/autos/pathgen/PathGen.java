@@ -23,7 +23,7 @@ public class PathGen {
 
 
     public static synchronized PathGen getInstance() {
-        if (instance == null) instance = new PathGen(0.15f, (float)Constants.robot.B_CROSSLENGTH); 
+        if (instance == null) instance = new PathGen(0.15f, (float)Constants.robot.A_CROSSLENGTH); 
         return instance;
     }
 

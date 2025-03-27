@@ -42,17 +42,22 @@ import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.gyro.GyroIO;
 import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.scoring.climber.Climber;
+import frc.robot.subsystems.scoring.climber.ClimberIOReal;
+import frc.robot.subsystems.scoring.climber.ClimberIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
+import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
+import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
 import frc.robot.util.FieldConstant.Reef.AlgaeSource;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +81,7 @@ public class RobotContainer {
   private Climber climb;
   //sim
   private SwerveDriveSimulation driveSim;
+  private SuperVisualizer supervis;
 
   private Runnable resetGyro;
 
@@ -100,9 +106,9 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.BackRight),
                 (pose) -> {});
 
-            
-
         superstructure = new Superstructure(Mode.REAL);
+
+        climb = new Climber(new ClimberIOReal());
 
         intake = new Intake(new IntakeIOReal());
         break;
@@ -122,10 +128,18 @@ public class RobotContainer {
                 new ModuleIOTalonFXSim(TunerConstants.BackLeft),
                 new ModuleIOTalonFXSim(TunerConstants.BackRight),
                 driveSim::setSimulationWorldPose);
+        
+        
 
         // vis = new Limelight(drive, new VisionIO(){});
-
+        climb = new Climber(new ClimberIOSim());
         superstructure = new Superstructure(Mode.SIM);
+
+        supervis = new SuperVisualizer("Models", 
+        () -> superstructure.getEleHeight(),
+        () -> superstructure.getWristAngle(), 
+        () -> climb.getAngle());
+
         intake = new Intake(new IntakeIO() {});
         break;
 
@@ -212,19 +226,21 @@ public class RobotContainer {
   public void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
-
-    Commands.run(() -> superstructure.manualOverride(
-        () -> controller2.getCorrectedLeft(Scale.LINEAR).getY(), 
-        () -> controller2.getCorrectedRight(Scale.LINEAR).getY()
-      )).schedule();
-    //default command without requiremnets ^
+    superstructure.setDefaultCommand(Commands.run(superstructure::disable_manual, superstructure));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
 
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> controller.getCorrectedLeft(Scale.LINEAR).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getCorrectedLeft(Scale.LINEAR).getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> -controller.getCorrectedLeft(Scale.LINEAR).getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> -controller.getCorrectedLeft(Scale.LINEAR).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
+      () -> -controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+
+    Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller2.getCorrectedRight(Scale.LINEAR).getNorm() != 0.0));
+
+    superInput.onTrue(superstructure.manual(
+      () -> controller2.getCorrectedLeft(Scale.LINEAR).getY(),
+      () -> controller2.getCorrectedRight(Scale.LINEAR).getY()
+    ));
 
     // Reset gyro to 0° when start button is pressed
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
@@ -234,13 +250,13 @@ public class RobotContainer {
         .onFalse(intake.stop());
       
     controller.getRightTButton().whileTrue(
-      intake.eject(()-> controller.getRightTriggerAxis() * 5))
+      intake.eject(()-> controller.getRightTriggerAxis() * 8))
         .onFalse(intake.stop());
 
     //emergency cases
-    controller2.x().and(controller.leftBumper()).onTrue(superstructure.resetEle());
-    controller2.b().and(controller.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.wristOverride = !superstructure.wristOverride));
-    controller2.y().and(controller.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.eleOverride = !superstructure.eleOverride));
+    controller2.x().and(controller2.leftBumper()).onTrue(superstructure.resetEle());
+    controller2.b().and(controller2.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.wrist_pid = !superstructure.wrist_pid));
+    controller2.y().and(controller2.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.ele_pid = !superstructure.ele_pid));
     controller2.a().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
 
     controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
@@ -283,6 +299,9 @@ public class RobotContainer {
 
     autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
     autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
+    autoChooser.addOption("extreme ", AutoTests.extreme(FieldConstant.start_left, drive, superstructure));
+    autoChooser.addOption("test1", AutoTests.test1(FieldConstant.start_left, drive, superstructure, intake));
+    autoChooser.addOption("test2", AutoTests.test2(FieldConstant.start_left, drive, superstructure, intake));
 
 
   }
@@ -299,15 +318,17 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(7.459, 5.991, new Rotation2d()));
+    drive.setPose(new Pose2d(0, 0, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
+    superstructure.setTarget(new SuperState());
   }
 
   public void displaySimFieldToAdvantageScope() {
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
+    supervis.update();
+
     Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
-    Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()});
 
     Logger.recordOutput(
             "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));

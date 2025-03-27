@@ -9,7 +9,7 @@ import frc.robot.subsystems.scoring.superstructure.Superstructure;
 public class ScoreNet extends SequentialCommandGroup {
 
     public ScoreNet(Superstructure superstruct, Intake intake) {
-        addRequirements(superstruct, intake);
+        addRequirements(intake);
 
         addCommands(
             new SuperToState(superstruct, 1, SuperPreset.NET.getState()),

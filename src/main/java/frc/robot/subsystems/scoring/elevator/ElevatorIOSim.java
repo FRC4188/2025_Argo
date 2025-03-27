@@ -15,7 +15,6 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Pounds;
 
 public class ElevatorIOSim implements ElevatorIO{
-    private final DCMotorSim sim;
     private final DCMotor gearbox;
     private double appliedVolts = 0.0;
 
@@ -23,30 +22,24 @@ public class ElevatorIOSim implements ElevatorIO{
 
     public ElevatorIOSim(){
         gearbox = DCMotor.getFalcon500(2);
+
         var plant =  LinearSystemId.createElevatorSystem(
             gearbox,
             Kilograms.convertFrom(23.37, Pounds), 
-            Units.inchesToMeters(0.75000 / 2), 
+            ElevatorConstants.kPitchRadius, 
             ElevatorConstants.kGearRatio);
-        sim = new DCMotorSim(
-            plant, 
-            gearbox);
-
-        sim.setState(0, 0); //maxlengthmeter / 2 , 0
-
+        
         physSim = new ElevatorSim(
             plant, gearbox, 0, ElevatorConstraints.RANGE, true, 0);
     }
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs){
-        
         inputs.connected = true;
         inputs.appliedVolts = appliedVolts;
-        inputs.posMeters = sim.getAngularPositionRad();
+        inputs.posMeters = getHeight();
         
         inputs.followerAppliedVolts = appliedVolts;
-        sim.update(robot.loopPeriodSecs);
         physSim.update(robot.loopPeriodSecs);
     }
 
@@ -55,14 +48,12 @@ public class ElevatorIOSim implements ElevatorIO{
     public void runVolts(double volts){
         appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
         
-        sim.setInputVoltage(appliedVolts);
         physSim.setInputVoltage(appliedVolts);
-       
     }
 
     @Override
     public double getHeight(){
-        return physSim.getPositionMeters();
+        return 3 * physSim.getPositionMeters();
     }
     
     

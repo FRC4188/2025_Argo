@@ -33,17 +33,8 @@ public class WristIOReal implements WristIO {
     private final StatusSignal<Angle> posRots;
 
     public WristIOReal() {  
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
-        config.idleMode(IdleMode.kBrake);
-        config.smartCurrentLimit(WristConstants.kCurrentLimit);
-        config.closedLoopRampRate(0.01);
-        config.signals
-            .absoluteEncoderPositionAlwaysOn(true)
-            .primaryEncoderPositionAlwaysOn(true);
 
-        
-        max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        max.configure(WristConstants.config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
         cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;

@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Hertz;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,6 +13,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
+import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.WristConstants;
 
 public class ClimberIOReal implements ClimberIO {
     private final TalonFX motor;
@@ -19,6 +22,9 @@ public class ClimberIOReal implements ClimberIO {
     private final StatusSignal<Voltage> appliedVolts;
     private final StatusSignal<Temperature> tempC;
     private final StatusSignal<Angle> posRots;
+
+    private final VoltageOut voltReq = new VoltageOut(0);
+    private final VoltageOut voltFOC = new VoltageOut(0).withEnableFOC(true);
 
     public ClimberIOReal() {
         motor = new TalonFX(Constants.Id.kClimber, Constants.robot.rio); 
@@ -48,7 +54,10 @@ public class ClimberIOReal implements ClimberIO {
 
     public void runVolts(double volts) {
         MathUtil.clamp(volts, -12, 12);
-        motor.setVoltage(volts);
+        if(ClimberConstants.isFOC)
+            motor.setControl(voltReq.withOutput(volts));
+        else
+            motor.setControl(voltFOC.withOutput(volts));
     }
 
     public double getAngle() {

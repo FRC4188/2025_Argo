@@ -2,6 +2,8 @@ package frc.robot.commands.scoring;
 
 import static frc.robot.util.FieldConstant.Reef.AlgaeSource.asources;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,10 +24,10 @@ public class AutoScore {
         private double happy_zone = 1;
         private Pose2d end_goal;
         private SuperPreset preset;
+        private Supplier<Command> factory = ()-> new Command() {};
 
         public algaeSource(Drive drive, Superstructure superstruct, Intake intake) {
             addRequirements(drive, superstruct, intake);
-
             end_goal = drive.getPose();
 
             addCommands(
@@ -42,45 +44,20 @@ public class AutoScore {
                             preset = SuperPreset.L2_ALGAE;
                         }
 
+                        factory = ()-> (new DriveTo(drive, end_goal).alongWith(
+                            new WaitUntilCommand(
+                                () -> AllianceFlip.flipDS(
+                                    drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) < happy_zone)
+                            .andThen(new SuperToState(superstruct,0, preset.getState())))
+                            .andThen(intake.ingest(()->4).withTimeout(1))
+                            .andThen(intake.stop()));
+
+                        factory.get().initialize();
                     }  
                 ),
-                new DriveTo(drive, end_goal).alongWith(
-                    new WaitUntilCommand(
-                        () -> AllianceFlip.flipDS(
-                            drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) < happy_zone)
-                    .andThen(new SuperToState(superstruct,0, preset.getState()))),
-                intake.ingest(()->4).withTimeout(1),
-                intake.stop()
-            );
-        }
 
-        public algaeSource(Pose2d pose, Drive drive, Superstructure superstruct, Intake intake) {
-            addRequirements(drive, superstruct, intake);
-
-            end_goal = pose;
-
-            addCommands(
-                Commands.runOnce(
-                    () -> {
-                        asources.remove(end_goal);
-
-                        int height = FieldConstant.Reef.AlgaeSource.algaeHeight(end_goal);
-            
-                        if (height == 3) {
-                            preset = SuperPreset.L3_ALGAE;
-                        } else {
-                            preset = SuperPreset.L2_ALGAE;
-                        }
-
-                    }  
-                ),
-                new DriveTo(drive, end_goal).alongWith(
-                    new WaitUntilCommand(
-                        () -> AllianceFlip.flipDS(
-                            drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) < happy_zone)
-                    .andThen(new SuperToState(superstruct,0, preset.getState()))),
-                intake.ingest(()->4).withTimeout(1),
-                intake.stop()
+                Commands.run(() -> (factory.get()).execute()).until(() -> factory.get().isFinished()),
+                Commands.runOnce(() -> factory.get().end(false))
             );
         }
 

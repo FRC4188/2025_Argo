@@ -53,7 +53,7 @@ public class CSP_Controller extends CommandXboxController {
   }
 
   public Translation2d getCorrectedRight(Scale scale) {
-    Translation2d input = new Translation2d(super.getRightY(), super.getRightX());
+    Translation2d input = new Translation2d(super.getRightX(), super.getRightY());
     if (input.getNorm() < Constants.controller.DEADBAND) {
       return new Translation2d();
     }
@@ -64,7 +64,7 @@ public class CSP_Controller extends CommandXboxController {
   }
 
   public Translation2d getCorrectedLeft(Scale scale) {
-    Translation2d input = new Translation2d(super.getLeftY(), super.getLeftX());
+    Translation2d input = new Translation2d(super.getLeftX(), super.getLeftY());
     if (input.getNorm() < Constants.controller.DEADBAND) {
       return new Translation2d();
     }

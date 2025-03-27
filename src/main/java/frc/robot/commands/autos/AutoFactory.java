@@ -95,26 +95,26 @@ public final class AutoFactory {
     }
 
     //input raw pose
-    public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake, Pose2d... goals){
+    // public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake, Pose2d... goals){
         
-        List<Pose2d> curr = Arrays.asList(goals);
-        Timer time = new Timer();
+    //     List<Pose2d> curr = Arrays.asList(goals);
+    //     Timer time = new Timer();
 
-        SequentialCommandGroup c = new SequentialCommandGroup(); 
+    //     SequentialCommandGroup c = new SequentialCommandGroup(); 
 
-        curr.forEach(
-            (pose) -> 
-                c.addCommands(
-                    new algaeSource(pose, drive, superstructure, intake),
-                    new algaeProcess(drive, superstructure, intake)
-                )
-        );
-        return Commands
-            .parallel(
-                Commands.runOnce(()-> time.reset()),
-                Commands.runOnce(()-> drive.setPose(starting))
-            ).andThen(c).until(()-> time.hasElapsed(13))
-            .andThen(Commands.runOnce(()-> intake.eject(()->5)).until(()-> !intake.isIn()))
-            .andThen(new SuperToState(superstructure, 0, SuperState.SuperPreset.START.getState()));
-    }
+    //     curr.forEach(
+    //         (pose) -> 
+    //             c.addCommands(
+    //                 new algaeSource(pose, drive, superstructure, intake),
+    //                 new algaeProcess(drive, superstructure, intake)
+    //             )
+    //     );
+    //     return Commands
+    //         .parallel(
+    //             Commands.runOnce(()-> time.reset()),
+    //             Commands.runOnce(()-> drive.setPose(starting))
+    //         ).andThen(c).until(()-> time.hasElapsed(13))
+    //         .andThen(Commands.runOnce(()-> intake.eject(()->5)).until(()-> !intake.isIn()))
+    //         .andThen(new SuperToState(superstructure, 0, SuperState.SuperPreset.START.getState()));
+    // }
 }

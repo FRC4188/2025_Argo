@@ -10,21 +10,19 @@ import edu.wpi.first.math.util.Units;
 
 public class SuperstructureConfig {
 
-    //not from pivot but at the end of the arm's bar (VERY rough estimate)
-    private static double wristRadiusCOG = (0.5011 + 0.1128) - 0.3957; 
-
     public static final Joint wrist = new Joint(
-        Kilograms.of(5.4545).magnitude(),
+        Kilograms.of(2.5401127).magnitude(),
         Meters.of(0.46478698).magnitude(), //from pivot to approximate center of algae
-        KilogramSquareMeters.of(1.363625).magnitude(),
-        Meters.of(wristRadiusCOG).magnitude());
+        KilogramSquareMeters.of(0.44).magnitude(),
+        Meters.of(0.287).magnitude());
 
 
 
     //config.json has all of these at zero, these are values from the robot's origin -rn
     public static Pose3d origin = new Pose3d(0.0, 0.0, 0, new Rotation3d(0,0,0));
-    public static Pose3d carriageOrigin = new Pose3d(0.000172, -0.00711, 0.23197, new Rotation3d(Units.degreesToRadians(180),0, 0));
-    public static Pose3d wristOrigin = new Pose3d(-0.004077, -0.049069, 0.644627, new Rotation3d(Units.degreesToRadians(180),0, 0));
+
+    public static Pose3d wristAxis = new Pose3d(0.30380, 0.03991, 0.16828 + 0.0127, new Rotation3d(0, 0, 0));
+    public static Pose3d climberAxis = new Pose3d(-0.31670, -0.05011, 0.20003 + 0.0127, new Rotation3d());
 
     public record Joint(
         double mass,

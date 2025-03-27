@@ -26,6 +26,7 @@ public class SuperToState extends SequentialCommandGroup {
 
     public SuperToState(Superstructure superstruct, double wrist_angle) {
         addRequirements(superstruct);
+        
         addCommands(
             new WristToState(superstruct, wrist_angle)
         );
@@ -46,7 +47,7 @@ public class SuperToState extends SequentialCommandGroup {
         }
 
         public boolean isFinished() {
-            return Constants.robot.currMode == Mode.SIM? true: superstructure.eleAtTarget();
+            return superstructure.eleAtTarget();
         }
     }
 
@@ -64,7 +65,7 @@ public class SuperToState extends SequentialCommandGroup {
         }
 
         public boolean isFinished() {
-            return Constants.robot.currMode == Mode.SIM? true: superstructure.wristAtTarget();
+            return superstructure.wristAtTarget();
         }
     }
     

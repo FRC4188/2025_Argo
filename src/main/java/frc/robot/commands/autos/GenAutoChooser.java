@@ -60,45 +60,45 @@ public class GenAutoChooser {
                                     
     }
                             
-    public Command getAutonomousCommand(Drive drive, Superstructure superstructure, Intake intake){
-        setRoutine(drive, superstructure, intake);
-        return Commands.repeatingSequence(
-            cmds.get(0),
-            Commands.runOnce(()-> cmds.remove(0))
-        ).until(()-> routine.size() == 0);
-    }
+    // public Command getAutonomousCommand(Drive drive, Superstructure superstructure, Intake intake){
+    //     setRoutine(drive, superstructure, intake);
+    //     return Commands.repeatingSequence(
+    //         cmds.get(0),
+    //         Commands.runOnce(()-> cmds.remove(0))
+    //     ).until(()-> routine.size() == 0);
+    // }
                             
-    private void setRoutine(Drive drive, Superstructure superstructure, Intake intake){
-        String[] ree = goal.get().split(" ");
+    // private void setRoutine(Drive drive, Superstructure superstructure, Intake intake){
+    //     String[] ree = goal.get().split(" ");
 
-        cmds.add(
-            new algaeSource(
-                getAlgaePos(ree[0].charAt(2), ree[0].charAt(1)), 
-                drive, superstructure, intake)
-        );
+    //     cmds.add(
+    //         new algaeSource(
+    //             getAlgaePos(ree[0].charAt(2), ree[0].charAt(1)), 
+    //             drive, superstructure, intake)
+    //     );
                         
-        //close/far -> location
-        for(int i = 1; i < ree.length; i ++){
-            cmds.add(new algaeProcess(drive, superstructure, intake));
-            cmds.add(new algaeSource(
-                getAlgaePos(ree[i].charAt(2), ree[i].charAt(1)), 
-                drive, superstructure, intake));
-        }
+    //     //close/far -> location
+    //     for(int i = 1; i < ree.length; i ++){
+    //         cmds.add(new algaeProcess(drive, superstructure, intake));
+    //         cmds.add(new algaeSource(
+    //             getAlgaePos(ree[i].charAt(2), ree[i].charAt(1)), 
+    //             drive, superstructure, intake));
+    //     }
         
 
-    }
+    // }
 
-    private Pose2d getAlgaePos(char loc, char far){
-        switch(loc){ // which 
-            case 'a':
-                return AllianceFlip.flipDS(isFar(far)? AlgaeSource.left_brg_src: AlgaeSource.left_src_src);
-            case 'b':
-                return AllianceFlip.flipDS(isFar(far)? AlgaeSource.mid_brg_src: AlgaeSource.alliance_src);
-            case 'c':
-                return AllianceFlip.flipDS(isFar(far)? AlgaeSource.right_brg_src: AlgaeSource.right_src_src);
-        }
-        return new Pose2d();
-    }
+    // private Pose2d getAlgaePos(char loc, char far){
+    //     switch(loc){ // which 
+    //         case 'a':
+    //             return AllianceFlip.flipDS(isFar(far)? AlgaeSource.left_brg_src: AlgaeSource.left_src_src);
+    //         case 'b':
+    //             return AllianceFlip.flipDS(isFar(far)? AlgaeSource.mid_brg_src: AlgaeSource.alliance_src);
+    //         case 'c':
+    //             return AllianceFlip.flipDS(isFar(far)? AlgaeSource.right_brg_src: AlgaeSource.right_src_src);
+    //     }
+    //     return new Pose2d();
+    // }
 
     private boolean isFar(char far){
         return far == 'c'? true: false;

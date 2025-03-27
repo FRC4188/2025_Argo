@@ -11,34 +11,27 @@ import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
 
 public class WristIOSim implements WristIO{
-    private final DCMotorSim sim;
     private double appliedVolts = 0.0;
-    private SingleJointedArmSim wSim;
+    private final SingleJointedArmSim wSim;
 
     public WristIOSim() {
-        sim = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                DCMotor.getNeo550(1), 
-                SuperstructureConfig.wrist.inertiaAbtCoM(), 
-                Constants.WristConstants.kGearRatio), 
-            DCMotor.getNeo550(1));
 
         wSim = new SingleJointedArmSim(
-            DCMotor.getFalcon500(1), 
+            DCMotor.getNeo550(1),
             Constants.WristConstants.kGearRatio,
             SuperstructureConfig.wrist.inertiaAbtCoM(), 
             SuperstructureConfig.wrist.length(), 
-            WristConstraints.LOWEST_A, 
-            WristConstraints.HIGHEST_A,
+            WristConstraints.LOWEST_A + Math.PI/2, 
+            WristConstraints.HIGHEST_A + Math.PI/2,
             true,
-             0.0
+             Math.PI/2
             );
     }
     
     @Override
     public void runVolts(double volts) {
         appliedVolts = MathUtil.clamp(volts,-12, 12);
-        sim.setInputVoltage(appliedVolts);
+        wSim.setInputVoltage(volts);
     }
 
     @Override
@@ -46,13 +39,14 @@ public class WristIOSim implements WristIO{
         if(DriverStation.isDisabled()){
             runVolts(0.0);
         }
-        sim.update(Constants.robot.loopPeriodSecs);
+
+        wSim.update(0.02);
         inputs.appliedVolts = appliedVolts;
         inputs.posRads = wSim.getAngleRads();
     }
 
     @Override
     public double getAngle() {
-        return sim.getAngularPositionRad();
+        return wSim.getAngleRads() - Math.PI/2;
     }
 }
