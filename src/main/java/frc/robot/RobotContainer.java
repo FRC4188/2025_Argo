@@ -61,6 +61,7 @@ import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.scoring.superstructure.Superstructure;
 import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
 import frc.robot.subsystems.vision.Limelight;
+import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.util.FieldConstant;
 import frc.robot.util.FieldConstant.Reef.AlgaeSource;
@@ -114,7 +115,11 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                 new ModuleIOTalonFXReal(TunerConstants.BackRight),
                 (pose) -> {});
-
+        vis = 
+            new Limelight(
+              drive,
+              new VisionIOLL(VisConstants.frontLL, ()-> new Rotation2d())
+            );
         superstructure = new Superstructure(Mode.REAL);
 
 
