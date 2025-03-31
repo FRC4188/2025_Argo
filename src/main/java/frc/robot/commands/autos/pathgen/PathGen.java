@@ -23,7 +23,7 @@ public class PathGen {
 
 
     public static synchronized PathGen getInstance() {
-        if (instance == null) instance = new PathGen(0.15f, (float)Constants.robot.A_CROSSLENGTH); 
+        if (instance == null) instance = new PathGen(0.15f, (float)Constants.robot.A_LENGTH); 
         return instance;
     }
 
@@ -61,12 +61,12 @@ public class PathGen {
                     FieldConstant.Field.all_wall_right_corner,
                     FieldConstant.Field.mid_right_wall,
                     FieldConstant.Field.mid_left_wall));
-        FOHandler.getInstance().addFO(
-                new RectFO(
-                    (float) FieldConstant.field_center_x,
-                    (float) FieldConstant.field_center_y,
-                    (float) FieldConstant.Field.brg_length,
-                    (float) FieldConstant.Field.brg_width));
+        // FOHandler.getInstance().addFO(
+        //         new RectFO(
+        //             (float) FieldConstant.field_center_x,
+        //             (float) FieldConstant.field_center_y,
+        //             (float) FieldConstant.Field.brg_length,
+        //             (float) FieldConstant.Field.brg_width));
 
         FOHandler.getInstance().addFO(
                 new CircleFO(

@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.Id;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -75,12 +76,18 @@ public class ElevatorIOReal implements ElevatorIO {
         
         inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
         inputs.followerTempC = tempCFollow.getValueAsDouble();
+        
     }
 
     @Override
     public void runVolts(double volts){
         volts = MathUtil.clamp(volts, -12, 12);
         leader.setControl(new VoltageOut(volts)); 
+    }
+
+    @Override
+    public boolean isStalled() {
+        return Math.abs(leader.getStatorCurrent().getValueAsDouble()) > 35;
     }
 
     @Override

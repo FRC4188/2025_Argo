@@ -32,6 +32,8 @@ public class Elevator extends SubsystemBase{
     public void periodic(){
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);   
+
+        if (io.isStalled()) setZero();
     }
 
     public void runVolts(double volts) {

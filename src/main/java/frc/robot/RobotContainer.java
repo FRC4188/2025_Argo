@@ -16,22 +16,29 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.autos.AutoFactory;
 import frc.robot.commands.autos.AutoTests;
+import frc.robot.commands.autos.GenAutoChooser;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.scoring.ScoreNet;
 import frc.robot.commands.scoring.SuperToState;
+import frc.robot.commands.scoring.AutoScore;
+import frc.robot.commands.scoring.AutoScore.algaeNet;
 import frc.robot.inputs.CSP_Controller;
 import frc.robot.inputs.CSP_Controller.Scale;
 import frc.robot.subsystems.drivetrain.Drive;
@@ -47,6 +54,7 @@ import frc.robot.subsystems.scoring.climber.ClimberIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
+import frc.robot.subsystems.scoring.intake.IntakeIOSim;
 import frc.robot.subsystems.scoring.superstructure.SuperState;
 import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
 import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
@@ -78,7 +86,6 @@ public class RobotContainer {
   private Superstructure superstructure;
   private Intake intake;
   private Limelight vis;
-  private Climber climb;
   //sim
   private SwerveDriveSimulation driveSim;
   private SuperVisualizer supervis;
@@ -91,6 +98,8 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  private final GenAutoChooser genChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -108,7 +117,6 @@ public class RobotContainer {
 
         superstructure = new Superstructure(Mode.REAL);
 
-        climb = new Climber(new ClimberIOReal());
 
         intake = new Intake(new IntakeIOReal());
         break;
@@ -132,15 +140,14 @@ public class RobotContainer {
         
 
         // vis = new Limelight(drive, new VisionIO(){});
-        climb = new Climber(new ClimberIOSim());
         superstructure = new Superstructure(Mode.SIM);
 
         supervis = new SuperVisualizer("Models", 
         () -> superstructure.getEleHeight(),
         () -> superstructure.getWristAngle(), 
-        () -> climb.getAngle());
+        () -> 0);
 
-        intake = new Intake(new IntakeIO() {});
+        intake = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -155,9 +162,12 @@ public class RobotContainer {
                 (pose) -> {});
 
         // vis = new Limelight(drive, new VisionIO(){});
+        superstructure = new Superstructure(Mode.SIM);
         break;
     }
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
+
+    genChooser = new GenAutoChooser(drive, superstructure, intake);
     resetGyro = 
     Constants.robot.currMode == Constants.Mode.SIM? 
       () -> drive.setPose(
@@ -261,12 +271,8 @@ public class RobotContainer {
 
     controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
 
-    // controller2.getRightBumperButton().onTrue(
-    //   new SuperToState(superstructure,1,  SuperPreset.NET.getState()));
-
     controller2.getRightBumperButton().onTrue(
       new ScoreNet(superstructure, intake));
-
     controller2.getUpButton().onTrue(
       new SuperToState(superstructure, 0.5, SuperPreset.PROCESSOR.getState()));
 
@@ -299,10 +305,44 @@ public class RobotContainer {
 
     autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
     autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
-    autoChooser.addOption("extreme ", AutoTests.extreme(FieldConstant.start_left, drive, superstructure));
-    autoChooser.addOption("test1", AutoTests.test1(FieldConstant.start_left, drive, superstructure, intake));
-    autoChooser.addOption("test2", AutoTests.test2(FieldConstant.start_left, drive, superstructure, intake));
+    autoChooser.addOption("test leave ", 
+      Commands.sequence(
+        AutoTests.init(FieldConstant.start_left, drive, superstructure),
+        AutoScore.pushLeave(drive)));
 
+    autoChooser.addOption("test source", 
+      Commands.sequence(
+        AutoTests.init(FieldConstant.start_left, drive, superstructure),
+        new AutoScore.algaeSource(drive, superstructure, intake)));
+    
+    autoChooser.addOption("test process", 
+      Commands.sequence(
+        AutoTests.init(FieldConstant.start_left, drive, superstructure),
+        new AutoScore.algaeSource(drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake),
+        new AutoScore.algaeSource(drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake)
+      ));
+
+    autoChooser.addOption("test net", 
+      Commands.sequence(
+          AutoTests.init(FieldConstant.start_left, drive, superstructure),
+          new AutoScore.algaeSource(drive, superstructure, intake),
+          new AutoScore.algaeNet(drive, superstructure, intake),
+          new AutoScore.algaeSource(drive, superstructure, intake)));
+
+    autoChooser.addOption("descore", 
+      Commands.sequence(
+          AutoTests.init(FieldConstant.start_left, drive, superstructure),
+          new AutoScore.algaeSource(drive, superstructure, intake),
+          new AutoScore.descore(drive, superstructure, intake),
+          new AutoScore.algaeSource(drive, superstructure, intake),
+          new AutoScore.descore(drive, superstructure, intake)));
+    
+    autoChooser.addOption("test coral", 
+      Commands.sequence(
+          AutoTests.init(FieldConstant.start_left, drive, superstructure),
+          new AutoScore.coralScore(drive, superstructure, intake)));
 
   }
 
@@ -312,7 +352,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+     return autoChooser.get();
+    // return genChooser.getAutonomousCommand();
   }
 
   public void resetSimulation(){

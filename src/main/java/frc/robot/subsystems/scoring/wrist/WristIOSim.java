@@ -19,8 +19,8 @@ public class WristIOSim implements WristIO{
         wSim = new SingleJointedArmSim(
             DCMotor.getNeo550(1),
             Constants.WristConstants.kGearRatio,
-            SuperstructureConfig.wrist.inertiaAbtCoM(), 
-            SuperstructureConfig.wrist.length(), 
+            0.1, 
+            1, 
             WristConstraints.LOWEST_A + Math.PI/2, 
             WristConstraints.HIGHEST_A + Math.PI/2,
             true,

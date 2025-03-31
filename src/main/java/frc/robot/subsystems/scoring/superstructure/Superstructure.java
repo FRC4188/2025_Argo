@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,7 +46,7 @@ public class Superstructure extends SubsystemBase{
 
     private SuperState target;
 
-    private boolean pid_tuning = false;
+    private boolean pid_tuning = (RobotBase.isReal())?false:false;
 
     LoggedNetworkNumber w_target = new LoggedNetworkNumber("WristTune/target", 0);
     LoggedNetworkNumber w_p = new LoggedNetworkNumber("WristTune/p", 0);
@@ -111,7 +113,7 @@ public class Superstructure extends SubsystemBase{
             
             Logger.recordOutput("WristTune/volts", wrist_volts);
 
-            if (!wrist_pid) {
+            if (wrist_pid) {
                 wrist.runVolts(
                     wrist_volts
                 );
@@ -124,7 +126,7 @@ public class Superstructure extends SubsystemBase{
 
             Logger.recordOutput("EleTune/volts",elePID.calculate(elevator.getHeight(), e_target.get()));
 
-            if (!ele_pid) {
+            if (ele_pid) {
                 elevator.runVolts(
                     elePID.calculate(elevator.getHeight(), e_target.get()) 
                     + e_ff.get()
@@ -167,11 +169,11 @@ public class Superstructure extends SubsystemBase{
 
                     if (wrist_pid) {
                         wristvolts = MathUtil.clamp(5 * wristinput.getAsDouble() + wristFF.calculate(wrist.getAngle() + Math.PI / 2, 0), 
-                        (wrist.getAngle() < WristConstraints.LOWEST_A)?0:-7, 
-                        (wrist.getAngle() > WristConstraints.HIGHEST_A)?0:7);
+                        (wrist.getAngle() < WristConstraints.LOWEST_A)?0:-3, 
+                        (wrist.getAngle() > WristConstraints.HIGHEST_A)?0:3);
                     } else {
-                        wristvolts = MathUtil.clamp(5 * wristinput.getAsDouble(), 
-                        -5, 5);
+                        wristvolts = MathUtil.clamp(3 * wristinput.getAsDouble(), 
+                        -3, 3);
                     }
                     
                     target.setWristAngle(
@@ -192,7 +194,7 @@ public class Superstructure extends SubsystemBase{
                     ele_man = true;
 
                     elevolts = MathUtil.clamp(
-                        Constants.ElevatorConstants.kFF - 7 * eleinput.getAsDouble(), 
+                        Constants.ElevatorConstants.kFF - 9 * eleinput.getAsDouble(), 
                         0, 
                         (elevator.getHeight() >= SuperConstraints.ElevatorConstraints.RANGE)?
                             Constants.ElevatorConstants.kFF:12);
@@ -245,6 +247,14 @@ public class Superstructure extends SubsystemBase{
 
     public double getEleHeight() {
         return elevator.getHeight();
+    }
+
+    public Wrist getWrist() {
+        return wrist;
+    }
+
+    public Elevator getEle() {
+        return elevator;
     }
 
     public void setTarget(SuperState goal) {

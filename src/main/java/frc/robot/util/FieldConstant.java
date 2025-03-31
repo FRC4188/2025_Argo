@@ -11,6 +11,7 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
@@ -37,9 +38,9 @@ public class FieldConstant {
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
     //starting positions
-    public static Pose2d start_mid = new Pose2d(7.180, FieldConstant.Reef.Base.mid_brg_wall.getY(), Rotation2d.k180deg);
-    public static Pose2d start_left = new Pose2d(7.180, 7.5750, Rotation2d.k180deg);
-    public static Pose2d start_right = new Pose2d(7.180, 0.480, Rotation2d.k180deg);
+    public static Pose2d start_mid = new Pose2d(7.125, 4.026, Rotation2d.k180deg);
+    public static Pose2d start_left = new Pose2d(7.125, 7.5750, Rotation2d.k180deg);
+    public static Pose2d start_right = new Pose2d(7.125, 0.480, Rotation2d.k180deg);
 
     public class Field {
         //idk what these are for
@@ -58,20 +59,27 @@ public class FieldConstant {
         public static Translation2d alliance_left_corner = new Translation2d(Units.inchesToMeters(0), field_width - Units.inchesToMeters(50.750));
         public static Translation2d all_wall_left_corner = new Translation2d(Units.inchesToMeters(67.039), field_width);
 
-        public static Translation2d mid_left_wall = new Translation2d(field_center_x, field_width);
-        public static Translation2d mid_right_wall = new Translation2d(field_center_x, 0);
+        public static Translation2d mid_left_wall = new Translation2d(field_center_x + 1, field_width);
+        public static Translation2d mid_right_wall = new Translation2d(field_center_x + 1, 0);
     }
 
     public class Net {
-        public static final double line = 8.027;
-        public static Pose2d left_score = new Pose2d(line, field_center_y + Units.inchesToMeters(127.375), Rotation2d.k180deg);
-        public static Pose2d mid_score = new Pose2d(line, field_center_y + Units.inchesToMeters(84.375), Rotation2d.k180deg);
-        public static Pose2d right_score = new Pose2d(line, field_center_y + Units.inchesToMeters(41.5), Rotation2d.k180deg);
+        public static final double lineX = 8.027 + Units.inchesToMeters(7);
+        public static final double lineYLow = 4.75;
+        public static final double lineYHigh = 7.65;
+        public static Pose2d left_score = new Pose2d(lineX, field_center_y + Units.inchesToMeters(127.375), Rotation2d.k180deg);
+        public static Pose2d mid_score = new Pose2d(lineX, field_center_y + Units.inchesToMeters(84.375), Rotation2d.k180deg);
+        public static Pose2d right_score = new Pose2d(lineX, field_center_y + Units.inchesToMeters(41.5), Rotation2d.k180deg);
 
         public static List<Pose2d> nscores = new LinkedList<Pose2d>(Arrays.asList(left_score,mid_score,right_score));
 
         public static void reloadNscores() {
             nscores = new LinkedList<Pose2d>(Arrays.asList(left_score,mid_score,right_score));
+        }
+
+        public static Pose2d getClosest(Pose2d current){
+            Pose2d unflipped = AllianceFlip.flipDS(current);
+            return AllianceFlip.flipDS(new Pose2d(lineX, MathUtil.clamp(unflipped.getY(), lineYLow, lineYHigh), Rotation2d.k180deg));
         }
     }
 
@@ -180,7 +188,7 @@ public class FieldConstant {
 
         public class AlgaeSource {
             //robot perpendicular distance from the wall
-            public static double src_perp = Constants.robot.B_CROSSLENGTH/2;
+            public static double src_perp = Constants.robot.A_LENGTH / 2;
             //robot parallel distance from the center of the wall
             public static double src_parallel = Units.inchesToMeters(0);
 
@@ -224,6 +232,45 @@ public class FieldConstant {
                 } else {
                     return 0;
                 }
+            }
+        }
+
+        public class DeSource {
+            //robot perpendicular distance from the wall
+            public static double src_perp = Constants.robot.B_CROSSLENGTH;
+            //robot parallel distance from the center of the wall
+            public static double src_parallel = Units.inchesToMeters(0);
+
+            public static Translation2d source = new Translation2d(-src_perp, src_parallel);
+
+            public static Pose2d alliance_src = new Pose2d(
+                Base.alliance_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(0)))),
+                new Rotation2d(Degrees.of(-180)));
+            
+            public static Pose2d left_brg_src = new Pose2d(
+                Base.left_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(-120)))),
+                new Rotation2d(Degrees.of(90)));
+
+            public static Pose2d right_brg_src = new Pose2d(
+                Base.right_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(120)))),
+                new Rotation2d(Degrees.of(-90)));
+
+            public static Pose2d left_src_src = new Pose2d(
+                Base.left_src_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(-60)))),
+                new Rotation2d(Degrees.of(90)));
+
+            public static Pose2d right_src_src = new Pose2d(
+                Base.right_src_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(60)))),
+                new Rotation2d(Degrees.of(-90)));
+
+            public static Pose2d mid_brg_src = new Pose2d(
+                Base.mid_brg_wall.getTranslation().plus(source.rotateBy(new Rotation2d(Degrees.of(180)))),
+                new Rotation2d(Degrees.of(0)));
+                
+            public static List<Pose2d> dsources = new LinkedList<Pose2d>(Arrays.asList(alliance_src, left_brg_src, right_brg_src, left_src_src, right_src_src, mid_brg_src));
+
+            public static void reloadDsources() {
+                dsources = new LinkedList<Pose2d>(Arrays.asList(alliance_src, left_brg_src, right_brg_src, left_src_src, right_src_src, mid_brg_src));
             }
         }
 

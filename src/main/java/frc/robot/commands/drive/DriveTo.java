@@ -31,8 +31,8 @@ public class DriveTo extends Command {
     public DriveTo(Drive drive, Pose2d goal) {
         this.drive = drive;
         config = new TrajectoryConfig(
-            TunerConstants.kSpeedAt12Volts.magnitude() * 0.7, 
-            Constants.robot.MAX_ACCELERATION.magnitude() * 0.7);
+            TunerConstants.kSpeedAt12Volts.magnitude() * 0.6, 
+            Constants.robot.MAX_ACCELERATION.magnitude() * 0.6);
         end_goal = goal;
     }
 

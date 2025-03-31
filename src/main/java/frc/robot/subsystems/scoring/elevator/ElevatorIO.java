@@ -22,4 +22,6 @@ public interface ElevatorIO {
     public default void runVolts(double volts) {}
     
     public default double getHeight(){return 0;}
+
+    public default boolean isStalled() {return false;}
 }

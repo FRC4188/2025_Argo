@@ -201,7 +201,7 @@ public class Drive extends SubsystemBase implements VisionConsumer{
         sysId = new SysIdRoutine(
                 new SysIdRoutine.Config(
                         Volts.of(1).per(Seconds), 
-                        Volts.of(3), 
+                        Volts.of(5), 
                         null, 
                         (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));

@@ -76,23 +76,23 @@ public final class AutoFactory {
      * @param intake
      * @return
      */
-    public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake){
-        return 
-            Commands.parallel(
-                Commands.runOnce(()-> timer.start()), 
-                Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))))
-            .andThen(new algaeSource(drive, superstructure, intake)
-            .andThen(new algaeProcess(drive, superstructure, intake))
-            .andThen(
-                Commands.repeatingSequence(
-                    Commands.runOnce(()-> System.out.println("sequence loop")),
-                    new algaeSource(drive, superstructure, intake),
-                    new algaeProcess(drive, superstructure, intake))
-                .until(() -> timer.hasElapsed(14))
-                .andThen(Commands.runOnce(()-> intake.eject(()->5)).until(()-> !intake.isIn()))
-                .andThen(new SuperToState(superstructure, 0, SuperPreset.START.getState())
-        )));
-    }
+    // public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake){
+    //     return 
+    //         Commands.parallel(
+    //             Commands.runOnce(()-> timer.start()), 
+    //             Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))))
+    //         .andThen(new algaeSource(drive, superstructure, intake)
+    //         .andThen(new algaeProcess(drive, superstructure, intake))
+    //         .andThen(
+    //             Commands.repeatingSequence(
+    //                 Commands.runOnce(()-> System.out.println("sequence loop")),
+    //                 new algaeSource(drive, superstructure, intake),
+    //                 new algaeProcess(drive, superstructure, intake))
+    //             .until(() -> timer.hasElapsed(14))
+    //             .andThen(Commands.runOnce(()-> intake.eject(()->5)).until(()-> !intake.isIn()))
+    //             .andThen(new SuperToState(superstructure, 0, SuperPreset.START.getState())
+    //     )));
+    // }
 
     //input raw pose
     // public static Command algaeGen(Pose2d starting, Drive drive, Superstructure superstructure, Intake intake, Pose2d... goals){

@@ -38,16 +38,20 @@ public class WristIOReal implements WristIO {
         
         CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
         cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        cancoderConfig.MagnetSensor.MagnetOffset = -0.165283;
 
         canCoder.getConfigurator().apply(cancoderConfig);
 
         posRots = canCoder.getAbsolutePosition();
         posRots.setUpdateFrequency(50);
+
+        canCoder.optimizeBusUtilization();
     }
 
     @Override
     public void runVolts(double volts){
         volts = MathUtil.clamp(volts,-12, 12);
+        
         max.setVoltage(volts);
     }
 
@@ -57,6 +61,8 @@ public class WristIOReal implements WristIO {
         inputs.appliedVolts = max.getAppliedOutput() * max.getBusVoltage();
         inputs.tempC = max.getMotorTemperature();
         inputs.posRads = Units.rotationsToRadians(posRots.getValueAsDouble());
+     
+        max.getEncoder().setPosition(posRots.getValueAsDouble());
     }
 
     @Override

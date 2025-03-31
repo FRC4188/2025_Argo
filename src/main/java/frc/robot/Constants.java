@@ -54,7 +54,8 @@ public final class Constants {
     public static final String canivore = "canivore";
     public static final double loopPeriodSecs = 0.02;
 
-    public static final Mode currMode = RobotBase.isReal()? Mode.REAL : Mode.SIM;
+    public static final Mode simMode = Mode.REPLAY;
+    public static final Mode currMode = RobotBase.isReal()? Mode.REAL : simMode;
 
     public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(8); // 12.6
 
@@ -103,7 +104,7 @@ public final class Constants {
     public static final double kConversion = kGearRatio / (3 * kPitchRadius);//should i kill myself
 
     public static final double kMax_Vel = 5;
-    public static final double kMax_Accel = 5;
+    public static final double kMax_Accel = 7.5;
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
     public static final double kP = 25;
@@ -142,25 +143,28 @@ public final class Constants {
       .withMotionMagic(kMagicConfigs)
       .withSlot0(kSlot0Configs)
       .withClosedLoopRamps(kClosedLoopRampsConfigs)
-      .withOpenLoopRamps(kOpenLoopRampsConfigs);
+      .withOpenLoopRamps(kOpenLoopRampsConfigs)
+      .withMotorOutput(
+        new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)
+      );
   }
 
   public static class WristConstants {
-    public static final double kTolerance = 0.05;
+    public static final double kTolerance = 0.2;
     public static final double kGearRatio = 25.0;//TODO: soon to change
     public static final int kCurrentLimit = 60; 
 
     public static final double kMax_Vel = Units.degreesToRadians(960.0);
-    public static final double kMax_Accel = Units.degreesToRadians(720.0);
+    public static final double kMax_Accel = Units.degreesToRadians(650.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final double kP = 4.0;
-    public static final double kI = 0.3;
-    public static final double kD = 0.2;
+    public static final double kP = 2;
+    public static final double kI = 0.0;
+    public static final double kD = 0.1;
     public static final double kS = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
-    public static final double kG = 1.0;
+    public static final double kG = 0.8;
 
     public static final ProfiledPIDController WristPID = new ProfiledPIDController(kP, kI, kD, kConstraints);
     public static final ArmFeedforward WristFF = new ArmFeedforward(kS, kG, kV, kA);
@@ -170,7 +174,7 @@ public final class Constants {
       .primaryEncoderPositionAlwaysOn(true);
 
     private static final ClosedLoopConfig tune = new ClosedLoopConfig()
-      .pidf(0.0, 0.0, 0.0, 0.0)
+      .pid(2.0, 0.0, 0.1)
       .apply(new MAXMotionConfig()
         .maxVelocity(kMax_Vel)
         .maxAcceleration(kMax_Accel)
@@ -181,8 +185,8 @@ public final class Constants {
       .idleMode(IdleMode.kBrake)
       .smartCurrentLimit(kCurrentLimit)
       .closedLoopRampRate(0.01)
-      .apply(signal);
-      // .apply(tune);
+      .apply(signal)
+      .apply(tune);
     
     
   }
@@ -205,7 +209,7 @@ public final class Constants {
   public static class ClimberConstants {
 
     public static final double kGearRatio = 1.0;
-    public static final double kTolerance = 0.1;
+    public static final double kTolerance = 0.15;
     public static final boolean isFOC = false;
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()

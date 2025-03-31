@@ -25,7 +25,7 @@ public class ElevatorIOSim implements ElevatorIO{
 
         var plant =  LinearSystemId.createElevatorSystem(
             gearbox,
-            Kilograms.convertFrom(23.37, Pounds), 
+            Kilograms.convertFrom(23.37 + 10, Pounds), 
             ElevatorConstants.kPitchRadius, 
             ElevatorConstants.kGearRatio);
         

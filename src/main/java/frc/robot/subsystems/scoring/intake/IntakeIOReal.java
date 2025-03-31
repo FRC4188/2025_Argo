@@ -46,6 +46,7 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     public boolean isIn(){
+        
         return !breaker.get(); //true when laser can hit breaker aka nothing in intake
     }
 

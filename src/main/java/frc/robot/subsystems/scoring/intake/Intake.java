@@ -30,22 +30,18 @@ public class Intake extends SubsystemBase{
     }
 
     public Command ingest(DoubleSupplier volts) {
-        return Commands.runEnd(
+        return Commands.run(
             () -> {
                 io.runVolts(volts.getAsDouble());
-                timer.restart();
-            },
-            ()-> io.stop()
+            }
             ,this);
     }
 
     public Command eject(DoubleSupplier volts) {
-        return Commands.runEnd(
+        return Commands.run(
             () -> {
                 io.runVolts(-volts.getAsDouble());
-                timer.restart();
-            },
-            () -> io.stop()
+            }
             ,this);
     }
 
@@ -53,7 +49,6 @@ public class Intake extends SubsystemBase{
         return Commands.runOnce(
             () -> {
                 io.runVolts(0);
-                System.out.println(timer.get());
             },this);
     }
 

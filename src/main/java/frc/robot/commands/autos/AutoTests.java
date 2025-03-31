@@ -41,38 +41,10 @@ public final class AutoTests {
             Volts.of(12),
             false);
 
-    public static Command extreme(Pose2d starting, Drive drive, Superstructure superstruct) {
-        return Commands.sequence(
-            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))),
-            Commands.runOnce(()-> superstruct.resetEle()),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
-            new DriveTo(drive, FieldConstant.Processor.processor_goal)
+    public static Command init(Pose2d pose, Drive drive, Superstructure superstructure) {
+        return Commands.runOnce(()->drive.setPose(AllianceFlip.flipDS(pose))).alongWith(
+            Commands.runOnce(() -> superstructure.resetEle())
         );
     }
 
-    public static Command test1(Pose2d starting, Drive drive, Superstructure superstruct, Intake intake) {
-        return Commands.sequence(
-            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))),
-            Commands.runOnce(()-> superstruct.resetEle()),
-            new AutoScore.algaeSource(drive, superstruct, intake),
-            new AutoScore.algaeProcess(drive, superstruct, intake),
-            new AutoScore.algaeSource(drive, superstruct, intake),
-            new AutoScore.algaeProcess(drive, superstruct, intake)
-        );
-    }
-
-    public static Command test2(Pose2d starting, Drive drive, Superstructure superstruct, Intake intake) {
-        return Commands.sequence(
-            Commands.runOnce(()-> drive.setPose(AllianceFlip.flipDS(starting))),
-            Commands.runOnce(()-> superstruct.resetEle()),
-            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
-            new SuperToState(superstruct, 0, SuperPreset.L3_ALGAE.getState())
-        );
-    }
 }
