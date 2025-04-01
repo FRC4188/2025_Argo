@@ -38,11 +38,11 @@ public class SuperState {
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                0.9, 0.8913)),
+                0.75, 0.8913)),
  
         L2_ALGAE(
             new SuperState(
-                0.9, 0.4719)),
+                0.75, 0.4719)),
     
         NET(
             new SuperState(

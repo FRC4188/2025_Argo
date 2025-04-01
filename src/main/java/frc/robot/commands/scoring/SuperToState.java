@@ -16,7 +16,7 @@ public class SuperToState extends SequentialCommandGroup {
 
     public SuperToState(Superstructure superstruct, double safeangle, SuperState state) {
         addRequirements(superstruct);
-
+                
         addCommands(
             new WristToState(superstruct, safeangle),
             new EleToState(superstruct, state.getEleHeight()),

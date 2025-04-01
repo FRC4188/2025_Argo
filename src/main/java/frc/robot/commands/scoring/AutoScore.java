@@ -86,7 +86,7 @@ public class AutoScore extends Command{
                 Commands.sequence(
                     new DriveTo(drive, goal).alongWith(
                         new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
-                        .andThen(new SuperToState(superstruct, 0, preset.getState()))),
+                        .andThen(new SuperToState(superstruct, 0, preset.getState()).withTimeout(3))),
                     intake.ingest(() -> 4).withTimeout(1.5),
                     intake.stop()
                 );
@@ -110,7 +110,7 @@ public class AutoScore extends Command{
             scoring = 
                 Commands.sequence(
                     new DriveTo(drive, goal).alongWith(
-                    new WaitCommand(0.5).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState())) // Move to processor and wait for superstructure to be ready
+                    new WaitCommand(0.25).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState())) // Move to processor and wait for superstructure to be ready
                     ),
                     intake.eject(() -> 10).withTimeout(1),
                     intake.stop()

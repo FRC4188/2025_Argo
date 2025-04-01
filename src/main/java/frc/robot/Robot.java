@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.FieldConstant;
+import frc.robot.util.LoggedCommandScheduler;
 
 import static frc.robot.util.FieldConstant.Reef.AlgaeSource.*;
 
@@ -52,6 +53,7 @@ public class Robot extends LoggedRobot {
 
     Logger.start();// Start logging! No more data receivers, replay sources, or metadata values may be added.
     SignalLogger.start();
+    LoggedCommandScheduler.init(CommandScheduler.getInstance());
   }
 
   @Override
@@ -61,6 +63,8 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     Threads.setCurrentThreadPriority(false, 10);
+
+    LoggedCommandScheduler.periodic();
   }
 
   @Override
@@ -83,6 +87,8 @@ public class Robot extends LoggedRobot {
     }
 
     FieldConstant.Net.reloadNscores();
+
+
 
     asources = new LinkedList<Pose2d>(Arrays.asList(
       alliance_src, left_brg_src, left_src_src, right_brg_src, right_src_src, mid_brg_src

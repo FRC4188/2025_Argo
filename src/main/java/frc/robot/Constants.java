@@ -54,7 +54,7 @@ public final class Constants {
     public static final String canivore = "canivore";
     public static final double loopPeriodSecs = 0.02;
 
-    public static final Mode simMode = Mode.REPLAY;
+    public static final Mode simMode = Mode.SIM;
     public static final Mode currMode = RobotBase.isReal()? Mode.REAL : simMode;
 
     public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(8); // 12.6
@@ -104,7 +104,7 @@ public final class Constants {
     public static final double kConversion = kGearRatio / (3 * kPitchRadius);//should i kill myself
 
     public static final double kMax_Vel = 5;
-    public static final double kMax_Accel = 7.5;
+    public static final double kMax_Accel = 5;
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
     public static final double kP = 25;

@@ -64,7 +64,7 @@ public class FieldConstant {
     }
 
     public class Net {
-        public static final double lineX = 8.027 + Units.inchesToMeters(7);
+        public static final double lineX = 8.027 + Units.inchesToMeters(9);
         public static final double lineYLow = 4.75;
         public static final double lineYHigh = 7.65;
         public static Pose2d left_score = new Pose2d(lineX, field_center_y + Units.inchesToMeters(127.375), Rotation2d.k180deg);
@@ -190,7 +190,7 @@ public class FieldConstant {
             //robot perpendicular distance from the wall
             public static double src_perp = Constants.robot.A_LENGTH / 2;
             //robot parallel distance from the center of the wall
-            public static double src_parallel = Units.inchesToMeters(0);
+            public static double src_parallel = Units.inchesToMeters(-1);
 
             public static Translation2d source = new Translation2d(-src_perp, src_parallel);
 
@@ -358,10 +358,10 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(5), 0.2);
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(5), 0.5);
 
         public static Pose2d processor_wall = new Pose2d(
-            field_center_x - Units.inchesToMeters(109.712),
+            field_center_x - Units.inchesToMeters(109.712) - Units.inchesToMeters(20),
             0, 
             new Rotation2d(Degree.of(90)));
 

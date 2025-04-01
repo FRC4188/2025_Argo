@@ -12,8 +12,7 @@ public class ScoreNet extends SequentialCommandGroup {
     private double start_time = 0.0;
 
     public ScoreNet(Superstructure superstruct, Intake intake) {
-
-
+        
         addCommands(
             new SuperToState(superstruct, 1, SuperPreset.NET.getState()),
             (Commands.sequence(

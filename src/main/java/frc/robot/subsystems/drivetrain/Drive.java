@@ -78,28 +78,12 @@ public class Drive extends SubsystemBase implements VisionConsumer{
     @AutoLogOutput(key = "Drive/vision?")
     public boolean vision_accept = false;
 
-
-    public PIDController translation =
-     new PIDController(0, 0, 0), 
-     rotation = new PIDController(0, 0, 0);
-
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             Constants.robot.TURN_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
 
     private final PIDController correctionPID = Constants.robot.CORRECTION_PID;
-
-    LoggedNetworkNumber t_p = new LoggedNetworkNumber("DriveTune/tp");
-    LoggedNetworkNumber t_i = new LoggedNetworkNumber("DriveTune/ti");
-    LoggedNetworkNumber t_d = new LoggedNetworkNumber("DriveTune/td");
-
-    LoggedNetworkNumber r_p = new LoggedNetworkNumber("DriveTune/rp");
-    LoggedNetworkNumber r_i = new LoggedNetworkNumber("DriveTune/ri");
-    LoggedNetworkNumber r_d = new LoggedNetworkNumber("DriveTune/rd");
-
-    LoggedNetworkNumber t_target = new LoggedNetworkNumber("DriveTune/ttarget", 0);
-    LoggedNetworkNumber r_target = new LoggedNetworkNumber("DriveTune/rtarget", 0);
 
     Field2d field;
 
@@ -214,44 +198,6 @@ public class Drive extends SubsystemBase implements VisionConsumer{
 
     @Override
     public void periodic() {
-        //manual tuning
-
-        // translation.setP(t_p.get());
-        // translation.setI(t_i.get());
-        // translation.setD(t_d.get());
-
-        
-        // rotation.setP(r_p.get());
-        // rotation.setI(r_i.get());
-        // rotation.setD(r_d.get());
-
-        // Logger.recordOutput("Drive/r_p", rotation.getP());
-
-        // ChassisSpeeds speeds = 
-        //     ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-        //        translation.calculate(Math.hypot(
-        //         getChassisSpeeds().vxMetersPerSecond, 
-        //         getChassisSpeeds().vyMetersPerSecond), t_target.get()),
-        //       0, 
-        //       rotation.calculate(getChassisSpeeds().omegaRadiansPerSecond,r_target.get())), 
-        //       AllianceFlip.apply(getRotation()));
-        
-        // Logger.recordOutput("Drive/tvolts",  translation.calculate(Math.hypot(
-        //         getChassisSpeeds().vxMetersPerSecond, 
-        //         getChassisSpeeds().vyMetersPerSecond), t_target.get()));
-
-        // Logger.recordOutput("Drive/rvolts",  
-        //         rotation.calculate(getChassisSpeeds().omegaRadiansPerSecond,r_target.get()));
-
-        // runVelocity(speeds);
-
-        // Logger.recordOutput("Drive/Speeds", 
-        //         Math.hypot(
-        //         getChassisSpeeds().vxMetersPerSecond, 
-        //         getChassisSpeeds().vyMetersPerSecond));
-
-        // Logger.recordOutput("Drive/Rotations",
-        //         getChassisSpeeds().omegaRadiansPerSecond);
 
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
@@ -317,11 +263,13 @@ public class Drive extends SubsystemBase implements VisionConsumer{
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
-        if (speeds.omegaRadiansPerSecond != 0.0) {
-            correctionPID.setSetpoint(getRotationDegrees());
-        } else if (speeds.vxMetersPerSecond != 0.0 || speeds.vyMetersPerSecond != 0.0) {
-            double correction = correctionPID.calculate(getRotationDegrees());
-            speeds.omegaRadiansPerSecond = correctionPID.atSetpoint() ? 0.0 : correction;
+        if(Constants.robot.currMode != Mode.SIM){
+            if (speeds.omegaRadiansPerSecond != 0.0) {
+                correctionPID.setSetpoint(getRotationDegrees());
+            } else if (speeds.vxMetersPerSecond != 0.0 || speeds.vyMetersPerSecond != 0.0) {
+                double correction = correctionPID.calculate(getRotationDegrees());
+                speeds.omegaRadiansPerSecond = correctionPID.atSetpoint() ? 0.0 : correction;
+            }
         }
 
         // Calculate module setpoints

@@ -162,7 +162,8 @@ public class RobotContainer {
                 (pose) -> {});
 
         // vis = new Limelight(drive, new VisionIO(){});
-        superstructure = new Superstructure(Mode.SIM);
+        superstructure = new Superstructure(Mode.REPLAY);
+        intake = new Intake(new IntakeIO(){});
         break;
     }
     autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -256,7 +257,7 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
       
     controller.getLeftTButton().whileTrue(
-      intake.ingest(()-> ((controller.getLeftTriggerAxis() >= 0.75)?10:4)))
+      intake.ingest(()-> ((controller.getLeftTriggerAxis() >= 0.75)? 10:4)))
         .onFalse(intake.stop());
       
     controller.getRightTButton().whileTrue(
@@ -317,7 +318,7 @@ public class RobotContainer {
     
     autoChooser.addOption("test process", 
       Commands.sequence(
-        AutoTests.init(FieldConstant.start_left, drive, superstructure),
+        AutoTests.init(FieldConstant.start_right, drive, superstructure),
         new AutoScore.algaeSource(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake),
         new AutoScore.algaeSource(drive, superstructure, intake),
@@ -359,7 +360,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(new Pose2d(0, 0, new Rotation2d()));
+    drive.setPose(FieldConstant.start_left);
     SimulatedArena.getInstance().resetFieldForAuto();
     superstructure.setTarget(new SuperState());
   }
