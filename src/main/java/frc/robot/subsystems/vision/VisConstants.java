@@ -27,7 +27,8 @@ public class VisConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String frontLL = "front_limelight";
-  public static String backLL = "back_limelight";
+//   public static String backLL = "back_limelight";
+  public static String frontPho = "front";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
