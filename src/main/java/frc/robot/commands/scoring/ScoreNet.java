@@ -21,7 +21,7 @@ public class ScoreNet extends SequentialCommandGroup {
                 intake.eject(()->2).withTimeout(0.1),
                 intake.stop()
 
-            ).repeatedly()).until(() -> Timer.getFPGATimestamp() - start_time > 0.5),
+            ).repeatedly()).until(() -> Timer.getFPGATimestamp() - start_time > 0.4),
             superstruct.manual(() -> -1, () ->0).until(() -> superstruct.getWrist().atGoal(-0.1)),
             Commands.runOnce(() -> superstruct.disable_manual()),
             intake.stop(),

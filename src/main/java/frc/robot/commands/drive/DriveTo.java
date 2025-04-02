@@ -31,7 +31,7 @@ public class DriveTo extends Command {
     public DriveTo(Drive drive, Pose2d goal) {
         this.drive = drive;
         config = new TrajectoryConfig(
-            TunerConstants.kSpeedAt12Volts.magnitude() * 0.7, 
+            TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
             Constants.robot.MAX_ACCELERATION.magnitude() * 0.7);
         end_goal = goal;
     }
@@ -66,7 +66,7 @@ public class DriveTo extends Command {
 
     @Override
     public boolean isFinished() {
-        //return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds()  + 1;
+        //return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 1;
         return AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= 0.05;
     }
 

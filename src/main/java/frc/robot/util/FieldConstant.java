@@ -38,9 +38,9 @@ public class FieldConstant {
     public static double algae_tolerance = Units.inchesToMeters(0.125);
 
     //starting positions
-    public static Pose2d start_mid = new Pose2d(7.125, 4.026, Rotation2d.k180deg);
-    public static Pose2d start_left = new Pose2d(7.125, 7.5750, Rotation2d.k180deg);
-    public static Pose2d start_right = new Pose2d(7.125, 0.480, Rotation2d.k180deg);
+    public static Pose2d start_mid = new Pose2d(7.1, Reef.AlgaeSource.mid_brg_src.getY(), Rotation2d.k180deg);
+    public static Pose2d start_left = new Pose2d(7.25, 7.5750, Rotation2d.k180deg);
+    public static Pose2d start_right = new Pose2d(7.25-0.0381, 0.440, Rotation2d.k180deg);
 
     public class Field {
         //idk what these are for
@@ -64,7 +64,7 @@ public class FieldConstant {
     }
 
     public class Net {
-        public static final double lineX = 8.027 + Units.inchesToMeters(9);
+        public static final double lineX = 8.027 + Units.inchesToMeters(6);
         public static final double lineYLow = 4.75;
         public static final double lineYHigh = 7.65;
         public static Pose2d left_score = new Pose2d(lineX, field_center_y + Units.inchesToMeters(127.375), Rotation2d.k180deg);
@@ -358,7 +358,7 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(5), 0.5);
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(3), 0.8);
 
         public static Pose2d processor_wall = new Pose2d(
             field_center_x - Units.inchesToMeters(109.712) - Units.inchesToMeters(20),
