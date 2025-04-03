@@ -84,7 +84,7 @@ public class AutoScore extends Command{
             }
             scoring = 
                 Commands.sequence(
-                    new DriveTo(drive, goal).alongWith(
+                    new DriveTo(drive, goal).andThen(Commands.run(drive::stopWithX, drive)).alongWith(
                         new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
                         .andThen(new SuperToState(superstruct, 0, preset.getState()))),
                     intake.ingest(() -> 7).withTimeout(1.5),
@@ -109,7 +109,7 @@ public class AutoScore extends Command{
             
             scoring = 
                 Commands.sequence(
-                    new DriveTo(drive, goal).alongWith(
+                    new DriveTo(drive, goal).andThen(Commands.run(drive::stopWithX, drive)).alongWith(
                     new WaitCommand(0.25).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState())) // Move to processor and wait for superstructure to be ready
                     ),
                     intake.eject(() -> 10).withTimeout(1),
@@ -149,7 +149,8 @@ public class AutoScore extends Command{
             scoring = 
                 Commands.sequence(
                     new DriveTo(drive, goal),
-                    new ScoreNet(superstruct, intake)
+                    Commands.run(drive::stopWithX, drive)
+                        .alongWith(new ScoreNet(superstruct, intake))
                 );
         }
     }
@@ -189,7 +190,7 @@ public class AutoScore extends Command{
 
             scoring = 
                 Commands.sequence(
-                    new DriveTo(drive, goal).alongWith(
+                    new DriveTo(drive, goal).andThen(Commands.run(drive::stopWithX, drive)).alongWith(
                         new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
                         .andThen(new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState()).withTimeout(2))).raceWith(intake.ingest(() -> 5)),
                     intake.eject(() -> 4).withTimeout(0.25),
@@ -229,8 +230,9 @@ public class AutoScore extends Command{
             scoring = 
                 Commands.sequence(
                     new DriveTo(drive, goal),
-                    intake.eject(() -> 10).until(() -> !intake.isIn()),
-                    intake.stop()
+                    Commands.run(drive::stopWithX, drive).alongWith(
+                        intake.eject(() -> 10).until(() -> !intake.isIn()),
+                        intake.stop())
                 );
         }
     }

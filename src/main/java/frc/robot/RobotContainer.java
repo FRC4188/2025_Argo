@@ -232,7 +232,7 @@ public class RobotContainer {
   }
 
   public void teleInit() {
-    superstructure.setTarget(new SuperState());
+    (new SuperToState(superstructure, 0, SuperPreset.START.getState())).schedule();
     superstructure.resetEle();
     drive.setPose();
   }
@@ -322,42 +322,33 @@ public class RobotContainer {
 
     autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
     autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
-    autoChooser.addOption("test leave ", 
+
+    autoChooser.addOption("leave ", 
       Commands.sequence(
-        AutoTests.init(FieldConstant.start_left, drive, superstructure),
+        Commands.runOnce(() -> superstructure.resetEle()),
         AutoScore.pushLeave(drive)));
     
-    autoChooser.addOption("right process", 
+    autoChooser.addOption("process", 
       Commands.sequence(
-        AutoTests.init(FieldConstant.start_right, drive, superstructure),
+        Commands.runOnce(() -> superstructure.resetEle()),
         new AutoScore.coralScore(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake),
         new AutoScore.algaeSource(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake)
       ));
 
-    autoChooser.addOption("mid process", 
+    autoChooser.addOption("net", 
       Commands.sequence(
-        AutoTests.init(FieldConstant.start_mid, drive, superstructure),
-        new AutoScore.coralScore(drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake),
-        new AutoScore.algaeSource(drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake)
-      ));
-
-    autoChooser.addOption("left net", 
-      Commands.sequence(
-          AutoTests.init(FieldConstant.start_left, drive, superstructure),
+          Commands.runOnce(() -> superstructure.resetEle()),
           new AutoScore.coralScore(drive, superstructure, intake),
           new AutoScore.algaeNet(drive, superstructure, intake),
           new AutoScore.algaeSource(drive, superstructure, intake)));
 
-    autoChooser.addOption("mid net", 
+    autoChooser.addOption("coral", 
       Commands.sequence(
-          AutoTests.init(FieldConstant.start_mid, drive, superstructure),
-          new AutoScore.coralScore(drive, superstructure, intake),
-          new AutoScore.algaeNet(drive, superstructure, intake),
-          new AutoScore.algaeSource(drive, superstructure, intake)));
+          Commands.runOnce(() -> superstructure.resetEle()),
+          new AutoScore.coralScore(drive, superstructure, intake))
+    );
   }
 
   /**

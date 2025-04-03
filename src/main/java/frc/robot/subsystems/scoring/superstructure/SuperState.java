@@ -39,15 +39,15 @@ public class SuperState {
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                0.68, 0.8913)),
+                0.53, 0.8913)),
  
         L2_ALGAE(
             new SuperState(
-                0.68, 0.4719)),
+                0.53, 0.4719)),
         
         L1_CORAL(
             new SuperState(
-                0.68, 0.4719 - Units.inchesToMeters(4)
+                0.3, 0.4719 - Units.inchesToMeters(4)
             )
         ),
     
