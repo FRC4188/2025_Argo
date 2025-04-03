@@ -86,8 +86,8 @@ public class AutoScore extends Command{
                 Commands.sequence(
                     new DriveTo(drive, goal).alongWith(
                         new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
-                        .andThen(new SuperToState(superstruct, 0, preset.getState()).withTimeout(3))),
-                    intake.ingest(() -> 4).withTimeout(1.5),
+                        .andThen(new SuperToState(superstruct, 0, preset.getState()))),
+                    intake.ingest(() -> 7).withTimeout(1.5),
                     intake.stop()
                 );
         }
@@ -176,18 +176,6 @@ public class AutoScore extends Command{
 
         @Override
         public void factory() {
-            // if (!presetGoal)  {goal = AllianceFlip.flipDS(drive.getPose()).nearest(FieldConstant.Reef.AlgaeSource.asources);}
-
-            // scoring = 
-            //     Commands.sequence(
-            //         Commands.parallel(
-            //             new DriveTo(drive, goal).raceWith(intake.ingest(() -> 5)),
-            //             new WaitCommand(0.3).andThen(new SuperToState(superstruct, 0, new SuperState(0, 0.41)))),
-            //         new SuperToState(superstruct, 0.5),
-            //         intake.eject(()->10).withTimeout(0.5),
-            //         intake.stop()
-            //    );
-
             if (!presetGoal)  {goal = AllianceFlip.flipDS(drive.getPose()).nearest(FieldConstant.Reef.AlgaeSource.asources);}
 
             FieldConstant.Reef.AlgaeSource.asources.remove(goal);
@@ -195,35 +183,21 @@ public class AutoScore extends Command{
             
             if (height == 3) {
                 preset = SuperPreset.L3_ALGAE;
+            } else {
+                preset = SuperPreset.L2_ALGAE;
+            }
 
-                scoring = 
+            scoring = 
                 Commands.sequence(
                     new DriveTo(drive, goal).alongWith(
                         new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
-                        .andThen(new SuperToState(superstruct, 0, SuperPreset.L2_ALGAE.getState()).withTimeout(1))).raceWith(intake.ingest(() -> 5)),
-                    intake.eject(() -> 4).withTimeout(0.5),
+                        .andThen(new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState()).withTimeout(2))).raceWith(intake.ingest(() -> 5)),
+                    intake.eject(() -> 4).withTimeout(0.25),
                     intake.stop(),
-                    new SuperToState(superstruct, 0, preset.getState()).withTimeout(3.5),
+                    new SuperToState(superstruct, 0, preset.getState()),
                     intake.ingest(() -> 7).withTimeout(1.5),
                     intake.stop()
                 );
-            } else {
-                preset = SuperPreset.L2_ALGAE;
-
-                scoring = 
-                Commands.sequence(
-                    Commands.parallel(
-                        new DriveTo(drive, goal).withTimeout(3),
-                        new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
-                            .andThen(
-                                new SuperToState(superstruct, 0, SuperPreset.L2_ALGAE.getState())
-                                .withTimeout(3.5))
-                    ).raceWith(intake.ingest(() -> 5)),
-                    intake.eject(() -> 5).withTimeout(0.5),
-                    intake.ingest(() -> 7).withTimeout(1.5),
-                    intake.stop()
-                );
-            }
             
         }
 

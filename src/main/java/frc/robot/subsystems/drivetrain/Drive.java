@@ -76,7 +76,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Drive extends SubsystemBase implements VisionConsumer{
     @AutoLogOutput(key = "Drive/vision?")
-    public boolean vision_accept = false;
+    public boolean vision_accept = true;
 
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             Constants.robot.DRIVE_PID.kP, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
@@ -398,8 +398,9 @@ public class Drive extends SubsystemBase implements VisionConsumer{
     // /** Adds a new timestamped vision measurement. */
     @Override
     public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
-        Pose2d t_only = new Pose2d(visionRobotPoseMeters.getTranslation(), getRotation());
-        if (vision_accept)poseEstimator.addVisionMeasurement(t_only, timestampSeconds, visionMeasurementStdDevs);
+        //Pose2d t_only = new Pose2d(visionRobotPoseMeters.getTranslation(), getRotation());
+        //if (vision_accept)poseEstimator.addVisionMeasurement(t_only, timestampSeconds, visionMeasurementStdDevs);
+        if (vision_accept)poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
     /** Returns the maximum linear speed in meters per sec. */

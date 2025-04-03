@@ -1,6 +1,7 @@
 package frc.robot.subsystems.scoring.superstructure;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.ElevatorConstraints;
 import frc.robot.subsystems.scoring.superstructure.SuperConstraints.WristConstraints;
 
@@ -38,11 +39,17 @@ public class SuperState {
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                0.75, 0.8913)),
+                0.68, 0.8913)),
  
         L2_ALGAE(
             new SuperState(
-                0.75, 0.4719)),
+                0.68, 0.4719)),
+        
+        L1_CORAL(
+            new SuperState(
+                0.68, 0.4719 - Units.inchesToMeters(4)
+            )
+        ),
     
         NET(
             new SuperState(

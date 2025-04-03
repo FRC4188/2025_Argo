@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.util.AllianceFlip;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -91,7 +92,7 @@ public class DriveCommands {
               xSpeed,
               ySpeed, 
               rotSpeed), 
-              (drive.getRotation()));
+              (AllianceFlip.apply(drive.getRotation())));
 
         
         drive.runVelocity(speeds);

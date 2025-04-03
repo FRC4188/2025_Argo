@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,11 +44,11 @@ public class Limelight extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
-
+  private final DigitalInput vrm;
   public Limelight(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
-
+    vrm = new DigitalInput(2);
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     for (int i = 0; i < inputs.length; i++) {
@@ -155,6 +156,8 @@ public class Limelight extends SubsystemBase {
       }
 
       // Log camera datadata
+      Logger.recordOutput(
+        "Vision/VRM Is Good", vrm.get());
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
           tagPoses.toArray(new Pose3d[tagPoses.size()]));

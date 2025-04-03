@@ -42,9 +42,10 @@ public final class AutoTests {
             false);
 
     public static Command init(Pose2d pose, Drive drive, Superstructure superstructure) {
-        return Commands.runOnce(()->drive.setPose(AllianceFlip.flipDS(pose))).alongWith(
-            Commands.runOnce(() -> superstructure.resetEle())
-        );
+        // return Commands.runOnce(()->drive.setPose(AllianceFlip.flipDS(pose))).alongWith(
+        //     Commands.runOnce(() -> superstructure.resetEle())
+        // );
+        return Commands.runOnce(() -> superstructure.resetEle());
     }
 
 }

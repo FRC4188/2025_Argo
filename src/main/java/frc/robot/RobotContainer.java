@@ -118,14 +118,12 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                 new ModuleIOTalonFXReal(TunerConstants.BackRight),
                 (pose) -> {});
-        // vis = 
-        //     new Limelight(
-        //       drive,
-        //       new VisionIOLL(VisConstants.frontLL, drive:: getRotation));
+      
         vis = 
             new Limelight(
-              drive,
+              drive::accept,
               new VisionIOPhotonVision(VisConstants.frontPho, robotToCamera0));
+
         superstructure = new Superstructure(Mode.REAL);
 
 
@@ -270,7 +268,14 @@ public class RobotContainer {
     controller.getLeftTButton().whileTrue(
       intake.ingest(()-> ((controller.getLeftTriggerAxis() >= 0.75)? 10:4)))
         .onFalse(intake.stop());
-      
+
+    controller.getLeftBumperButton().whileTrue(
+      Commands.sequence(
+                intake.ingest(() -> 10).until(()->intake.isStalled()),
+                intake.eject(()->2).withTimeout(0.1),
+                intake.stop()
+            ).repeatedly()).onFalse(intake.stop());
+
     controller.getRightTButton().whileTrue(
       intake.eject(()-> controller.getRightTriggerAxis() * 8))
         .onFalse(intake.stop());
@@ -321,41 +326,38 @@ public class RobotContainer {
       Commands.sequence(
         AutoTests.init(FieldConstant.start_left, drive, superstructure),
         AutoScore.pushLeave(drive)));
-
-    autoChooser.addOption("test source", 
-      Commands.sequence(
-        AutoTests.init(FieldConstant.start_left, drive, superstructure),
-        new AutoScore.algaeSource(drive, superstructure, intake)));
     
-    autoChooser.addOption("test process", 
+    autoChooser.addOption("right process", 
       Commands.sequence(
         AutoTests.init(FieldConstant.start_right, drive, superstructure),
-        new AutoScore.algaeSource(drive, superstructure, intake),
+        new AutoScore.coralScore(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake),
         new AutoScore.algaeSource(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake)
       ));
 
-    autoChooser.addOption("test net", 
+    autoChooser.addOption("mid process", 
+      Commands.sequence(
+        AutoTests.init(FieldConstant.start_mid, drive, superstructure),
+        new AutoScore.coralScore(drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake),
+        new AutoScore.algaeSource(drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake)
+      ));
+
+    autoChooser.addOption("left net", 
       Commands.sequence(
           AutoTests.init(FieldConstant.start_left, drive, superstructure),
-          new AutoScore.algaeSource(drive, superstructure, intake),
+          new AutoScore.coralScore(drive, superstructure, intake),
           new AutoScore.algaeNet(drive, superstructure, intake),
           new AutoScore.algaeSource(drive, superstructure, intake)));
 
-    autoChooser.addOption("descore", 
+    autoChooser.addOption("mid net", 
       Commands.sequence(
-          AutoTests.init(FieldConstant.start_left, drive, superstructure),
-          new AutoScore.algaeSource(drive, superstructure, intake),
-          new AutoScore.descore(drive, superstructure, intake),
-          new AutoScore.algaeSource(drive, superstructure, intake),
-          new AutoScore.descore(drive, superstructure, intake)));
-    
-    autoChooser.addOption("test coral", 
-      Commands.sequence(
-          AutoTests.init(FieldConstant.start_left, drive, superstructure),
-          new AutoScore.coralScore(drive, superstructure, intake)));
-
+          AutoTests.init(FieldConstant.start_mid, drive, superstructure),
+          new AutoScore.coralScore(drive, superstructure, intake),
+          new AutoScore.algaeNet(drive, superstructure, intake),
+          new AutoScore.algaeSource(drive, superstructure, intake)));
   }
 
   /**
@@ -371,7 +373,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(FieldConstant.start_left);
+    drive.setPose(FieldConstant.Reef.AlgaeSource.left_brg_src);
     SimulatedArena.getInstance().resetFieldForAuto();
     superstructure.setTarget(new SuperState());
   }
