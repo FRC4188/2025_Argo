@@ -263,7 +263,7 @@ public class Drive extends SubsystemBase implements VisionConsumer{
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
-        if(Constants.robot.currMode != Mode.SIM && !DriverStation.isAutonomous()){
+        if(Constants.robot.currMode != Mode.SIM){
             if (speeds.omegaRadiansPerSecond != 0.0) {
                 correctionPID.setSetpoint(getRotationDegrees());
             } else if (speeds.vxMetersPerSecond != 0.0 || speeds.vyMetersPerSecond != 0.0) {

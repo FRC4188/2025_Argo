@@ -108,7 +108,7 @@ public class GenAutoChooser {
 
     public Command getAutonomousCommand(){
         return Commands.sequence(
-            AutoTests.init(startPose.get(), drive, superstructure),
+            Commands.runOnce(()-> superstructure.resetEle()),
             Commands.runOnce(() -> start_time = Timer.getFPGATimestamp()),
             staact.get(),
             src1.get(),

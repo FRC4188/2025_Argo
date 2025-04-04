@@ -82,11 +82,19 @@ public class AutoScore extends Command{
             } else {
                 preset = SuperPreset.L2_ALGAE;
             }
+
             scoring = 
                 Commands.sequence(
-                    new DriveTo(drive, goal).andThen(Commands.run(drive::stopWithX, drive)).alongWith(
-                        new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
-                        .andThen(new SuperToState(superstruct, 0, preset.getState()))),
+                    Commands.race(
+                        Commands.sequence(
+                            new DriveTo(drive, goal),
+                            Commands.run(drive::stopWithX, drive)
+                        ),
+                        Commands.sequence(
+                            new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2),
+                            new SuperToState(superstruct, 0, preset.getState())
+                        )
+                    ),
                     intake.ingest(() -> 7).withTimeout(1.5),
                     intake.stop()
                 );
@@ -109,12 +117,20 @@ public class AutoScore extends Command{
             
             scoring = 
                 Commands.sequence(
-                    new DriveTo(drive, goal).andThen(Commands.run(drive::stopWithX, drive)).alongWith(
-                    new WaitCommand(0.25).andThen(new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState())) // Move to processor and wait for superstructure to be ready
+                    Commands.race(
+                        Commands.sequence(
+                            new DriveTo(drive, goal),
+                            Commands.run(drive::stopWithX, drive)
+                        ),
+                        Commands.sequence(
+                            new WaitCommand(0.25),
+                            new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState())
+                        )
                     ),
                     intake.eject(() -> 10).withTimeout(1),
                     intake.stop()
                 );
+
         }
     }
 
@@ -149,8 +165,10 @@ public class AutoScore extends Command{
             scoring = 
                 Commands.sequence(
                     new DriveTo(drive, goal),
-                    Commands.run(drive::stopWithX, drive)
-                        .alongWith(new ScoreNet(superstruct, intake))
+                    Commands.race(
+                        Commands.run(drive::stopWithX, drive), 
+                        new ScoreNet(superstruct, intake)
+                    )
                 );
         }
     }
@@ -190,9 +208,17 @@ public class AutoScore extends Command{
 
             scoring = 
                 Commands.sequence(
-                    new DriveTo(drive, goal).andThen(Commands.run(drive::stopWithX, drive)).alongWith(
-                        new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2)
-                        .andThen(new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState()).withTimeout(2))).raceWith(intake.ingest(() -> 5)),
+                    Commands.race(
+                        intake.ingest(() -> 5),
+                        Commands.sequence(
+                            new DriveTo(drive, goal),
+                            Commands.run(drive::stopWithX, drive)
+                        ),
+                        Commands.sequence(
+                            new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2),
+                            new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState()).withTimeout(2)
+                        )
+                    ),
                     intake.eject(() -> 4).withTimeout(0.25),
                     intake.stop(),
                     new SuperToState(superstruct, 0, preset.getState()),
@@ -200,40 +226,6 @@ public class AutoScore extends Command{
                     intake.stop()
                 );
             
-        }
-
-
-    }
-
-    public static class descore extends AutoScore {
-
-        public descore(Drive drive, Superstructure superstructure, Intake intake) {
-            this.drive = drive;
-            this.superstruct = superstructure;
-            this.intake = intake;
-        }
-
-        public descore(Pose2d pose, Drive drive, Superstructure superstructure, Intake intake) {
-            this.drive = drive;
-            this.superstruct = superstructure;
-            this.intake = intake;
-            goal = pose;
-            presetGoal = true;
-        }
-        
-        @Override
-        public void factory() {
-            if (!presetGoal)  {goal = AllianceFlip.flipDS(drive.getPose()).nearest(FieldConstant.Reef.DeSource.dsources);}
-
-            FieldConstant.Reef.DeSource.dsources.remove(goal);
-        
-            scoring = 
-                Commands.sequence(
-                    new DriveTo(drive, goal),
-                    Commands.run(drive::stopWithX, drive).alongWith(
-                        intake.eject(() -> 10).until(() -> !intake.isIn()),
-                        intake.stop())
-                );
         }
     }
 }

@@ -245,7 +245,6 @@ public class RobotContainer {
    */
   public void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
     superstructure.setDefaultCommand(Commands.run(superstructure::disable_manual, superstructure));
 
     Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
@@ -253,14 +252,15 @@ public class RobotContainer {
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
       () -> -controller.getCorrectedLeft(Scale.LINEAR).getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
       () -> -controller.getCorrectedLeft(Scale.LINEAR).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> -controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)));
+      () -> -controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)))
+      .onFalse(Commands.runOnce(drive::stopWithX, drive));
 
     Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller2.getCorrectedRight(Scale.LINEAR).getNorm() != 0.0));
 
     superInput.onTrue(superstructure.manual(
       () -> controller2.getCorrectedLeft(Scale.LINEAR).getY(),
       () -> controller2.getCorrectedRight(Scale.LINEAR).getY()
-    ));
+    )).onFalse(Commands.runOnce(superstructure::disable_manual));
 
     // Reset gyro to 0° when start button is pressed
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
@@ -364,7 +364,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(FieldConstant.Reef.AlgaeSource.left_brg_src);
+    drive.setPose(FieldConstant.start_left);
     SimulatedArena.getInstance().resetFieldForAuto();
     superstructure.setTarget(new SuperState());
   }
