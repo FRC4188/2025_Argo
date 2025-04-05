@@ -85,10 +85,10 @@ public class AutoScore extends Command{
 
             scoring = 
                 Commands.sequence(
-                    Commands.race(
+                    Commands.parallel(
                         Commands.sequence(
                             new DriveTo(drive, goal),
-                            Commands.run(drive::stopWithX, drive)
+                            Commands.runOnce(drive::stopWithX, drive)
                         ),
                         Commands.sequence(
                             new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2),
@@ -117,10 +117,10 @@ public class AutoScore extends Command{
             
             scoring = 
                 Commands.sequence(
-                    Commands.race(
+                    Commands.parallel(
                         Commands.sequence(
                             new DriveTo(drive, goal),
-                            Commands.run(drive::stopWithX, drive)
+                            Commands.runOnce(drive::stopWithX, drive)
                         ),
                         Commands.sequence(
                             new WaitCommand(0.25),
@@ -165,10 +165,8 @@ public class AutoScore extends Command{
             scoring = 
                 Commands.sequence(
                     new DriveTo(drive, goal),
-                    Commands.race(
-                        Commands.run(drive::stopWithX, drive), 
-                        new ScoreNet(superstruct, intake)
-                    )
+                    Commands.runOnce(drive::stopWithX, drive), 
+                    new ScoreNet(superstruct, intake)
                 );
         }
     }
@@ -209,20 +207,20 @@ public class AutoScore extends Command{
             scoring = 
                 Commands.sequence(
                     Commands.race(
-                        intake.ingest(() -> 5),
-                        Commands.sequence(
-                            new DriveTo(drive, goal),
-                            Commands.run(drive::stopWithX, drive)
-                        ),
-                        Commands.sequence(
-                            new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2),
-                            new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState()).withTimeout(2)
+                        //intake.ingest(() -> 5),
+                        Commands.parallel(
+                            Commands.sequence(
+                                new DriveTo(drive, goal),
+                                Commands.runOnce(drive::stopWithX, drive)
+                            ),
+                            Commands.sequence(
+                                new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2),
+                                new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState())
+                            )
                         )
                     ),
-                    intake.eject(() -> 4).withTimeout(0.25),
-                    intake.stop(),
                     new SuperToState(superstruct, 0, preset.getState()),
-                    intake.ingest(() -> 7).withTimeout(1.5),
+                    intake.ingest(() -> 7).withTimeout(0.7),
                     intake.stop()
                 );
             

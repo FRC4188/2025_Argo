@@ -64,6 +64,7 @@ import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.VisionIOLL;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.FieldConstant;
 import frc.robot.util.FieldConstant.Reef.AlgaeSource;
 
@@ -184,7 +185,7 @@ public class RobotContainer {
                 driveSim
                   .getSimulatedDriveTrainPose()): // reset odometry to actual robot pose during simulation
 
-       () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
+       () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), AllianceFlip.apply(new Rotation2d())));
 
     //add cmds for pathplanner events
     HashMap<String, Command> EVENTS =
@@ -233,7 +234,6 @@ public class RobotContainer {
 
   public void teleInit() {
     (new SuperToState(superstructure, 0, SuperPreset.START.getState())).schedule();
-    superstructure.resetEle();
     drive.setPose();
   }
 
@@ -259,7 +259,7 @@ public class RobotContainer {
 
     superInput.onTrue(superstructure.manual(
       () -> controller2.getCorrectedLeft(Scale.LINEAR).getY(),
-      () -> controller2.getCorrectedRight(Scale.LINEAR).getY()
+      () -> -controller2.getCorrectedRight(Scale.LINEAR).getY()
     )).onFalse(Commands.runOnce(superstructure::disable_manual));
 
     // Reset gyro to 0° when start button is pressed
@@ -277,14 +277,17 @@ public class RobotContainer {
             ).repeatedly()).onFalse(intake.stop());
 
     controller.getRightTButton().whileTrue(
-      intake.eject(()-> controller.getRightTriggerAxis() * 8))
+      intake.eject(()-> controller.getRightT(Scale.QUARTIC) * 8))
         .onFalse(intake.stop());
+
+    
 
     //emergency cases
     controller2.x().and(controller2.leftBumper()).onTrue(superstructure.resetEle());
     controller2.b().and(controller2.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.wrist_pid = !superstructure.wrist_pid));
     controller2.y().and(controller2.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.ele_pid = !superstructure.ele_pid));
-    controller2.a().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
+    controller2.a().and(controller2.leftBumper()).onTrue(superstructure.resetWrist());
+    controller.a().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
 
     controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
 
@@ -364,7 +367,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(FieldConstant.start_left);
+    drive.setPose(FieldConstant.start_mid);
     SimulatedArena.getInstance().resetFieldForAuto();
     superstructure.setTarget(new SuperState());
   }

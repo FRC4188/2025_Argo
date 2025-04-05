@@ -18,6 +18,7 @@ public class ScoreNet extends SequentialCommandGroup {
             (Commands.sequence(
                 Commands.runOnce(() -> start_time = Timer.getFPGATimestamp()),
                 intake.ingest(() -> 10).until(()->intake.isStalled()),
+                Commands.runOnce(() -> start_time = Timer.getFPGATimestamp()),
                 intake.eject(()->2).withTimeout(0.1),
                 intake.stop()
 

@@ -109,9 +109,14 @@ public class DriveToPose extends Command {
             thetaVelocity = 0.0;
 
         // Command speeds
-        var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
+        var driveVelocity = new Pose2d(
+                new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
+
+        Logger.recordOutput("Drive/DriveToPose/x_speed", driveVelocity.getX());
+        Logger.recordOutput("Drive/DriveToPose/y_speed", driveVelocity.getY());
+        Logger.recordOutput("Drive/DriveToPose/t_speed", thetaVelocity);
                 
         driveSubsystem.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                 driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation()));
@@ -119,7 +124,7 @@ public class DriveToPose extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        //driveSubsystem.stopWithX();
+        driveSubsystem.stopWithX();
     }
 
     @Override

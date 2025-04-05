@@ -38,7 +38,7 @@ public class WristIOReal implements WristIO {
         
         CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
         cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        cancoderConfig.MagnetSensor.MagnetOffset = -0.165283;
+        cancoderConfig.MagnetSensor.MagnetOffset = -0.16772;
 
         canCoder.getConfigurator().apply(cancoderConfig);
 
@@ -62,11 +62,12 @@ public class WristIOReal implements WristIO {
         inputs.tempC = max.getMotorTemperature();
         inputs.posRads = Units.rotationsToRadians(posRots.getValueAsDouble());
      
-        max.getEncoder().setPosition(posRots.getValueAsDouble());
+        //max.getEncoder().setPosition(posRots.getValueAsDouble());
     }
 
     @Override
     public double getAngle() {
+        // return Units.rotationsToRadians(max.getEncoder().getPosition() / 25.0);
         return Units.rotationsToRadians(posRots.getValueAsDouble());
     }
 }

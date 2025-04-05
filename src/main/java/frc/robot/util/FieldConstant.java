@@ -374,7 +374,7 @@ public class FieldConstant {
         public static double opening_height = Units.inchesToMeters(20);
         public static double opening_from_ground = Units.inchesToMeters(7);
 
-        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(3), 0); //0.8 no vision
+        public static Translation2d score_pos = new Translation2d(-Constants.robot.B_LENGTH/2 - Units.inchesToMeters(3), 0.5); //0.8 no vision
 
         public static Pose2d processor_wall = new Pose2d(
             field_center_x - Units.inchesToMeters(109.712) - Units.inchesToMeters(20),

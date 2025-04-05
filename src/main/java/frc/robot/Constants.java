@@ -154,8 +154,8 @@ public final class Constants {
     public static final double kGearRatio = 25.0;//TODO: soon to change
     public static final int kCurrentLimit = 60; 
 
-    public static final double kMax_Vel = Units.degreesToRadians(360.0);
-    public static final double kMax_Accel = Units.degreesToRadians(360.0);
+    public static final double kMax_Vel = Units.degreesToRadians(720.0);
+    public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
     public static final double kP = 2;

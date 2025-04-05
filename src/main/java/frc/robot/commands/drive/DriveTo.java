@@ -29,6 +29,8 @@ public class DriveTo extends Command {
 
     //flipped drive, unflipped goal
     public DriveTo(Drive drive, Pose2d goal) {
+        addRequirements(drive);
+
         this.drive = drive;
         config = new TrajectoryConfig(
             TunerConstants.kSpeedAt12Volts.magnitude() * 0.5, 
@@ -48,25 +50,24 @@ public class DriveTo extends Command {
             driving = new DriveToPose(drive, goalPose);
         }
         
-        driving.repeatedly().schedule();
+        driving.initialize();
 
         start_time = Timer.getFPGATimestamp();
     }
 
     @Override
     public void execute() {
-
+        driving.execute();
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (driving != null) driving.cancel();
-        drive.stopWithX();
+        driving.end(interrupted);
     }
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 1;
+        return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 0.5;
         //return AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= 0.05;
     }
 

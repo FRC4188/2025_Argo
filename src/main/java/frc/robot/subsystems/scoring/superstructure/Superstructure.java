@@ -194,10 +194,10 @@ public class Superstructure extends SubsystemBase{
                     ele_man = true;
 
                     elevolts = MathUtil.clamp(
-                        Constants.ElevatorConstants.kFF - 9 * eleinput.getAsDouble(), 
-                        0, 
-                        (elevator.getHeight() >= SuperConstraints.ElevatorConstraints.RANGE)?
-                            Constants.ElevatorConstants.kFF:12);
+                        7 * eleinput.getAsDouble(), 
+                        -5,
+                        7
+                        );
         
                     target.setEleHeight(
                         MathUtil.clamp(
@@ -223,6 +223,10 @@ public class Superstructure extends SubsystemBase{
  
     public Command resetEle() {
         return Commands.runOnce(() -> elevator.setZero());
+    }
+
+    public Command resetWrist() {
+        return Commands.runOnce(() -> wrist.zero());
     }
 
     public SuperState getState() {

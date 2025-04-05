@@ -21,6 +21,7 @@ import frc.robot.subsystems.scoring.superstructure.SuperConstraints;
 public class Wrist extends SubsystemBase {//J.C
   private WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+  private double relative_zero = 0.0;
 
 
   //here cause relative encoder
@@ -44,7 +45,11 @@ public class Wrist extends SubsystemBase {//J.C
    */
   @AutoLogOutput(key = "Wrist/Angle Radians")
   public double getAngle(){
-    return io.getAngle();
+    return io.getAngle() - relative_zero;
+  }
+  
+  public void zero() {
+    relative_zero = io.getAngle();
   }
 
   public boolean atGoal(double target) {
