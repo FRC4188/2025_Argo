@@ -36,10 +36,11 @@ public class SuperState {
         elevator_height = MathUtil.clamp(height, 0, ElevatorConstraints.RANGE);
     }
 
+    //TODO: right auto + coral + L3
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                0.7, 0.8913)),
+                0.7, 0.8713)),
  
         L2_ALGAE(
             new SuperState(

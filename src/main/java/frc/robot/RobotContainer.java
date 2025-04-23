@@ -367,7 +367,7 @@ public class RobotContainer {
   public void resetSimulation(){
     if (Constants.robot.currMode != Constants.Mode.SIM) return;
 
-    drive.setPose(FieldConstant.start_mid);
+    drive.setPose(AllianceFlip.flipDS(FieldConstant.start_mid));
     SimulatedArena.getInstance().resetFieldForAuto();
     superstructure.setTarget(new SuperState());
   }

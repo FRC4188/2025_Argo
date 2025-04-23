@@ -67,8 +67,7 @@ public class DriveTo extends Command {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 0.5;
-        //return AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= 0.05;
+        return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 0.5 || AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= 0.05;
     }
 
 

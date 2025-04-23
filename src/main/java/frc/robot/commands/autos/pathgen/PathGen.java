@@ -198,7 +198,7 @@ public class PathGen {
 
 	    if (pivots.size() < 2) return pivots;
 
-	    if (start.getDistance(a_star.node_to_t2d(backward_nodes.get(backward_nodes.size() - 1))) <  Constants.robot.A_CROSSLENGTH) {
+	    if (a_star.t2d_to_node(start) == backward_nodes.get(backward_nodes.size() - 1)) {
             pivots.remove(0);
         }
 	    if (end.getDistance(a_star.node_to_t2d(backward_nodes.get(0))) < 2 * Constants.robot.A_CROSSLENGTH) {

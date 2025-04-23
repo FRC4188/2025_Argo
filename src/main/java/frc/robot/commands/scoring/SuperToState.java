@@ -28,7 +28,7 @@ public class SuperToState extends SequentialCommandGroup {
         addRequirements(superstruct);
         
         addCommands(
-            new WristToState(superstruct, wrist_angle).withTimeout(1.5)
+            new WristToState(superstruct, wrist_angle).withTimeout(1)
         );
     }
 

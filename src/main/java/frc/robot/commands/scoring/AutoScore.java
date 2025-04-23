@@ -133,6 +133,7 @@ public class AutoScore extends Command{
 
         }
     }
+    //TODO: MIDMIDMIDMIDMIDMDID
 
     public static class algaeNet extends AutoScore {
         public algaeNet(Drive drive, Superstructure superstructure, Intake intake) {
