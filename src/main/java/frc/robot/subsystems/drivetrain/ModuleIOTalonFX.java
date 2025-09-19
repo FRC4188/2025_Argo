@@ -38,9 +38,11 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     protected final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0).withEnableFOC(true);
 
     // Torque-current control requests
-    protected final VoltageOut torqueCurrentRequest = new VoltageOut(0).withEnableFOC(true);
-    protected final PositionVoltage positionTorqueCurrentRequest = new PositionVoltage(0.0).withEnableFOC(true);
-    protected final VelocityVoltage velocityTorqueCurrentRequest = new VelocityVoltage(0.0).withEnableFOC(true);
+    private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
+    private final PositionTorqueCurrentFOC positionTorqueCurrentRequest =
+        new PositionTorqueCurrentFOC(0.0);
+    private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
+        new VelocityTorqueCurrentFOC(0.0);
 
     // Inputs from drive motor
     protected final StatusSignal<Angle> drivePosition;
@@ -171,7 +173,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         turnTalon.setControl(
                 switch (constants.SteerMotorClosedLoopOutput) {
                     case Voltage -> voltageRequest.withOutput(output);
-                    case TorqueCurrentFOC -> voltageRequest.withOutput(output);
+                    case TorqueCurrentFOC -> torqueCurrentRequest.withOutput(output);
                 });
     }
 
