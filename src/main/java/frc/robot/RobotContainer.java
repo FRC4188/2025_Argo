@@ -352,6 +352,31 @@ public class RobotContainer {
           Commands.runOnce(() -> superstructure.resetEle()),
           new AutoScore.coralScore(drive, superstructure, intake))
     );
+
+    autoChooser.addOption("ring around the rosie", 
+      Commands.sequence(
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src),
+          new DriveTo(drive, FieldConstant.Source.left_src_mid),
+          new DriveTo(drive, FieldConstant.Source.right_src_mid),
+          new DriveTo(drive, FieldConstant.start_mid),
+          new DriveTo(drive, FieldConstant.start_left),
+          new DriveTo(drive, FieldConstant.start_right)
+      )
+    );
+
+    autoChooser.addOption("ring around one rosie", 
+      Commands.sequence(
+          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
+          new DriveTo(drive, FieldConstant.start_right),
+          new DriveTo(drive, FieldConstant.Source.left_src_mid)
+          
+      )
+    );
   }
 
   /**

@@ -33,9 +33,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     protected final TalonFX turnTalon;
     protected final CANcoder cancoder;
 
-    protected final VoltageOut voltageRequest = new VoltageOut(0);
-    protected final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
-    protected final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0);
+    protected final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);
+    protected final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0).withEnableFOC(true);
+    protected final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0).withEnableFOC(true);
 
     // Torque-current control requests
     protected final VoltageOut torqueCurrentRequest = new VoltageOut(0).withEnableFOC(true);

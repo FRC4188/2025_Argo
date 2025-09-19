@@ -400,7 +400,7 @@ public class Drive extends SubsystemBase implements VisionConsumer{
     public void accept(Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
         //Pose2d t_only = new Pose2d(visionRobotPoseMeters.getTranslation(), getRotation());
         //if (vision_accept)poseEstimator.addVisionMeasurement(t_only, timestampSeconds, visionMeasurementStdDevs);
-        if (vision_accept)poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+        if (vision_accept )poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
     /** Returns the maximum linear speed in meters per sec. */
