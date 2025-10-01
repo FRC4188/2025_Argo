@@ -252,7 +252,7 @@ public class RobotContainer {
     drivingInput.onTrue(DriveCommands.TeleDrive(drive,
       () -> -controller.getCorrectedLeft(Scale.LINEAR).getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
       () -> -controller.getCorrectedLeft(Scale.LINEAR).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> -controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0)))
+      () -> (Math.abs(controller.getCorrectedRight(Scale.SQUARED).getX()) <= (intake.isIn() ? 0.3 : 0.35))  ? -controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0) : (intake.isIn() ? -0.3 : -0.35) * Math.signum(controller.getCorrectedRight(Scale.SQUARED).getX())))
       .onFalse(Commands.runOnce(drive::stopWithX, drive));
 
     Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller2.getCorrectedRight(Scale.LINEAR).getNorm() != 0.0));
@@ -289,7 +289,8 @@ public class RobotContainer {
     controller2.a().and(controller2.leftBumper()).onTrue(superstructure.resetWrist());
     controller.a().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
 
-    controller2.getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
+    controller2.
+    getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
 
     controller2.getRightBumperButton().onTrue(
       new ScoreNet(superstructure, intake));
