@@ -332,10 +332,19 @@ public class RobotContainer {
         Commands.runOnce(() -> superstructure.resetEle()),
         AutoScore.pushLeave(drive)));
     
-    autoChooser.addOption("process", 
+    autoChooser.addOption("coral n process", 
       Commands.sequence(
         Commands.runOnce(() -> superstructure.resetEle()),
         new AutoScore.coralScore(drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake),
+        new AutoScore.algaeSource(drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake)
+      ));
+
+      autoChooser.addOption("process", 
+      Commands.sequence(
+        Commands.runOnce(() -> superstructure.resetEle()),
+        new AutoScore.algaeSource(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake),
         new AutoScore.algaeSource(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake)
