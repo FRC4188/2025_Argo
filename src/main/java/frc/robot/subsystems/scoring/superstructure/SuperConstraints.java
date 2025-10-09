@@ -11,7 +11,7 @@ public class SuperConstraints {
     
     public class WristConstraints{
         public final static double LOWEST_A = 0;
-        public final static double HIGHEST_A = Units.degreesToRadians(80);
+        public final static double HIGHEST_A = 1.35;
     }
 
     public class ElevatorConstraints{

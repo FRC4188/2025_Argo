@@ -63,8 +63,8 @@ public final class Constants {
     public static final double A_WIDTH = Units.inchesToMeters(30); //inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3.5) * 2;
-    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(3.5) * 2;
+    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3) * 2;
+    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(3) * 2;
     public static final double B_CROSSLENGTH = Math.hypot(B_LENGTH, B_WIDTH);
 
     public static  final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
@@ -192,7 +192,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double kStallCurrent = 35;
+    public static final double kStallCurrent = 40;
 
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = new CurrentLimitsConfigs()
       .withStatorCurrentLimit(80)

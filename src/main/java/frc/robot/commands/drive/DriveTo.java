@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -67,7 +68,7 @@ public class DriveTo extends Command {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 0.5 || AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= 0.05;
+        return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 1 || AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation()) <= Units.inchesToMeters(1);
     }
 
 

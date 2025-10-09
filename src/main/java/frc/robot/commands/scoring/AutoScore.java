@@ -95,7 +95,8 @@ public class AutoScore extends Command{
                             new SuperToState(superstruct, 0, preset.getState())
                         )
                     ),
-                    intake.ingest(() -> 7).withTimeout(1.5),
+                    intake.ingest(() -> 7).until(()->intake.isStalled()).withTimeout(1.5),
+                    intake.ingest(()->7).withTimeout(0.5),
                     intake.stop()
                 );
         }
@@ -124,7 +125,7 @@ public class AutoScore extends Command{
                         ),
                         Commands.sequence(
                             new WaitCommand(0.25),
-                            new SuperToState(superstruct, 0.5, SuperPreset.PROCESSOR.getState())
+                            new SuperToState(superstruct, SuperPreset.PROCESSOR.getState())
                         )
                     ),
                     intake.eject(() -> 10).withTimeout(1),
@@ -173,7 +174,7 @@ public class AutoScore extends Command{
     }
 
     public static Command pushLeave(Drive drive){
-        return drive.sysIdDynamic(Direction.kForward).withTimeout(5);
+        return drive.sysIdDynamic(Direction.kForward).withTimeout(15);
     }
 
     public static class coralScore extends AutoScore {
@@ -221,10 +222,51 @@ public class AutoScore extends Command{
                         )
                     ),
                     new SuperToState(superstruct, 0, preset.getState()),
-                    intake.ingest(() -> 7).withTimeout(0.7),
+                    intake.ingest(() -> 7).until(()->intake.isStalled()).withTimeout(1.5),
+                    intake.ingest(()->7).withTimeout(0.5),
                     intake.stop()
                 );
             
+        }
+
+        public static class coralOnly extends AutoScore {
+
+            public coralOnly(Drive drive, Superstructure superstructure, Intake intake) {
+                this.drive = drive;
+                this.superstruct = superstructure;
+                this.intake = intake;
+            }
+    
+            public coralOnly(Pose2d pose, Drive drive, Superstructure superstructure, Intake intake) {
+                this.drive = drive;
+                this.superstruct = superstructure;
+                this.intake = intake;
+                goal = pose;
+                presetGoal = true;
+            }
+    
+            @Override
+            public void factory() {
+                if (!presetGoal)  {goal = AllianceFlip.flipDS(drive.getPose()).nearest(FieldConstant.Reef.AlgaeSource.asources);}
+    
+                scoring = 
+                    Commands.sequence(
+                        Commands.race(
+                            //intake.ingest(() -> 5),
+                            Commands.parallel(
+                                Commands.sequence(
+                                    new DriveTo(drive, goal),
+                                    Commands.runOnce(drive::stopWithX, drive)
+                                ),
+                                Commands.sequence(
+                                    new WaitUntilCommand(() -> AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(goal.getTranslation()) < 2),
+                                    new SuperToState(superstruct, 0, SuperPreset.L1_CORAL.getState())
+                                )
+                            )
+                        )
+                    );
+                
+            }
         }
     }
 }

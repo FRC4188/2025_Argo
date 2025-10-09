@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -235,6 +236,7 @@ public class RobotContainer {
   public void teleInit() {
     (new SuperToState(superstructure, 0, SuperPreset.START.getState())).schedule();
     drive.setPose();
+    intake.stop().schedule();
   }
 
   /**
@@ -293,7 +295,8 @@ public class RobotContainer {
     getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
 
     controller2.getRightBumperButton().onTrue(
-      new ScoreNet(superstructure, intake));
+      new ScoreNet(superstructure, intake)
+    );
     controller2.getUpButton().onTrue(
       new SuperToState(superstructure, 0.5, SuperPreset.PROCESSOR.getState()));
 
@@ -349,6 +352,16 @@ public class RobotContainer {
         new AutoScore.algaeSource(drive, superstructure, intake),
         new AutoScore.algaeProcess(drive, superstructure, intake)
       ));
+
+      autoChooser.addOption("54 process n coral", 
+      Commands.sequence(
+        Commands.runOnce(() -> superstructure.resetEle()),
+        new AutoScore.coralScore(FieldConstant.Reef.AlgaeSource.alliance_src, drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake),
+        new AutoScore.algaeSource(FieldConstant.Reef.AlgaeSource.right_src_src, drive, superstructure, intake),
+        new AutoScore.algaeProcess(drive, superstructure, intake)
+      ));
+
 
     autoChooser.addOption("net", 
       Commands.sequence(

@@ -14,12 +14,12 @@ public class ScoreNet extends SequentialCommandGroup {
     public ScoreNet(Superstructure superstruct, Intake intake) {
         
         addCommands(
-            new SuperToState(superstruct, 1, SuperPreset.NET.getState()),
+            new SuperToState(superstruct, 0.75, SuperPreset.NET.getState()),
             (Commands.sequence(
                 Commands.runOnce(() -> start_time = Timer.getFPGATimestamp()),
-                intake.ingest(() -> 10).until(()->intake.isStalled()),
+                intake.ingest(() -> 12).until(()->intake.isStalled()),
                 Commands.runOnce(() -> start_time = Timer.getFPGATimestamp()),
-                intake.eject(()->2).withTimeout(0.1),
+                intake.eject(()->2).withTimeout(0.2),
                 intake.stop()
 
             ).repeatedly()).until(() -> Timer.getFPGATimestamp() - start_time > 0.4),

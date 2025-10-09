@@ -40,11 +40,11 @@ public class SuperState {
     public static enum SuperPreset{
         L3_ALGAE(
             new SuperState(
-                0.7, 0.8713)),
+                0.75, 0.8713)),
  
         L2_ALGAE(
             new SuperState(
-                0.7, 0.4719)),
+                0.75, 0.4719)),
         
         L1_CORAL(
             new SuperState(
@@ -57,7 +57,7 @@ public class SuperState {
                 1, SuperConstraints.ElevatorConstraints.RANGE)),
 
         ALGAE_GROUND(
-             new SuperState(1.4, 0)),
+             new SuperState(1.35, 0)),
         
         START(
             new SuperState(0, 0)),
