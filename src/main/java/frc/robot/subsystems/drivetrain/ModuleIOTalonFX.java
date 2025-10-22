@@ -180,7 +180,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     @Override
     public void setDriveVelocity(double wheelVelocityRadPerSec) {
         double motorVelocityRotPerSec =
-                Units.radiansToRotations(wheelVelocityRadPerSec) * constants.DriveMotorGearRatio;
+                Units.radiansToRotations(wheelVelocityRadPerSec);
         driveTalon.setControl(
                 switch (constants.DriveMotorClosedLoopOutput) {
                     case Voltage -> velocityVoltageRequest.withVelocity(motorVelocityRotPerSec);
