@@ -13,71 +13,27 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
-import edu.wpi.first.math.MathUtil;
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.Mode;
-import frc.robot.commands.autos.AutoFactory;
-import frc.robot.commands.autos.AutoTests;
-import frc.robot.commands.autos.GenAutoChooser;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.drive.DriveTo;
-import frc.robot.commands.scoring.ScoreNet;
-import frc.robot.commands.scoring.SuperToState;
-import frc.robot.commands.scoring.AutoScore;
-import frc.robot.commands.scoring.AutoScore.algaeNet;
-import frc.robot.inputs.CSP_Controller;
-import frc.robot.inputs.CSP_Controller.Scale;
-import frc.robot.subsystems.drivetrain.Drive;
-import frc.robot.subsystems.drivetrain.ModuleIO;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFXSim;
-import frc.robot.subsystems.drivetrain.ModuleIOTalonFXReal;
-import frc.robot.subsystems.generated.TunerConstants;
-import frc.robot.subsystems.gyro.GyroIO;
-import frc.robot.subsystems.gyro.GyroIOPigeon2;
-import frc.robot.subsystems.scoring.climber.Climber;
-import frc.robot.subsystems.scoring.climber.ClimberIOReal;
-import frc.robot.subsystems.scoring.climber.ClimberIOSim;
-import frc.robot.subsystems.scoring.intake.Intake;
-import frc.robot.subsystems.scoring.intake.IntakeIO;
-import frc.robot.subsystems.scoring.intake.IntakeIOReal;
-import frc.robot.subsystems.scoring.intake.IntakeIOSim;
-import frc.robot.subsystems.scoring.superstructure.SuperState;
-import frc.robot.subsystems.scoring.superstructure.SuperVisualizer;
-import frc.robot.subsystems.scoring.superstructure.SuperState.SuperPreset;
-import frc.robot.subsystems.scoring.superstructure.Superstructure;
-import frc.robot.subsystems.scoring.superstructure.SuperstructureConfig;
-import frc.robot.subsystems.vision.Limelight;
-import frc.robot.subsystems.vision.VisConstants;
-import frc.robot.subsystems.vision.VisionIOLL;
-import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.util.AllianceFlip;
+import frc.robot.CSPLib.inputs.CSP_Controller;
+import frc.robot.CSPLib.inputs.CSP_Controller.Scale;
+import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveTo;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.util.FieldConstant;
-import frc.robot.util.FieldConstant.Reef.AlgaeSource;
-
-import static frc.robot.subsystems.vision.VisConstants.robotToCamera0;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -89,76 +45,37 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private Superstructure superstructure;
-  private Intake intake;
-  private Limelight vis;
-  //sim
-  private SwerveDriveSimulation driveSim;
-  private SuperVisualizer supervis;
 
-  private Runnable resetGyro;
-
-  // Controller
-  private final CSP_Controller controller = new CSP_Controller(0);
-  private final CSP_Controller controller2 = new CSP_Controller(1);
+  // pilot
+  private final CSP_Controller pilot = new CSP_Controller(0);
+  private final CSP_Controller copilot = new CSP_Controller(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  private final GenAutoChooser genChooser;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    switch (Constants.robot.currMode) {
+    switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIOPigeon2(),
-                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                (pose) -> {});
-      
-        vis = 
-            new Limelight(
-              drive::accept,
-              new VisionIOPhotonVision(VisConstants.frontPho, robotToCamera0));
-
-        superstructure = new Superstructure(Mode.REAL);
-
-
-        intake = new Intake(new IntakeIOReal());
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
         break;
 
       case SIM:
-        //maple sim
-        
         // Sim robot, instantiate physics sim IO implementations
-        driveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(7.459, 5.991, Rotation2d.k180deg));
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
-                // new GyroIOSim(driveSim.getGyroSimulation()),
                 new GyroIO() {},
-                new ModuleIOTalonFXSim(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXSim(TunerConstants.FrontRight),
-                new ModuleIOTalonFXSim(TunerConstants.BackLeft),
-                new ModuleIOTalonFXSim(TunerConstants.BackRight),
-                driveSim::setSimulationWorldPose);
-        
-        
-
-        // vis = new Limelight(drive, new VisionIO(){});
-        superstructure = new Superstructure(Mode.SIM);
-
-        supervis = new SuperVisualizer("Models", 
-        () -> superstructure.getEleHeight(),
-        () -> superstructure.getWristAngle(), 
-        () -> 0);
-
-        intake = new Intake(new IntakeIOSim());
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
         break;
 
       default:
@@ -169,237 +86,107 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-
-        // vis = new Limelight(drive, new VisionIO(){});
-        superstructure = new Superstructure(Mode.REPLAY);
-        intake = new Intake(new IntakeIO(){});
+                new ModuleIO() {});
         break;
     }
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
-    genChooser = new GenAutoChooser(drive, superstructure, intake);
-    resetGyro = 
-    Constants.robot.currMode == Constants.Mode.SIM? 
-      () -> drive.setPose(
-                driveSim
-                  .getSimulatedDriveTrainPose()): // reset odometry to actual robot pose during simulation
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-       () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), AllianceFlip.apply(new Rotation2d())));
-
-    //add cmds for pathplanner events
-    HashMap<String, Command> EVENTS =
-      new HashMap<>(
-          Map.ofEntries(            
-            Map.entry("Delay", new WaitCommand(1.5))
-            // Map.entry("Super Start", 
-            //   new SuperToState(superstructure, SuperPreset.START.getState())),
-            // Map.entry("Coral L3", 
-            //   new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
-            // Map.entry("Coral L4", 
-            //   new SuperToState(superstructure, SuperPreset.L4_CORAL.getState())),
-            // Map.entry("Coral L2", 
-            //   new SuperToState(superstructure, SuperPreset.L3_CORAL.getState())),
-            // Map.entry("Coral Source", 
-            //   new SuperToState(superstructure, SuperPreset.SOURCE_REVERSE.getState())),
-            // Map.entry("Algae L3", 
-            //   new SuperToState(superstructure, SuperPreset.L3_ALGAE.getState())),
-            // Map.entry("Algae L2", 
-            //   new SuperToState(superstructure, SuperPreset.L2_ALGAE.getState()))
-            // Map.entry("Score Coral", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(1)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Score Algae", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(1)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Get Coral", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.CORAL, false)).withTimeout(2.5)
-            //   .andThen(Commands.run(()-> intake.stop()))),
-            // Map.entry("Get Algae", 
-            //   Commands.run(()-> 
-            //     intake.ingest(Intake.Mode.ALGAE, false)).withTimeout(2.5)
-            //   .andThen(Commands.run(()-> intake.stop())))
-        )
-      );
-
-    NamedCommands.registerCommands(EVENTS);
-
+    // Configure the button bindings
     configureDashboard();
     configureButtonBindings();
-    teleInit();
-  }
 
-  public void teleInit() {
-    (new SuperToState(superstructure, 0, SuperPreset.START.getState())).schedule();
-    drive.setPose();
-    intake.stop().schedule();
+    drive.setPose(FieldConstant.start_mid);
   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link Xboxpilot}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  public void configureButtonBindings() {
+  private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    superstructure.setDefaultCommand(Commands.run(superstructure::disable_manual, superstructure));
+    // rahhhhhhhhhhhhhhhhh
+    Trigger driveInput =
+        new Trigger(
+            () ->
+                (pilot.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0
+                    || pilot.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
 
-    Trigger drivingInput = new Trigger(() -> (controller.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
+    drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
 
-    drivingInput.onTrue(DriveCommands.TeleDrive(drive,
-      () -> -controller.getCorrectedLeft(Scale.LINEAR).getY() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> -controller.getCorrectedLeft(Scale.LINEAR).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0),
-      () -> (Math.abs(controller.getCorrectedRight(Scale.SQUARED).getX()) <= (intake.isIn() ? 0.3 : 0.35))  ? -controller.getCorrectedRight(Scale.SQUARED).getX() * (controller.getRightBumperButton().getAsBoolean() ? 0.25 : 1.0) : (intake.isIn() ? -0.3 : -0.35) * Math.signum(controller.getCorrectedRight(Scale.SQUARED).getX())))
-      .onFalse(Commands.runOnce(drive::stopWithX, drive));
+    driveInput.whileTrue(
+        DriveCommands.joystickDrive(
+            drive,
+            () ->
+                -pilot.getCorrectedLeft(Scale.SQUARED).getY()
+                    * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
+            () ->
+                -pilot.getCorrectedLeft(Scale.SQUARED).getX()
+                    * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
+            () ->
+                -pilot.getCorrectedRight(Scale.SQUARED).getX()
+                    * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0)));
 
-    Trigger superInput = new Trigger(() -> (controller2.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0 || controller2.getCorrectedRight(Scale.LINEAR).getNorm() != 0.0));
+    pilot
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    () ->
+                        -pilot.getCorrectedLeft(Scale.SQUARED).getY()
+                            * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
+                    () ->
+                        -pilot.getCorrectedLeft(Scale.SQUARED).getX()
+                            * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
+                    () -> drive.getPose().getTranslation().getAngle())
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
-    superInput.onTrue(superstructure.manual(
-      () -> controller2.getCorrectedLeft(Scale.LINEAR).getY(),
-      () -> -controller2.getCorrectedRight(Scale.LINEAR).getY()
-    )).onFalse(Commands.runOnce(superstructure::disable_manual));
+    switch (Constants.pid_mode) {
+      case DRIVE_MOD:
+        pilot.b().onTrue(Commands.runOnce(drive::updateDrivePID, drive));
+        break;
+      case TURN_MOD:
+        pilot.b().onTrue(Commands.runOnce(drive::updateTurnPID, drive));
+        break;
+      case NONE:
+      default:
+    }
 
-    // Reset gyro to 0° when start button is pressed
-    controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true)); 
-      
-    controller.getLeftTButton().whileTrue(
-      intake.ingest(()-> ((controller.getLeftTriggerAxis() >= 0.75)? 10:4)))
-        .onFalse(intake.stop());
-
-    controller.getLeftBumperButton().whileTrue(
-      Commands.sequence(
-                intake.ingest(() -> 10).until(()->intake.isStalled()),
-                intake.eject(()->2).withTimeout(0.1),
-                intake.stop()
-            ).repeatedly()).onFalse(intake.stop());
-
-    controller.getRightTButton().whileTrue(
-      intake.eject(()-> controller.getRightT(Scale.QUARTIC) * 8))
-        .onFalse(intake.stop());
-
-    
-
-    //emergency cases
-    controller2.x().and(controller2.leftBumper()).onTrue(superstructure.resetEle());
-    controller2.b().and(controller2.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.wrist_pid = !superstructure.wrist_pid));
-    controller2.y().and(controller2.leftBumper()).onTrue(Commands.runOnce(() -> superstructure.ele_pid = !superstructure.ele_pid));
-    controller2.a().and(controller2.leftBumper()).onTrue(superstructure.resetWrist());
-    controller.a().onTrue(Commands.runOnce(() -> drive.vision_accept = !drive.vision_accept));
-
-    controller2.
-    getStartButton().onTrue(new SuperToState(superstructure, 0, SuperPreset.START.getState()));
-
-    controller2.getRightBumperButton().onTrue(
-      new ScoreNet(superstructure, intake)
-    );
-    controller2.getUpButton().onTrue(
-      new SuperToState(superstructure, 0.5, SuperPreset.PROCESSOR.getState()));
-
-    controller2.getLeftButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.L2_ALGAE.getState()));
-
-    controller2.getRightButton().onTrue(
-      new SuperToState(superstructure, 0, SuperPreset.L3_ALGAE.getState()));
-      
-    controller2.getDownButton().onTrue(
-      new SuperToState(superstructure, SuperPreset.ALGAE_GROUND.getState().getWristAngle()));
+    // Reset gyro to 0° when B button is pressed
+    pilot
+        .start()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
   }
 
   private void configureDashboard() {
-    
+
     // Set up SysId routines
-    // autoChooser.addOption(
-    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addDefaultOption(
-        "Drive SysId (Dynamic Forward)", 
-        Commands.runOnce(() -> superstructure.resetEle()).andThen(drive.sysIdDynamic(SysIdRoutine.Direction.kForward)));
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("gui 3 left source", new PathPlannerAuto("3 Left Corals"));
-    autoChooser.addOption("gui 3 right source", new PathPlannerAuto("3 Right Corals"));
-
-    autoChooser.addOption("leave ", 
-      Commands.sequence(
-        Commands.runOnce(() -> superstructure.resetEle()),
-        AutoScore.pushLeave(drive)));
-    
-    autoChooser.addOption("coral n process", 
-      Commands.sequence(
-        Commands.runOnce(() -> superstructure.resetEle()),
-        new AutoScore.coralScore(drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake),
-        new AutoScore.algaeSource(drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake)
-      ));
-
-      autoChooser.addOption("process", 
-      Commands.sequence(
-        Commands.runOnce(() -> superstructure.resetEle()),
-        new AutoScore.algaeSource(drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake),
-        new AutoScore.algaeSource(drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake)
-      ));
-
-      autoChooser.addOption("54 process n coral", 
-      Commands.sequence(
-        Commands.runOnce(() -> superstructure.resetEle()),
-        new AutoScore.coralScore(FieldConstant.Reef.AlgaeSource.alliance_src, drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake),
-        new AutoScore.algaeSource(FieldConstant.Reef.AlgaeSource.right_src_src, drive, superstructure, intake),
-        new AutoScore.algaeProcess(drive, superstructure, intake)
-      ));
-
-
-    autoChooser.addOption("net", 
-      Commands.sequence(
-          Commands.runOnce(() -> superstructure.resetEle()),
-          new AutoScore.coralScore(drive, superstructure, intake),
-          new AutoScore.algaeNet(drive, superstructure, intake),
-          new AutoScore.algaeSource(drive, superstructure, intake)));
-
-    autoChooser.addOption("coral", 
-      Commands.sequence(
-          Commands.runOnce(() -> superstructure.resetEle()),
-          new AutoScore.coralScore(drive, superstructure, intake))
-    );
-
-    autoChooser.addOption("ring around the rosie", 
-      Commands.sequence(
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src),
-          new DriveTo(drive, FieldConstant.Source.left_src_mid),
-          new DriveTo(drive, FieldConstant.Source.right_src_mid),
-          new DriveTo(drive, FieldConstant.start_mid),
-          new DriveTo(drive, FieldConstant.start_left),
-          new DriveTo(drive, FieldConstant.start_right)
-      )
-    );
-
-    autoChooser.addOption("ring around one rosie", 
-      Commands.sequence(
-          new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
-          new DriveTo(drive, FieldConstant.start_right),
-          new DriveTo(drive, FieldConstant.Source.left_src_mid)
-          
-      )
-    );
+    autoChooser.addOption(
+        "Trajectory Test", new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src));
   }
 
   /**
@@ -408,28 +195,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-     return autoChooser.get();
-    // return genChooser.getAutonomousCommand();
-  }
-
-  public void resetSimulation(){
-    if (Constants.robot.currMode != Constants.Mode.SIM) return;
-
-    drive.setPose(AllianceFlip.flipDS(FieldConstant.start_mid));
-    SimulatedArena.getInstance().resetFieldForAuto();
-    superstructure.setTarget(new SuperState());
-  }
-
-  public void displaySimFieldToAdvantageScope() {
-    if (Constants.robot.currMode != Constants.Mode.SIM) return;
-
-    supervis.update();
-
-    Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
-
-    Logger.recordOutput(
-            "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-            "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    return autoChooser.get();
   }
 }
