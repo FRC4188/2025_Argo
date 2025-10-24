@@ -67,7 +67,6 @@ public class DriveTo extends Command {
 
     drive.runVelocity(
         controller.calculate(drive.getPose(), curstate, curstate.poseMeters.getRotation()));
-
   }
 
   @Override
