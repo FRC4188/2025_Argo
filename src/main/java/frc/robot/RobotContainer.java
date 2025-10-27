@@ -33,6 +33,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.vision.VisConstants;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOPhoton;
 import frc.robot.util.FieldConstant;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -45,6 +48,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private Vision vis;
 
   // pilot
   private final CSP_Controller pilot = new CSP_Controller(0);
@@ -65,6 +69,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        vis =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhoton(VisConstants.frontPho, VisConstants.robotToCamera0));
         break;
 
       case SIM:
@@ -97,8 +106,6 @@ public class RobotContainer {
     // Configure the button bindings
     configureDashboard();
     configureButtonBindings();
-
-    drive.setPose(FieldConstant.start_mid);
   }
 
   /**
@@ -142,8 +149,14 @@ public class RobotContainer {
                     () ->
                         -pilot.getCorrectedLeft(Scale.SQUARED).getX()
                             * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
-                    () -> drive.getPose().getTranslation().getAngle())
+                    () ->
+                        FieldConstant.Reef.center
+                            .minus(drive.getPose().getTranslation())
+                            .getAngle())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    pilot.x().onTrue(Commands.runOnce(() -> drive.acceptVision(true), drive));
+    pilot.y().onTrue(Commands.runOnce(() -> drive.acceptVision(false), drive));
 
     switch (Constants.pid_mode) {
       case DRIVE_MOD:
@@ -151,6 +164,9 @@ public class RobotContainer {
         break;
       case TURN_MOD:
         pilot.b().onTrue(Commands.runOnce(drive::updateTurnPID, drive));
+        break;
+      case ANGLE_PROF:
+        pilot.b().onTrue(Commands.runOnce(DriveCommands::updateAnglePID, drive));
         break;
       case NONE:
       default:
@@ -187,7 +203,10 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     autoChooser.addOption(
-        "Trajectory Test", new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src));
+        "Trajectory Test",
+        Commands.sequence(
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
+            new DriveTo(drive, FieldConstant.Processor.processor_goal)));
   }
 
   /**
@@ -196,6 +215,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return autoChooser.get();
   }
 }

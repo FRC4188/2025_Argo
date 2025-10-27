@@ -1,13 +1,9 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CSPLib.pathgen.PathGen;
@@ -15,15 +11,17 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlip;
+import java.util.function.Supplier;
 
 public class DriveTo extends Command {
 
   private double start_time = 0;
+  private Supplier<Pose2d> goalPose;
   private Trajectory traj;
   private TrajectoryConfig config;
+  private DriveToPose driving;
   private Drive drive;
   private Pose2d end_goal;
-  private HolonomicDriveController controller;
 
   // flipped drive, unflipped goal
   public DriveTo(Drive drive, Pose2d goal) {
@@ -35,19 +33,6 @@ public class DriveTo extends Command {
             TunerConstants.kSpeedAt12Volts.magnitude() * 0.5,
             Constants.robot.MAX_ACCELERATION.magnitude() * 0.7);
     end_goal = goal;
-
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            Constants.robot.ANGLE_KP,
-            0.0,
-            Constants.robot.ANGLE_KD,
-            new TrapezoidProfile.Constraints(
-                Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    controller =
-        new HolonomicDriveController(
-            new PIDController(2.5, 0, 0), new PIDController(2.5, 0, 0), angleController);
   }
 
   @Override
@@ -56,28 +41,36 @@ public class DriveTo extends Command {
         PathGen.getInstance()
             .generateTrajectory(AllianceFlip.flipDS(drive.getPose()), end_goal, config);
 
+    if (traj.getStates().isEmpty()) {
+      goalPose = () -> drive.getPose();
+    } else {
+      goalPose =
+          () -> AllianceFlip.flipDS(traj.sample(Timer.getFPGATimestamp() - start_time).poseMeters);
+
+      driving = new DriveToPose(drive, goalPose);
+    }
+
+    driving.initialize();
+
     start_time = Timer.getFPGATimestamp();
   }
 
   @Override
   public void execute() {
-    State curstate = traj.sample(Timer.getFPGATimestamp() - start_time);
-
-    curstate.poseMeters = AllianceFlip.flipDS(curstate.poseMeters);
-
-    drive.runVelocity(
-        controller.calculate(drive.getPose(), curstate, curstate.poseMeters.getRotation()));
+    driving.execute();
   }
 
   @Override
   public void end(boolean interrupted) {
-    drive.stopWithX();
+    driving.end(interrupted);
   }
 
   @Override
   public boolean isFinished() {
-    return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 1;
-    // AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation())
-    // <= Units.inchesToMeters(1);
+    return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 1
+        || AllianceFlip.flipDS(drive.getPose())
+                .getTranslation()
+                .getDistance(end_goal.getTranslation())
+            <= Units.inchesToMeters(1);
   }
 }

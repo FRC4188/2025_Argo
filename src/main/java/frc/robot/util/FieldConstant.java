@@ -144,6 +144,8 @@ public class FieldConstant {
   public class Reef {
     public static double center_x = field_center_x - Units.inchesToMeters(168.692);
     public static double center_y = field_width / 2;
+    public static Translation2d center = new Translation2d(center_x, center_y);
+
     public static double from_reef = Units.inchesToMeters(65.5 / 2);
     public static double long_radius = Units.inchesToMeters(75.238 / 2);
     public static double side_length = Units.inchesToMeters(37.043);
@@ -530,8 +532,7 @@ public class FieldConstant {
     public static double opening_from_ground = Units.inchesToMeters(7);
 
     public static Translation2d score_pos =
-        new Translation2d(
-            -Constants.robot.B_LENGTH / 2 + Units.inchesToMeters(4), 0.45); // 0.8 no vision
+        new Translation2d(-Constants.robot.B_LENGTH / 2, 0.0); // 0.8 no vision
 
     public static Pose2d processor_wall =
         new Pose2d(

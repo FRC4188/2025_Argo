@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-  public static final PIDTuning pid_mode = PIDTuning.DRIVE_MOD;
+  public static final PIDTuning pid_mode = PIDTuning.NONE;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -48,7 +48,10 @@ public final class Constants {
     DRIVE_MOD,
 
     /** Tuning individual turn modules */
-    TURN_MOD
+    TURN_MOD,
+
+    /** Tuning profiled angle controller */
+    ANGLE_PROF
   }
 
   public static class controller {
@@ -75,13 +78,14 @@ public final class Constants {
 
     public static final double ANGLE_KP = 5.0;
     public static final double ANGLE_KD = 0.4;
+    public static final double ANGLE_TOL = 0.02;
 
-    public static final double A_LENGTH = Units.inchesToMeters(32); // F to B
-    public static final double A_WIDTH = Units.inchesToMeters(26); // L to R
+    public static final double A_LENGTH = Units.inchesToMeters(29); // inches
+    public static final double A_WIDTH = Units.inchesToMeters(30); // inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3) * 2;
-    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(3) * 2;
+    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(2.5) * 2;
+    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(2.5) * 2;
     public static final double B_CROSSLENGTH = Math.hypot(B_LENGTH, B_WIDTH);
 
     // Add if problem present

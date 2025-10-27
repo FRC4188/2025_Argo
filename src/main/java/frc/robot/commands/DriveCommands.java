@@ -33,8 +33,36 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
+
+  public static LoggedNetworkNumber akp =
+      new LoggedNetworkNumber("Drive/Angle_kP", Constants.robot.ANGLE_KP);
+  public static LoggedNetworkNumber aki = new LoggedNetworkNumber("Drive/Angle_kI", 0);
+  public static LoggedNetworkNumber akd =
+      new LoggedNetworkNumber("Drive/Angle_kD", Constants.robot.ANGLE_KD);
+
+  public static ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          Constants.robot.ANGLE_KP,
+          0.0,
+          Constants.robot.ANGLE_KD,
+          new TrapezoidProfile.Constraints(
+              Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
+
+  public static void updateAnglePID() {
+    angleController =
+        new ProfiledPIDController(
+            akp.get(),
+            aki.get(),
+            akd.get(),
+            new TrapezoidProfile.Constraints(
+                Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
+
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
@@ -82,24 +110,23 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
 
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            Constants.robot.ANGLE_KP,
-            0.0,
-            Constants.robot.ANGLE_KD,
-            new TrapezoidProfile.Constraints(
-                Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
+    // ConstructPID
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
     return Commands.run(
             () -> {
+              Logger.recordOutput("Drive/Angle Target", rotationSupplier.get().getRadians());
+              Logger.recordOutput(
+                  "Drive/Angle Current", drive.getPose().getRotation().getRadians());
 
               // Calculate angular speed
               double omega =
-                  angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                  (Math.abs(drive.getRotation().getRadians() - rotationSupplier.get().getRadians())
+                          < Constants.robot.ANGLE_TOL)
+                      ? 0
+                      : angleController.calculate(
+                          drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
