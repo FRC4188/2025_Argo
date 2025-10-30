@@ -1,6 +1,8 @@
 
 package frc.robot.subsystems.scoring.elevator;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -15,6 +17,10 @@ public interface ElevatorIO {
 
         public double followerTempC = 0.0;
         public double followerAppliedVolts = 0.0;
+
+        public double getVelocityMetersPerSec;
+
+        public double velocityRotsPerSec;
     }
 
     public default void updateInputs(ElevatorIOInputs inputs) {}
@@ -24,4 +30,12 @@ public interface ElevatorIO {
     public default double getHeight(){return 0;}
 
     public default boolean isStalled() {return false;}
+
+    public default void setLeaderOpenLoop(double output) {}
+
+    public default void setMotorPosition(DoubleSupplier target) {}
+
+    public default void setHeight(DoubleSupplier target) {}
+
+    public default void setElevatorVelocity(double velocityRadPerSec) {}
 }
