@@ -15,12 +15,14 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -30,22 +32,20 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import frc.robot.Constants.Id;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.drivetrain.Drive;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import edu.wpi.first.units.measure.Current;
 
 public class ElevatorIOReal implements ElevatorIO {
 
     private final TalonFX leader;
     private final TalonFX follower;
-
+    
+    private final StatusSignal<Angle> positionRots;
+    private final StatusSignal<AngularVelocity> velocityRots;
     private final StatusSignal<Voltage> appliedVolts;
-    private final StatusSignal<Temperature> tempC;
-    private final StatusSignal<Angle> posRots;
-    private final StatusSignal<Voltage> appliedVoltsFollow;
-    private final StatusSignal<Temperature> tempCFollow;
-
-    // inputs from leader motor for velocity (2026 update)
-    protected final StatusSignal<AngularVelocity> velocityRotsPerSec;
+    private final StatusSignal<Current> currentAmps;
 
     protected final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);
     protected final PositionVoltage positionVoltageRequest = new PositionVoltage(0).withEnableFOC(true);
@@ -57,6 +57,9 @@ public class ElevatorIOReal implements ElevatorIO {
         new PositionTorqueCurrentFOC(0.0);
     private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
         new VelocityTorqueCurrentFOC(0.0);
+
+    private final Debouncer leaderConnectedDebounce = new Debouncer(0.5);
+    private final Debouncer followerConnectedDebounce = new Debouncer(0.5);
 
     public ElevatorIOReal() {
         leader = new TalonFX(Id.kElevatorLead, Constants.robot.rio);
@@ -76,53 +79,40 @@ public class ElevatorIOReal implements ElevatorIO {
         leader.optimizeBusUtilization();
         follower.optimizeBusUtilization();   
         
-        posRots = leader.getPosition();
+        positionRots = leader.getPosition();
+        velocityRots = leader.getVelocity();
         appliedVolts = leader.getMotorVoltage();
-        tempC = leader.getDeviceTemp();
-        appliedVoltsFollow = follower.getMotorVoltage();
-        tempCFollow = follower.getDeviceTemp();
+        currentAmps = leader.getStatorCurrent();
 
-        velocityRotsPerSec = leader.getVelocity();
-
-        posRots.setUpdateFrequency(Hertz.of(50));
-        appliedVolts.setUpdateFrequency(Hertz.of(50));
-        tempC.setUpdateFrequency(Hertz.of(0.5));
-        appliedVoltsFollow.setUpdateFrequency(Hertz.of(50));
-        tempCFollow.setUpdateFrequency(Hertz.of(0.5));
-        velocityRotsPerSec.setUpdateFrequency(Hertz.of(50));
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                50.0, positionRots, velocityRots, appliedVolts, currentAmps);
+        ParentDevice.optimizeBusUtilizationForAll(leader, follower);
     }
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.connected =
+        inputs.leaderConnected =
         BaseStatusSignal.refreshAll(
-                posRots, appliedVolts, tempC, appliedVoltsFollow, tempCFollow)
+                positionRots, appliedVolts, velocityRots, currentAmps)
+            .isOK();
+
+        inputs.followerConnected =
+        BaseStatusSignal.refreshAll(
+                follower.getMotorVoltage(), follower.getStatorCurrent())
             .isOK();
     
         inputs.appliedVolts = appliedVolts.getValueAsDouble();
-        inputs.tempC = tempC.getValueAsDouble();
-        inputs.posMeters = Units.rotationsToRadians(posRots.getValueAsDouble());
-        
-        inputs.followerAppliedVolts = appliedVoltsFollow.getValueAsDouble();
-        inputs.followerTempC = tempCFollow.getValueAsDouble();
-
-        inputs.velocityRotsPerSec = velocityRotsPerSec.getValueAsDouble();
-        inputs.getVelocityMetersPerSec = velocityRotsPerSec.getValueAsDouble() * 1; // 1 is the drum circumference in meters/motor to mechanism ratio in meters
+        inputs.currentAmps = currentAmps.getValueAsDouble();
+        inputs.positionMeters = positionRots.getValueAsDouble() / (3 * Constants.ElevatorConstants.kPitchRadius);
+        inputs.velocityMeters = velocityRots.getValueAsDouble() / (3 * Constants.ElevatorConstants.kPitchRadius);
     }
 
     
 
     @Override
-    public void runVolts(double volts){
+    public void setOpenLoop(double volts){
         volts = MathUtil.clamp(volts, -12, 12);
         leader.setControl(new VoltageOut(volts)); 
-    }
-
-    @Override
-    public void setLeaderOpenLoop(double output) {
-        leader.setControl(
-            (Constants.ElevatorConstants.isPro) ? torqueCurrentRequest.withOutput(output) : voltageRequest.withOutput(output)
-        );
     }
 
     // yanshu fix

@@ -120,7 +120,7 @@ public final class Constants {
       .withStatorCurrentLimitEnable(true);
 
     private static final FeedbackConfigs kFeedbackConfigs = new FeedbackConfigs()
-      .withSensorToMechanismRatio(kConversion);
+      .withSensorToMechanismRatio(kGearRatio);
     
     private static final MotionMagicConfigs kMagicConfigs = new MotionMagicConfigs()
       .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1))

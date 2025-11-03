@@ -21,8 +21,6 @@ public class Elevator extends SubsystemBase{
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs;
 
-    public double kZero = 0;
-
     public Elevator(ElevatorIO io){
         this.io = io;
         inputs = new ElevatorIOInputsAutoLogged();
@@ -32,22 +30,15 @@ public class Elevator extends SubsystemBase{
     public void periodic(){
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);   
-
-        // if (io.isStalled()) setZero();
     }
 
     public void runVolts(double volts) {
         io.runVolts(volts);
     }
 
-    public void setZero() {
-        kZero = io.getHeight();
-      }
-
-
     @AutoLogOutput(key = "Elevator/Height Meters")
     public double getHeight(){
-        return io.getHeight() - kZero;
+        return io.getHeight();
     }
 
     public Command runSetHeight(double height) {
