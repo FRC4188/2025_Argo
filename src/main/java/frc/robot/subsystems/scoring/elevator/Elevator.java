@@ -50,6 +50,10 @@ public class Elevator extends SubsystemBase{
         return io.getHeight() - kZero;
     }
 
+    public Command runSetHeight(double height) {
+        return Commands.run(() -> io.setElevatorHeight(() -> height));
+    }
+
     public boolean atGoal(double target) {
         return Math.abs(getHeight() - target) < ElevatorConstants.kTolerance;
     }

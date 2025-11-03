@@ -52,6 +52,10 @@ import frc.robot.subsystems.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.scoring.climber.Climber;
 import frc.robot.subsystems.scoring.climber.ClimberIOReal;
 import frc.robot.subsystems.scoring.climber.ClimberIOSim;
+import frc.robot.subsystems.scoring.elevator.Elevator;
+import frc.robot.subsystems.scoring.elevator.ElevatorIO;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOReal;
+import frc.robot.subsystems.scoring.elevator.ElevatorIOSim;
 import frc.robot.subsystems.scoring.intake.Intake;
 import frc.robot.subsystems.scoring.intake.IntakeIO;
 import frc.robot.subsystems.scoring.intake.IntakeIOReal;
@@ -90,6 +94,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private Superstructure superstructure;
+  private Elevator elevator;
   private Intake intake;
   private Limelight vis;
   //sim
@@ -127,6 +132,7 @@ public class RobotContainer {
               new VisionIOPhotonVision(VisConstants.frontPho, robotToCamera0));
 
         superstructure = new Superstructure(Mode.REAL);
+        elevator = new Elevator(new ElevatorIOReal());
 
 
         intake = new Intake(new IntakeIOReal());
@@ -152,6 +158,7 @@ public class RobotContainer {
 
         // vis = new Limelight(drive, new VisionIO(){});
         superstructure = new Superstructure(Mode.SIM);
+        elevator = new Elevator(new ElevatorIOSim());
 
         supervis = new SuperVisualizer("Models", 
         () -> superstructure.getEleHeight(),
@@ -174,6 +181,7 @@ public class RobotContainer {
 
         // vis = new Limelight(drive, new VisionIO(){});
         superstructure = new Superstructure(Mode.REPLAY);
+        elevator = new Elevator(new ElevatorIO(){});
         intake = new Intake(new IntakeIO(){});
         break;
     }

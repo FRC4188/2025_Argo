@@ -38,4 +38,6 @@ public interface ElevatorIO {
     public default void setHeight(DoubleSupplier target) {}
 
     public default void setElevatorVelocity(double velocityRadPerSec) {}
+
+    public default void setElevatorHeight(DoubleSupplier target) {}
 }

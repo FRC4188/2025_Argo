@@ -48,7 +48,7 @@ public class ElevatorIOReal implements ElevatorIO {
     protected final StatusSignal<AngularVelocity> velocityRotsPerSec;
 
     protected final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);
-    protected final PositionVoltage currentRequest = new PositionVoltage(0).withEnableFOC(true);
+    protected final PositionVoltage positionVoltageRequest = new PositionVoltage(0).withEnableFOC(true);
     protected final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0).withEnableFOC(true);
 
     // Torque-current control requests
@@ -125,23 +125,12 @@ public class ElevatorIOReal implements ElevatorIO {
         );
     }
 
-    // Similar to ModuleIOTalonFX's setTurnPosition
+    // yanshu fix
 
-    @Override
-    public void setMotorPosition(DoubleSupplier target) {
+    @Override 
+    public void setElevatorHeight(DoubleSupplier target) {
         leader.setControl(
-            (Constants.ElevatorConstants.isPro) ? positionTorqueCurrentRequest.withPosition(target.getAsDouble()) : currentRequest.withPosition(target.getAsDouble())
-        );
-    }
-
-    @Override
-    public void setElevatorVelocity(double velocityRadPerSec) {
-        double motorVelocityRotPerSec = Units.radiansToRotations(velocityRadPerSec) * Constants.ElevatorConstants.kConversion; // * (1 / drum circumference in meters) * (1 / mechanism to motor ratio in meters)
-
-        leader.setControl(
-            (Constants.ElevatorConstants.isPro) ? 
-            velocityTorqueCurrentRequest.withVelocity(MathUtil.clamp(motorVelocityRotPerSec, -Constants.WristConstants.kMax_Vel, Constants.WristConstants.kMax_Vel)) : 
-            velocityVoltageRequest.withVelocity(MathUtil.clamp(motorVelocityRotPerSec, -Constants.WristConstants.kMax_Vel, Constants.WristConstants.kMax_Vel))
+            positionVoltageRequest.withPosition(target.getAsDouble())
         );
     }
 
