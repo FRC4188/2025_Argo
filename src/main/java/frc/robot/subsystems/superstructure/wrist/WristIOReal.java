@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.wrist;
+package frc.robot.subsystems.superstructure.wrist;
 
 import static frc.robot.util.SparkUtil.*;
 
@@ -111,7 +111,6 @@ public class WristIOReal implements WristIO {
             wristSpark.configure(
                 wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    // Create odometry queues
     // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.MagnetOffset = Constants.WristConstants.kEncoderOffset;
@@ -171,7 +170,7 @@ public class WristIOReal implements WristIO {
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         wristff.calculate(
-            Units.rotationsToRadians(wristAbsolutePosition.getValueAsDouble() - Math.PI / 2), 0));
+            Units.rotationsToRadians((Math.PI / 2) - wristAbsolutePosition.getValueAsDouble()), 0));
   }
 
   @Override

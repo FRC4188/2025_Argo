@@ -11,7 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.lift;
+package frc.robot.subsystems.superstructure.elevator;
 
 import static frc.robot.util.PhoenixUtil.*;
 

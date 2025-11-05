@@ -5,17 +5,17 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.wrist;
+package frc.robot.subsystems.superstructure.wrist;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-public class Wrist extends SubsystemBase {
+public class Wrist {
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
@@ -40,17 +40,21 @@ public class Wrist extends SubsystemBase {
     wristDisconnectedAlert.set(!inputs.wristConnected);
   }
 
-  /** Runs the wrist to a specified angle radians */
-  public void setPosition(double angleRads) {
+  /** Runs the wrist to a specified angle */
+  public void setPosition(Rotation2d angle) {
     if (Constants.pid_mode == Constants.PIDTuning.WRIST) {
-      angleRads = targetAngle.get();
+      angle = Rotation2d.fromRadians(targetAngle.get());
     }
 
-    io.setPosition(Rotation2d.fromRadians(angleRads));
+    angle = Rotation2d.fromRadians(MathUtil.clamp(angle.getRadians(), 0, Math.PI / 2));
+
+    Logger.recordOutput("Wrist/SetPoint", angle);
+    io.setPosition(angle);
   }
 
   /** Runs the wrist with a specified output. */
   public void runVolts(double output) {
+    output = MathUtil.clamp(output, -12.0, 12.0);
     io.setOpenLoop(output);
   }
 

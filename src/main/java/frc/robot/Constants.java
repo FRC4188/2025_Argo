@@ -108,6 +108,17 @@ public final class Constants {
     // public static final PIDController CORRECTION_PID = new PIDController(0.1, 0.0, 0.006);
   }
 
+  public class Id {
+    // pigeon 0
+    // DT ids are 1->12
+    public static final int kElevatorLead = 13;
+    public static final int kElevatorFollow = 14;
+    public static final int kWristCANCoder = 15;
+    public static final int kClimber = 16;
+    public static final int kWrist = 17;
+    public static final int kIntake = 18;
+  }
+
   public static class EleConstants {
     public static final TalonFXConfiguration kInitialConfigs =
         new TalonFXConfiguration()
@@ -141,6 +152,7 @@ public final class Constants {
     public static final double kGearRatio = 5;
     public static final boolean kMotorInverted = false;
     public static final double kMaxTorqueCurrent = 80;
+    public static final double kMaxVel = 4;
 
     public static final TalonFXConfiguration kInitialConfigs =
         new TalonFXConfiguration()
@@ -153,17 +165,6 @@ public final class Constants {
     public static final Slot0Configs kMotorGains = new Slot0Configs().withKP(0.0).withKD(0.0);
 
     public static final ClosedLoopOutputType motorClosedLoopOutput = ClosedLoopOutputType.Voltage;
-  }
-
-  public class Id {
-    // pigeon 0
-    // DT ids are 1->12
-    public static final int kElevatorLead = 13;
-    public static final int kElevatorFollow = 14;
-    public static final int kWristCANCoder = 15;
-    public static final int kClimber = 16;
-    public static final int kWrist = 17;
-    public static final int kIntake = 18;
   }
 
   public static class WristConstants {

@@ -16,11 +16,19 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Intake extends SubsystemBase {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+
+  private LoggedNetworkNumber kP = new LoggedNetworkNumber("Intake/kP", 0.0);
+  private LoggedNetworkNumber kI = new LoggedNetworkNumber("Intake/kI", 0.0);
+  private LoggedNetworkNumber kD = new LoggedNetworkNumber("Intake/kD", 0.0);
+  private LoggedNetworkNumber target = new LoggedNetworkNumber("Intake/Target RPM", 0.0);
 
   private final Alert falconDisconnectedAlert;
 
@@ -40,6 +48,10 @@ public class Intake extends SubsystemBase {
 
   /** Runs the intake to a set rpm */
   public void setVelocityRPM(double rpm) {
+    if (Constants.pid_mode == Constants.PIDTuning.INTAKE) {
+      rpm = target.get();
+    }
+
     io.setVelocity(rpm * 60);
   }
 
@@ -54,11 +66,12 @@ public class Intake extends SubsystemBase {
   }
 
   /** Returns the current intake velocity in rpm. */
+  @AutoLogOutput(key = "Intake/RPM")
   public double getRPM() {
     return inputs.velocityRotPerSec / 60;
   }
 
-  public void updatePID(double p, double i, double d) {
-    io.updatePID(p, i, d);
+  public void updatePID() {
+    io.updatePID(kP.get(), kI.get(), kD.get());
   }
 }
