@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.drive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -123,10 +123,6 @@ public class DriveToPose extends Command {
             .transformBy(
                 new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
             .getTranslation();
-
-    Logger.recordOutput("Drive/DriveToPose/x_speed", driveVelocity.getX());
-    Logger.recordOutput("Drive/DriveToPose/y_speed", driveVelocity.getY());
-    Logger.recordOutput("Drive/DriveToPose/t_speed", thetaVelocity);
 
     driveSubsystem.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(

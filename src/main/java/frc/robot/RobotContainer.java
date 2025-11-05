@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.CSPLib.inputs.CSP_Controller;
 import frc.robot.CSPLib.inputs.CSP_Controller.Scale;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.DriveTo;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.DriveTo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -33,9 +33,12 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.intake.*;
+import frc.robot.subsystems.lift.*;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhoton;
+import frc.robot.subsystems.wrist.*;
 import frc.robot.util.FieldConstant;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -49,6 +52,9 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private Vision vis;
+  private final Elevator elevator;
+  private final Wrist wrist;
+  private final Intake intake;
 
   // pilot
   private final CSP_Controller pilot = new CSP_Controller(0);
@@ -74,6 +80,11 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhoton(VisConstants.frontPho, VisConstants.robotToCamera0));
+
+        elevator = new Elevator(new ElevatorIOReal());
+        intake = new Intake(new IntakeIOReal());
+        wrist = new Wrist(new WristIOReal());
+
         break;
 
       case SIM:
@@ -85,6 +96,10 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        elevator = new Elevator(new ElevatorIOSim());
+        intake = new Intake(new IntakeIOSim());
+        wrist = new Wrist(new WristIOSim());
         break;
 
       default:
@@ -96,6 +111,11 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        elevator = new Elevator(new ElevatorIO() {});
+        intake = new Intake(new IntakeIO() {});
+        wrist = new Wrist(new WristIO() {});
+
         break;
     }
 
@@ -123,7 +143,28 @@ public class RobotContainer {
                 (pilot.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0
                     || pilot.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
 
+    Trigger eleInput = new Trigger(() -> (copilot.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0));
+
+    Trigger wristInput =
+        new Trigger(() -> (copilot.getCorrectedRight(Scale.LINEAR).getNorm() != 0.0));
+
     drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
+    elevator.setDefaultCommand(Commands.run(() -> elevator.setHeight(0.0), elevator));
+    wrist.setDefaultCommand(Commands.run(() -> wrist.setPosition(0.0), wrist));
+    intake.setDefaultCommand(
+        Commands.run(
+            () ->
+                intake.runVolts(
+                    12 * (copilot.getLeftT(Scale.LINEAR) - copilot.getRightT(Scale.LINEAR))),
+            intake));
+
+    copilot.a().onTrue(Commands.runOnce(elevator::setZero, elevator));
+
+    eleInput.whileTrue(
+        Commands.run(() -> elevator.runVolts(12 * copilot.getLeftY(Scale.LINEAR)), elevator));
+
+    wristInput.whileTrue(
+        Commands.run(() -> wrist.runVolts(3 * copilot.getRightY(Scale.LINEAR)), wrist));
 
     driveInput.whileTrue(
         DriveCommands.joystickDrive(
@@ -167,6 +208,13 @@ public class RobotContainer {
         break;
       case ANGLE_PROF:
         pilot.b().onTrue(Commands.runOnce(DriveCommands::updateAnglePID, drive));
+        break;
+
+      case ELEVATOR:
+        copilot.b().onTrue(Commands.runOnce(elevator::updatePID, drive));
+        break;
+      case WRIST:
+        copilot.b().onTrue(Commands.runOnce(wrist::updatePID, drive));
         break;
       case NONE:
       default:
