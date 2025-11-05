@@ -35,6 +35,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.*;
+import frc.robot.subsystems.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
@@ -209,7 +210,7 @@ public class RobotContainer {
         Commands.run(
             () ->
                 intake.runVolts(
-                    12 * (copilot.getLeftT(Scale.LINEAR) - copilot.getRightT(Scale.LINEAR))),
+                    12 * (pilot.getLeftT(Scale.LINEAR) - pilot.getRightT(Scale.LINEAR))),
             intake));
 
     // intakeInput.whileTrue(IntakeCommands.driveIntake(intake, () ->
@@ -230,6 +231,36 @@ public class RobotContainer {
             () ->
                 -copilot.getCorrectedRight(Scale.SQUARED).getY()
                     * (copilot.rightBumper().getAsBoolean() ? 0.5 : 1.0)));
+
+    copilot
+        .getUpButton()
+        .onTrue(
+            SuperCommands.superToState(
+                superstruct, SuperPreset.PROCESSOR.getState(), Rotation2d.fromRadians(0.5)));
+
+    copilot
+        .getLeftButton()
+        .onTrue(
+            SuperCommands.superToState(
+                superstruct, SuperPreset.L2_ALGAE.getState(), Rotation2d.fromRadians(0.0)));
+
+    copilot
+        .getRightButton()
+        .onTrue(
+            SuperCommands.superToState(
+                superstruct, SuperPreset.L3_ALGAE.getState(), Rotation2d.fromRadians(0.0)));
+
+    copilot
+        .getDownButton()
+        .onTrue(
+            SuperCommands.superToState(
+                superstruct, SuperPreset.ALGAE_GROUND.getState()));
+
+    copilot
+        .start()
+        .onTrue(
+            SuperCommands.superToState(
+                superstruct, SuperPreset.START.getState(), Rotation2d.fromRadians(0.0)));
 
     copilot
         .x()

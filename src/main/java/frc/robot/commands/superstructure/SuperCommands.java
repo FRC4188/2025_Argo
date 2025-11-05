@@ -41,5 +41,16 @@ public class SuperCommands {
         Commands.waitUntil(() -> superstruct.atElevatorGoal(superstate.getEleHeight(), 0.2)),
         Commands.runOnce(() -> superstruct.setWrist(superstate.getWristAngle()), superstruct),
         Commands.waitUntil(() -> superstruct.atWristGoal(superstate.getWristAngle())));
+    
   }
+
+  public static Command superToState(
+      SuperStructure superstruct, SuperState superstate) {
+
+    return Commands.sequence(
+        Commands.runOnce(() -> superstruct.setElevator(superstate.getEleHeight()), superstruct),
+        Commands.waitUntil(() -> superstruct.atElevatorGoal(superstate.getEleHeight(), 0.2)),
+        Commands.runOnce(() -> superstruct.setWrist(superstate.getWristAngle()), superstruct),
+        Commands.waitUntil(() -> superstruct.atWristGoal(superstate.getWristAngle())));
+      }
 }

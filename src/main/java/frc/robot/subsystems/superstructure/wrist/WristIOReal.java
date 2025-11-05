@@ -170,12 +170,18 @@ public class WristIOReal implements WristIO {
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         wristff.calculate(
-            Units.rotationsToRadians((Math.PI / 2) - wristAbsolutePosition.getValueAsDouble()), 0));
+            Units.rotationsToRadians(0.25 - wristAbsolutePosition.getValueAsDouble()), 0));
   }
 
   @Override
   public void updatePID(double kP, double kI, double kD, double kG) {
     wristConfig.closedLoop.pidf(kP, kI, kD, 0);
+    tryUntilOk(
+        wristSpark,
+        5,
+        () ->
+            wristSpark.configure(
+                wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     wristff.setKg(kG);
   }
 }

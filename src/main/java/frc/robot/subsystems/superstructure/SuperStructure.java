@@ -20,6 +20,10 @@ public class SuperStructure extends SubsystemBase {
   public void periodic() {
     elevator.periodic();
     wrist.periodic();
+
+    if (Constants.pid_mode == Constants.PIDTuning.WRIST) {
+      wrist.setPosition(Rotation2d.kZero);
+    }
   }
 
   public void resetElevator() {

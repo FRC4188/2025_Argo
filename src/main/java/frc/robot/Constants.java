@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-  public static final PIDTuning pid_mode = PIDTuning.WRIST;
+  public static final PIDTuning pid_mode = PIDTuning.NONE;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -124,8 +124,8 @@ public final class Constants {
         new TalonFXConfiguration()
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withSupplyCurrentLimit(25)
-                    .withStatorCurrentLimit(35)
+                    .withSupplyCurrentLimit(20)
+                    .withStatorCurrentLimit(30)
                     .withStatorCurrentLimitEnable(true));
 
     public static final double LOWEST_H = Units.inchesToMeters(9.13250);
@@ -176,7 +176,7 @@ public final class Constants {
     public static final double kMax_Accel = Units.degreesToRadians(720.0);
     public static final Constraints kConstraints = new Constraints(kMax_Vel, kMax_Accel);
 
-    public static final boolean kSparkInverted = false;
+    public static final boolean kSparkInverted = true;
     public static final double turnMotorReduction = 9424.0 / 203.0;
     public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
@@ -187,10 +187,10 @@ public final class Constants {
     public static final double kEncoderVelocityFactor =
         (2 * Math.PI) / 60.0 / kGearRatio; // RPM -> Rad/Sec
 
-    public static final double kP = 0.0;
+    public static final double kP = 0.17;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
-    public static final double kG = 0.0;
+    public static final double kG = -0.6;
     public static final double kV = 0.0;
     public static final double simkP = 0.0;
     public static final double simkD = 0.0;
