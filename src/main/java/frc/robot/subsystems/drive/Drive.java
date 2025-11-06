@@ -54,7 +54,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Drive extends SubsystemBase {
 
@@ -72,14 +71,6 @@ public class Drive extends SubsystemBase {
           Math.max(
               Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
               Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
-
-  LoggedNetworkNumber skp = new LoggedNetworkNumber("Drive/SpeedkP", TunerConstants.driveGains.kP);
-  LoggedNetworkNumber ski = new LoggedNetworkNumber("Drive/SpeedkI", TunerConstants.driveGains.kI);
-  LoggedNetworkNumber skd = new LoggedNetworkNumber("Drive/SpeedkD", TunerConstants.driveGains.kD);
-
-  LoggedNetworkNumber tkp = new LoggedNetworkNumber("Drive/TurnkP", TunerConstants.steerGains.kP);
-  LoggedNetworkNumber tki = new LoggedNetworkNumber("Drive/TurnkI", TunerConstants.steerGains.kI);
-  LoggedNetworkNumber tkd = new LoggedNetworkNumber("Drive/TurnkD", TunerConstants.steerGains.kD);
 
   // PathPlanner config constants
   private static final double ROBOT_MASS_KG = 74.088;
@@ -263,15 +254,15 @@ public class Drive extends SubsystemBase {
     vision_accept = vis;
   }
 
-  public void updateDrivePID() {
+  public void updateDrivePID(double kp, double ki, double kd, double kg) {
     for (int i = 0; i < 4; i++) {
-      modules[i].updateDrivePID(skp.get(), ski.get(), skd.get());
+      modules[i].updateDrivePID(kp, ki, kd);
     }
   }
 
-  public void updateTurnPID() {
+  public void updateTurnPID(double kp, double ki, double kd, double kg) {
     for (int i = 0; i < 4; i++) {
-      modules[i].updateTurnPID(tkp.get(), tki.get(), tkd.get());
+      modules[i].updateTurnPID(kp, ki, kd);
     }
   }
 

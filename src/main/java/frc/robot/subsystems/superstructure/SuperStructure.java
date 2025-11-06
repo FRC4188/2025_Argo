@@ -20,10 +20,6 @@ public class SuperStructure extends SubsystemBase {
   public void periodic() {
     elevator.periodic();
     wrist.periodic();
-
-    if (Constants.pid_mode == Constants.PIDTuning.WRIST) {
-      wrist.setPosition(Rotation2d.kZero);
-    }
   }
 
   public void resetElevator() {
@@ -77,12 +73,12 @@ public class SuperStructure extends SubsystemBase {
     return Math.abs(elevator.getPositionMeters() - meters) < Constants.EleConstants.kTolerance;
   }
 
-  public void updateElePID() {
-    elevator.updatePID();
+  public void updateElePID(double kp, double ki, double kd, double kg) {
+    elevator.updatePID(kp, ki, kd, kg);
   }
 
-  public void updateWristPID() {
-    wrist.updatePID();
+  public void updateWristPID(double kp, double ki, double kd, double kg) {
+    wrist.updatePID(kp, ki, kd, kg);
   }
 
   public SuperState getState() {

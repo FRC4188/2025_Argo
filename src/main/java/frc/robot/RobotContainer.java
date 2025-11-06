@@ -16,7 +16,6 @@ package frc.robot;
 // import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.CSPLib.inputs.CSP_Controller;
 import frc.robot.CSPLib.inputs.CSP_Controller.Scale;
+import frc.robot.CSPLib.pidtuning.PIDTuning;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.superstructure.SuperCommands;
@@ -35,6 +35,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.*;
+import frc.robot.subsystems.superstructure.SuperState;
 import frc.robot.subsystems.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
@@ -61,6 +62,7 @@ public class RobotContainer {
   private Vision vis;
   private final SuperStructure superstruct;
   private final Intake intake;
+  private PIDTuning tuner = null;
 
   // pilot
   private final CSP_Controller pilot = new CSP_Controller(0);
@@ -123,6 +125,56 @@ public class RobotContainer {
         break;
     }
 
+    switch (Constants.pid_mode) {
+      case DRIVE_MOD:
+        tuner = new PIDTuning("Drive Modules", () -> 0, (set) -> {}, drive::updateDrivePID);
+        break;
+      case TURN_MOD:
+        tuner = new PIDTuning("Turn Modules", () -> 0, (set) -> {}, drive::updateTurnPID);
+        break;
+      case ANGLE_PROF:
+        tuner =
+            new PIDTuning(
+                "Angle Controller",
+                () -> drive.getPose().getRotation().getRadians(),
+                (set) -> {},
+                DriveCommands::updateAnglePID);
+
+        break;
+      case ELEVATOR:
+        tuner =
+            new PIDTuning(
+                "Elevator",
+                () -> superstruct.getState().getEleHeight(),
+                (set) -> {
+                  superstruct.setElevator(set);
+                },
+                superstruct::updateElePID);
+        break;
+      case WRIST:
+        tuner =
+            new PIDTuning(
+                "Wrist",
+                () -> superstruct.getState().getWristAngle().getRadians(),
+                (set) -> {
+                  superstruct.setWrist(Rotation2d.fromRadians(set));
+                },
+                superstruct::updateWristPID);
+        break;
+      case INTAKE:
+        tuner =
+            new PIDTuning(
+                "Intake",
+                () -> intake.getRPM(),
+                (set) -> {
+                  intake.setVelocityRPM(set);
+                },
+                intake::updatePID);
+        break;
+      case NONE:
+      default:
+    }
+
     // Set up auto routines
     autoChooser =
         new LoggedDashboardChooser<>("Auto Choices"); // , AutoBuilder.buildAutoChooser());
@@ -132,12 +184,14 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link Xboxpilot}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
+  public void teleInit() {
+    superstruct.setState(SuperState.SuperPreset.START.getState());
+  }
+
+  public void telePeriodic() {
+    if (tuner != null) tuner.updateLoop();
+  }
+
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     Trigger driveInput =
@@ -203,7 +257,7 @@ public class RobotContainer {
             () ->
                 (copilot.getLeftT(Scale.LINEAR) != 0.0 || copilot.getRightT(Scale.LINEAR) != 0.0));
 
-    intake.setDefaultCommand(Commands.run(() -> intake.runVolts(0), intake));
+    intake.setDefaultCommand(Commands.runOnce(() -> intake.runVolts(0), intake));
 
     // temp command
     intakeInput.whileTrue(
@@ -216,13 +270,7 @@ public class RobotContainer {
     // intakeInput.whileTrue(IntakeCommands.driveIntake(intake, () ->
     // (copilot.getLeftT(Scale.LINEAR) - copilot.getRightT(Scale.LINEAR))), intake);
 
-    Trigger superInput =
-        new Trigger(
-            () ->
-                (copilot.getCorrectedLeft(Scale.LINEAR).getY() != 0.0
-                    || copilot.getCorrectedRight(Scale.LINEAR).getY() != 0.0));
-
-    superInput.whileTrue(
+    superstruct.setDefaultCommand(
         SuperCommands.superDrive(
             superstruct,
             () ->
@@ -252,9 +300,7 @@ public class RobotContainer {
 
     copilot
         .getDownButton()
-        .onTrue(
-            SuperCommands.superToState(
-                superstruct, SuperPreset.ALGAE_GROUND.getState()));
+        .onTrue(SuperCommands.superToState(superstruct, SuperPreset.ALGAE_GROUND.getState()));
 
     copilot
         .start()
@@ -266,29 +312,6 @@ public class RobotContainer {
         .x()
         .and(copilot.leftBumper())
         .onTrue(Commands.runOnce(superstruct::resetElevator, superstruct));
-
-    switch (Constants.pid_mode) {
-      case DRIVE_MOD:
-        pilot.b().onTrue(Commands.runOnce(drive::updateDrivePID, drive));
-        break;
-      case TURN_MOD:
-        pilot.b().onTrue(Commands.runOnce(drive::updateTurnPID, drive));
-        break;
-      case ANGLE_PROF:
-        pilot.b().onTrue(Commands.runOnce(DriveCommands::updateAnglePID, drive));
-        break;
-      case ELEVATOR:
-        copilot.b().onTrue(Commands.runOnce(superstruct::updateElePID, superstruct));
-        break;
-      case WRIST:
-        copilot.b().onTrue(Commands.runOnce(superstruct::updateWristPID, superstruct));
-        break;
-      case INTAKE:
-        copilot.b().onTrue(Commands.runOnce(intake::updatePID, intake));
-        break;
-      case NONE:
-      default:
-    }
   }
 
   private void configureDashboard() {

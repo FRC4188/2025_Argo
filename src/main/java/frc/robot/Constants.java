@@ -60,13 +60,13 @@ public final class Constants {
     /** Tuning profiled angle controller */
     ANGLE_PROF,
 
-    /** Tuning profiled angle controller */
+    /** Tuning elevator motors */
     ELEVATOR,
 
-    /** Tuning profiled angle controller */
+    /** Tuning wrist sparkmax */
     WRIST,
 
-    /** Tuning profiled angle controller */
+    /** Tuning intake falcon */
     INTAKE,
   }
 
@@ -132,9 +132,8 @@ public final class Constants {
     public static final double RANGE = Units.inchesToMeters(72);
 
     public static final double kGearRatio = 30.0;
-    public static final double kPitchRadius = 0.04475 / 2; // sproket size
-    public static final double kConversion = (3 * kPitchRadius);
-    public static final double kMaxTorqueCurrent = 80;
+    public static final double kConversion = 3 * 0.04475 * 0.5;
+    public static final double kMaxTorqueCurrent = 30;
     public static final boolean motorInverted = false;
 
     public static final double kTolerance = 0.05;
@@ -153,6 +152,7 @@ public final class Constants {
     public static final boolean kMotorInverted = false;
     public static final double kMaxTorqueCurrent = 80;
     public static final double kMaxVel = 4;
+    public static final double kStallCurrent = 40;
 
     public static final TalonFXConfiguration kInitialConfigs =
         new TalonFXConfiguration()
@@ -169,7 +169,7 @@ public final class Constants {
 
   public static class WristConstants {
     public static final double kTolerance = 0.2;
-    public static final double kGearRatio = 25.0; // TODO: soon to change
+    public static final double kGearRatio = 25.0;
     public static final int kCurrentLimit = 40;
 
     public static final double kMax_Vel = Units.degreesToRadians(720.0);
@@ -190,7 +190,7 @@ public final class Constants {
     public static final double kP = 0.17;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
-    public static final double kG = -0.6;
+    public static final double kG = 0.6;
     public static final double kV = 0.0;
     public static final double simkP = 0.0;
     public static final double simkD = 0.0;

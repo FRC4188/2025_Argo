@@ -149,6 +149,8 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    robotContainer.teleInit();
+
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -156,7 +158,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    robotContainer.telePeriodic();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

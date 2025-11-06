@@ -19,8 +19,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -51,15 +49,11 @@ public class IntakeIOReal implements IntakeIO {
 
   // Voltage control requests
   private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);
-  private final PositionVoltage positionVoltageRequest =
-      new PositionVoltage(0.0).withEnableFOC(true);
   private final VelocityVoltage velocityVoltageRequest =
       new VelocityVoltage(0.0).withEnableFOC(true);
 
   // Torque-current control requests
   private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
-  private final PositionTorqueCurrentFOC positionTorqueCurrentRequest =
-      new PositionTorqueCurrentFOC(0.0);
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
       new VelocityTorqueCurrentFOC(0.0);
 
@@ -116,6 +110,11 @@ public class IntakeIOReal implements IntakeIO {
   public void updatePID(double kP, double kI, double kD) {
     intakeConfig.Slot0 = new Slot0Configs().withKP(kP).withKI(kI).withKD(kD);
     tryUntilOk(5, () -> intakeTalon.getConfigurator().apply(intakeConfig, 0.25));
+  }
+
+  @Override
+  public boolean isStalled() {
+    return currentAmps.getValueAsDouble() > Constants.IntakeConstants.kStallCurrent;
   }
 
   @Override

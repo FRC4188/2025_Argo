@@ -83,7 +83,6 @@ public class WristIOReal implements WristIO {
         .voltageCompensation(12.0);
     wristConfig
         .encoder
-        // .inverted(Constants.WristConstants.kEncoderInverted)
         .positionConversionFactor(Constants.WristConstants.kEncoderPositionFactor)
         .velocityConversionFactor(Constants.WristConstants.kEncoderVelocityFactor)
         .uvwMeasurementPeriod(10)
@@ -169,7 +168,7 @@ public class WristIOReal implements WristIO {
         setpoint,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
-        wristff.calculate(
+        -wristff.calculate(
             Units.rotationsToRadians(0.25 - wristAbsolutePosition.getValueAsDouble()), 0));
   }
 

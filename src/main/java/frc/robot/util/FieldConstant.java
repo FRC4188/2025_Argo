@@ -505,7 +505,7 @@ public class FieldConstant {
     }
   }
 
-  // TODO: double check these poses
+
   public class Elem_Locations {
     public static double distance_x = Units.inchesToMeters(48);
     public static double distance_apart = Units.inchesToMeters(72);

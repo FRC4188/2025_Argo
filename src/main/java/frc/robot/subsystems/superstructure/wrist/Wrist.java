@@ -11,19 +11,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Wrist {
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
-
-  private LoggedNetworkNumber targetAngle = new LoggedNetworkNumber("Wrist/Target", 0.0);
-  private LoggedNetworkNumber wristkP = new LoggedNetworkNumber("Wrist/kP", 0.0);
-  private LoggedNetworkNumber wristkI = new LoggedNetworkNumber("Wrist/kI", 0.0);
-  private LoggedNetworkNumber wristkD = new LoggedNetworkNumber("Wrist/kD", 0.0);
-  private LoggedNetworkNumber wristkG = new LoggedNetworkNumber("Wrist/kG", 0.0);
 
   private final Alert wristDisconnectedAlert;
 
@@ -42,10 +34,6 @@ public class Wrist {
 
   /** Runs the wrist to a specified angle */
   public void setPosition(Rotation2d angle) {
-    if (Constants.pid_mode == Constants.PIDTuning.WRIST) {
-      angle = Rotation2d.fromRadians(targetAngle.get());
-    }
-
     angle = Rotation2d.fromRadians(MathUtil.clamp(angle.getRadians(), 0, Math.PI / 2));
 
     Logger.recordOutput("Wrist/SetPoint", angle);
@@ -63,8 +51,8 @@ public class Wrist {
     io.setOpenLoop(0.0);
   }
 
-  public void updatePID() {
-    io.updatePID(wristkP.get(), wristkI.get(), wristkD.get(), wristkG.get());
+  public void updatePID(double kp, double ki, double kd, double kg) {
+    io.updatePID(kp, ki, kd, kg);
   }
 
   /** Returns the current angle of the wrist. */

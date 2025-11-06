@@ -34,15 +34,8 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveCommands {
-
-  public static LoggedNetworkNumber akp =
-      new LoggedNetworkNumber("Drive/Angle_kP", Constants.robot.ANGLE_KP);
-  public static LoggedNetworkNumber aki = new LoggedNetworkNumber("Drive/Angle_kI", 0);
-  public static LoggedNetworkNumber akd =
-      new LoggedNetworkNumber("Drive/Angle_kD", Constants.robot.ANGLE_KD);
 
   public static ProfiledPIDController angleController =
       new ProfiledPIDController(
@@ -52,12 +45,12 @@ public class DriveCommands {
           new TrapezoidProfile.Constraints(
               Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
 
-  public static void updateAnglePID() {
+  public static void updateAnglePID(double kp, double ki, double kd, double kg) {
     angleController =
         new ProfiledPIDController(
-            akp.get(),
-            aki.get(),
-            akd.get(),
+            kp,
+            ki,
+            kd,
             new TrapezoidProfile.Constraints(
                 Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
 

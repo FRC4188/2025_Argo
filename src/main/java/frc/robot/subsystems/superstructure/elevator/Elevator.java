@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Elevator {
   private final ElevatorIO io;
@@ -28,12 +27,6 @@ public class Elevator {
 
   private final Alert leaderDisconnectedAlert;
   private final Alert followerDisconnectedAlert;
-
-  private LoggedNetworkNumber targetHeight = new LoggedNetworkNumber("Elevator/Target", 0.0);
-  private LoggedNetworkNumber elekP = new LoggedNetworkNumber("Elevator/kP", 0.0);
-  private LoggedNetworkNumber elekI = new LoggedNetworkNumber("Elevator/kI", 0.0);
-  private LoggedNetworkNumber elekD = new LoggedNetworkNumber("Elevator/kD", 0.0);
-  private LoggedNetworkNumber elekG = new LoggedNetworkNumber("Elevator/kG", 0.0);
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -53,10 +46,6 @@ public class Elevator {
 
   /** Runs the elevator to a set height meters */
   public void setHeight(double height) {
-    if (Constants.pid_mode == Constants.PIDTuning.ELEVATOR) {
-      height = targetHeight.get();
-    }
-
     Logger.recordOutput("Elevator/SetPoint", height);
     height = MathUtil.clamp(height, 0, Constants.EleConstants.RANGE);
 
@@ -89,7 +78,7 @@ public class Elevator {
     return inputs.velocityRadPerSec * Constants.EleConstants.kConversion;
   }
 
-  public void updatePID() {
-    io.updatePID(elekP.get(), elekI.get(), elekD.get(), elekG.get());
+  public void updatePID(double kp, double ki, double kd, double kg) {
+    io.updatePID(kp, ki, kd, kg);
   }
 }

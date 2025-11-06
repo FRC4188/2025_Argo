@@ -34,6 +34,8 @@ public interface IntakeIO {
   /** Run the intake to the specified rotations. */
   public default void setVelocity(double rotations) {}
 
+  public default boolean isStalled() {return false;}
+
   /** Update the PID values of the elevator */
   public default void updatePID(double kP, double kI, double kD) {}
 }
