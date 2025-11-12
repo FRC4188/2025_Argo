@@ -41,7 +41,7 @@ public class Intake extends SubsystemBase {
 
   /** Runs the intake to a set rpm */
   public void setVelocityRPM(double rpm) {
-    io.setVelocity(rpm * 60);
+    io.setVelocity(rpm / 60.0);
   }
 
   /** Runs the intake with the specified output. */
@@ -49,6 +49,7 @@ public class Intake extends SubsystemBase {
     io.setOpenLoop(output);
   }
 
+  @AutoLogOutput(key = "Intake/Is Stalled?")
   public boolean isStalled() {
     return io.isStalled();
   }
@@ -61,7 +62,7 @@ public class Intake extends SubsystemBase {
   /** Returns the current intake velocity in rpm. */
   @AutoLogOutput(key = "Intake/RPM")
   public double getRPM() {
-    return inputs.velocityRotPerSec / 60;
+    return inputs.velocityRotPerSec * 60;
   }
 
   public void updatePID(double kp, double ki, double kd, double kg) {

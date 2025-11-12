@@ -30,8 +30,8 @@ public class DriveTo extends Command {
     this.drive = drive;
     config =
         new TrajectoryConfig(
-            TunerConstants.kSpeedAt12Volts.magnitude() * 0.5,
-            Constants.robot.MAX_ACCELERATION.magnitude() * 0.7);
+            TunerConstants.kSpeedAt12Volts.magnitude() * 0.8,
+            Constants.robot.MAX_ACCELERATION.magnitude() * 0.4);
     end_goal = goal;
   }
 
@@ -71,6 +71,6 @@ public class DriveTo extends Command {
         || AllianceFlip.flipDS(drive.getPose())
                 .getTranslation()
                 .getDistance(end_goal.getTranslation())
-            <= Units.inchesToMeters(1);
+            <= Units.inchesToMeters(1.0);
   }
 }

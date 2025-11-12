@@ -27,19 +27,27 @@ public class VisConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String frontPho = "front";
+  public static String backPho = "back";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =
       new Transform3d(0.14, 0.343, 0.356, new Rotation3d(0.0, 0, 0));
 
+  public static Transform3d robotToCamera2 =
+      new Transform3d(
+          0.14 - 2 * Units.inchesToMeters(0.42),
+          -0.343,
+          0.356 + Units.inchesToMeters(8.5),
+          new Rotation3d(0.0, 0.0, Math.PI));
+
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.0001; // Meters 0.02 default
-  public static double angularStdDevBaseline = 0.0002; // Radians 0.06 default
+  public static double linearStdDevBaseline = 0.02; // Meters 0.02 default
+  public static double angularStdDevBaseline = 0.06; // Radians 0.06 default
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)

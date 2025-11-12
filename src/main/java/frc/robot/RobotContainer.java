@@ -26,6 +26,9 @@ import frc.robot.CSPLib.inputs.CSP_Controller.Scale;
 import frc.robot.CSPLib.pidtuning.PIDTuning;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveTo;
+import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.superstructure.AutoScore;
+import frc.robot.commands.superstructure.ScoreNet;
 import frc.robot.commands.superstructure.SuperCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -47,7 +50,10 @@ import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhoton;
+import frc.robot.util.AllianceFlip;
 import frc.robot.util.FieldConstant;
+import java.util.Arrays;
+import java.util.LinkedList;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -87,7 +93,8 @@ public class RobotContainer {
         vis =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhoton(VisConstants.frontPho, VisConstants.robotToCamera0));
+                new VisionIOPhoton(VisConstants.frontPho, VisConstants.robotToCamera0),
+                new VisionIOPhoton(VisConstants.backPho, VisConstants.robotToCamera2));
 
         superstruct = new SuperStructure(new ElevatorIOReal(), new WristIOReal());
         intake = new Intake(new IntakeIOReal());
@@ -184,8 +191,31 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
+  public void autoInit() {
+    superstruct.setState(SuperState.SuperPreset.START.getState());
+    FieldConstant.Reef.AlgaeSource.asources =
+        new LinkedList<Pose2d>(
+            Arrays.asList(
+                FieldConstant.Reef.AlgaeSource.alliance_src,
+                FieldConstant.Reef.AlgaeSource.left_brg_src,
+                FieldConstant.Reef.AlgaeSource.left_src_src,
+                FieldConstant.Reef.AlgaeSource.right_brg_src,
+                FieldConstant.Reef.AlgaeSource.right_src_src,
+                FieldConstant.Reef.AlgaeSource.mid_brg_src));
+  }
+
   public void teleInit() {
     superstruct.setState(SuperState.SuperPreset.START.getState());
+    intake.runVolts(0.0);
+    FieldConstant.Reef.AlgaeSource.asources =
+        new LinkedList<Pose2d>(
+            Arrays.asList(
+                FieldConstant.Reef.AlgaeSource.alliance_src,
+                FieldConstant.Reef.AlgaeSource.left_brg_src,
+                FieldConstant.Reef.AlgaeSource.left_src_src,
+                FieldConstant.Reef.AlgaeSource.right_brg_src,
+                FieldConstant.Reef.AlgaeSource.right_src_src,
+                FieldConstant.Reef.AlgaeSource.mid_brg_src));
   }
 
   public void telePeriodic() {
@@ -200,20 +230,20 @@ public class RobotContainer {
                 (pilot.getCorrectedLeft(Scale.LINEAR).getNorm() != 0.0
                     || pilot.getCorrectedRight(Scale.LINEAR).getX() != 0.0));
 
-    drive.setDefaultCommand(Commands.runOnce(drive::stopWithX, drive));
-
-    driveInput.whileTrue(
-        DriveCommands.joystickDrive(
-            drive,
-            () ->
-                -pilot.getCorrectedLeft(Scale.SQUARED).getY()
-                    * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
-            () ->
-                -pilot.getCorrectedLeft(Scale.SQUARED).getX()
-                    * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
-            () ->
-                -pilot.getCorrectedRight(Scale.SQUARED).getX()
-                    * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0)));
+    driveInput
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                drive,
+                () ->
+                    -pilot.getCorrectedLeft(Scale.SQUARED).getY()
+                        * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
+                () ->
+                    -pilot.getCorrectedLeft(Scale.SQUARED).getX()
+                        * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
+                () ->
+                    -pilot.getCorrectedRight(Scale.SQUARED).getX()
+                        * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0)))
+        .onFalse(Commands.runOnce(drive::stop, drive));
 
     pilot
         .a()
@@ -230,7 +260,8 @@ public class RobotContainer {
                         FieldConstant.Reef.center
                             .minus(drive.getPose().getTranslation())
                             .getAngle())
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+        .onFalse(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
     pilot
@@ -252,25 +283,41 @@ public class RobotContainer {
         .and(pilot.leftBumper())
         .onTrue(Commands.runOnce(() -> drive.acceptVision(false), drive));
 
+    pilot
+        .b()
+        .whileTrue(
+            new DriveToPose(
+                    drive,
+                    () ->
+                        AllianceFlip.flipDS(drive.getPose())
+                            .nearest(FieldConstant.Reef.AlgaeSource.asources))
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+        .onFalse(Commands.runOnce(drive::stopWithX, drive));
+
     Trigger intakeInput =
         new Trigger(
-            () ->
-                (copilot.getLeftT(Scale.LINEAR) != 0.0 || copilot.getRightT(Scale.LINEAR) != 0.0));
-
-    intake.setDefaultCommand(Commands.runOnce(() -> intake.runVolts(0), intake));
+            () -> (pilot.getLeftT(Scale.LINEAR) != 0.0 || pilot.getRightT(Scale.LINEAR) != 0.0));
 
     // temp command
-    intakeInput.whileTrue(
-        Commands.run(
-            () ->
-                intake.runVolts(
-                    12 * (pilot.getLeftT(Scale.LINEAR) - pilot.getRightT(Scale.LINEAR))),
-            intake));
+    intakeInput
+        .whileTrue(
+            Commands.run(
+                () ->
+                    intake.runVolts(
+                        12 * (pilot.getLeftT(Scale.LINEAR) - pilot.getRightT(Scale.LINEAR))),
+                intake))
+        .onFalse(Commands.runOnce(intake::stop, intake));
 
     // intakeInput.whileTrue(IntakeCommands.driveIntake(intake, () ->
     // (copilot.getLeftT(Scale.LINEAR) - copilot.getRightT(Scale.LINEAR))), intake);
 
-    superstruct.setDefaultCommand(
+    Trigger superInput =
+        new Trigger(
+            () ->
+                (copilot.getCorrectedLeft(Scale.LINEAR).getY() != 0.0
+                    || copilot.getCorrectedRight(Scale.LINEAR).getY() != 0.0));
+
+    superInput.whileTrue(
         SuperCommands.superDrive(
             superstruct,
             () ->
@@ -300,13 +347,17 @@ public class RobotContainer {
 
     copilot
         .getDownButton()
-        .onTrue(SuperCommands.superToState(superstruct, SuperPreset.ALGAE_GROUND.getState()));
+        .onTrue(
+            SuperCommands.superToState(
+                superstruct, SuperPreset.ALGAE_GROUND.getState().getWristAngle()));
 
     copilot
         .start()
         .onTrue(
             SuperCommands.superToState(
                 superstruct, SuperPreset.START.getState(), Rotation2d.fromRadians(0.0)));
+
+    copilot.rightBumper().onTrue(new ScoreNet(superstruct, intake));
 
     copilot
         .x()
@@ -336,6 +387,65 @@ public class RobotContainer {
         "Trajectory Test",
         Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
+            new DriveTo(drive, FieldConstant.Processor.processor_goal)));
+
+    autoChooser.addOption("leave ", Commands.sequence(AutoScore.pushLeave(drive)));
+
+    autoChooser.addOption(
+        "coral n process",
+        Commands.sequence(
+            new AutoScore.coralScore(drive, superstruct, intake),
+            new AutoScore.algaeProcess(drive, superstruct, intake),
+            new AutoScore.algaeSource(drive, superstruct, intake),
+            new AutoScore.algaeProcess(drive, superstruct, intake)));
+
+    autoChooser.addOption(
+        "process",
+        Commands.sequence(
+            new AutoScore.algaeSource(drive, superstruct, intake),
+            new AutoScore.algaeProcess(drive, superstruct, intake),
+            new AutoScore.algaeSource(drive, superstruct, intake),
+            new AutoScore.algaeProcess(drive, superstruct, intake)));
+
+    autoChooser.addOption(
+        "net",
+        Commands.sequence(
+            new AutoScore.coralScore(drive, superstruct, intake),
+            new AutoScore.algaeNet(drive, superstruct, intake),
+            new AutoScore.algaeSource(drive, superstruct, intake)));
+
+    autoChooser.addOption(
+        "coral", Commands.sequence(new AutoScore.coralScore(drive, superstruct, intake)));
+
+    autoChooser.addOption(
+        "ring around the rosie",
+        Commands.sequence(
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_brg_src),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_src_src),
+            new DriveTo(drive, FieldConstant.Source.left_src_mid),
+            new DriveTo(drive, FieldConstant.Processor.processor_goal),
+            new DriveTo(drive, FieldConstant.Source.right_src_mid),
+            new DriveTo(drive, FieldConstant.start_mid),
+            new DriveTo(drive, FieldConstant.start_left),
+            new DriveTo(drive, FieldConstant.start_right)));
+
+    autoChooser.addOption(
+        "ring around one rosie",
+        Commands.sequence(
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
+            new DriveTo(drive, FieldConstant.start_right),
+            new DriveTo(drive, FieldConstant.Source.left_src_mid)));
+
+    autoChooser.addOption(
+        "Test pathing",
+        Commands.sequence(
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
+            new DriveTo(drive, FieldConstant.Processor.processor_goal),
+            new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
             new DriveTo(drive, FieldConstant.Processor.processor_goal)));
   }
 

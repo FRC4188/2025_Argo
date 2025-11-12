@@ -85,7 +85,7 @@ public class Vision extends SubsystemBase {
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
-      disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
+      disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].frontConnected);
 
       // Initialize logging values
       List<Pose3d> tagPoses = new LinkedList<>();

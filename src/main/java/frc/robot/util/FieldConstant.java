@@ -505,7 +505,6 @@ public class FieldConstant {
     }
   }
 
-
   public class Elem_Locations {
     public static double distance_x = Units.inchesToMeters(48);
     public static double distance_apart = Units.inchesToMeters(72);
@@ -532,7 +531,7 @@ public class FieldConstant {
     public static double opening_from_ground = Units.inchesToMeters(7);
 
     public static Translation2d score_pos =
-        new Translation2d(-Constants.robot.B_LENGTH / 2, 0.0); // 0.8 no vision
+        new Translation2d(-Constants.robot.B_LENGTH / 2 - 0.1, 0.3); // 0.8 no vision
 
     public static Pose2d processor_wall =
         new Pose2d(

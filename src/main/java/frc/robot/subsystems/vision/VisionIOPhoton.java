@@ -42,11 +42,13 @@ public class VisionIOPhoton implements VisionIO {
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    inputs.connected = camera.isConnected();
+    inputs.frontConnected = camera.isConnected();
+    inputs.backConnected = camera.isConnected();
 
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
+
     for (var result : camera.getAllUnreadResults()) {
       // Update latest target observation
       if (result.hasTargets()) {
@@ -114,7 +116,6 @@ public class VisionIOPhoton implements VisionIO {
         }
       }
     }
-
     // Save pose observations to inputs object
     inputs.poseObservations = new PoseObservation[poseObservations.size()];
     for (int i = 0; i < poseObservations.size(); i++) {

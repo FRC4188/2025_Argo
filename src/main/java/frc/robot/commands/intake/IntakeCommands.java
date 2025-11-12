@@ -16,4 +16,13 @@ public class IntakeCommands {
         },
         intake);
   }
+
+  public static Command driveVolts(Intake intake, DoubleSupplier input) {
+
+    return Commands.runOnce(
+        () -> {
+          intake.runVolts(input.getAsDouble() * 12);
+        },
+        intake);
+  }
 }

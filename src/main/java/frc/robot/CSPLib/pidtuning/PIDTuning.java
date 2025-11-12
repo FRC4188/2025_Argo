@@ -17,7 +17,7 @@ public class PIDTuning {
   private LoggedNetworkNumber loggedkG;
   private LoggedNetworkNumber loggedkTarget;
 
-  private double kP = 0.0;
+  private double kP = 1.0;
   private double kI = 0.0;
   private double kD = 0.0;
   private double kG = 0.0;
@@ -47,14 +47,14 @@ public class PIDTuning {
         || kD != loggedkD.get()
         || kG != loggedkG.get()
         || kTarget != loggedkTarget.get()) {
-      updateValue.accept(kP, kI, kD, kG);
-      setValue.accept(kTarget);
 
       kP = loggedkP.get();
       kI = loggedkI.get();
       kD = loggedkD.get();
       kG = loggedkG.get();
       kTarget = loggedkTarget.get();
+      updateValue.accept(kP, kI, kD, kG);
+      setValue.accept(kTarget);
     }
   }
 

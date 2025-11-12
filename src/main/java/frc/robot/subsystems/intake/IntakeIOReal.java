@@ -73,10 +73,6 @@ public class IntakeIOReal implements IntakeIO {
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     intakeConfig.Slot0 = Constants.IntakeConstants.kMotorGains;
     intakeConfig.Feedback.SensorToMechanismRatio = Constants.IntakeConstants.kGearRatio;
-    intakeConfig.TorqueCurrent.PeakForwardTorqueCurrent =
-        Constants.IntakeConstants.kMaxTorqueCurrent;
-    intakeConfig.TorqueCurrent.PeakReverseTorqueCurrent =
-        Constants.IntakeConstants.kMaxTorqueCurrent;
     intakeConfig.MotorOutput.Inverted =
         Constants.IntakeConstants.kMotorInverted
             ? InvertedValue.Clockwise_Positive
@@ -114,7 +110,8 @@ public class IntakeIOReal implements IntakeIO {
 
   @Override
   public boolean isStalled() {
-    return currentAmps.getValueAsDouble() > Constants.IntakeConstants.kStallCurrent;
+    return currentAmps.getValueAsDouble() > Constants.IntakeConstants.kStallCurrent
+        && velocity.getValueAsDouble() < 0.001;
   }
 
   @Override

@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-  public static final PIDTuning pid_mode = PIDTuning.NONE;
+  public static final PIDTuning pid_mode = PIDTuning.INTAKE;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -86,7 +86,7 @@ public final class Constants {
 
     // source: adkit
     public static final double ANGLE_MAX_VELOCITY = 3.0 * Math.PI;
-    public static final double ANGLE_MAX_ACCELERATION = 20.0;
+    public static final double ANGLE_MAX_ACCELERATION = 40.0;
 
     // TODO: tune eventually
     public static final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
@@ -100,8 +100,8 @@ public final class Constants {
     public static final double A_WIDTH = Units.inchesToMeters(30); // inches
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
 
-    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(2.5) * 2;
-    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(2.5) * 2;
+    public static final double B_LENGTH = A_LENGTH + Units.inchesToMeters(3) * 2;
+    public static final double B_WIDTH = A_WIDTH + Units.inchesToMeters(3) * 2;
     public static final double B_CROSSLENGTH = Math.hypot(B_LENGTH, B_WIDTH);
 
     // Add if problem present
@@ -125,7 +125,7 @@ public final class Constants {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withSupplyCurrentLimit(20)
-                    .withStatorCurrentLimit(30)
+                    .withStatorCurrentLimit(20)
                     .withStatorCurrentLimitEnable(true));
 
     public static final double LOWEST_H = Units.inchesToMeters(9.13250);
@@ -133,7 +133,7 @@ public final class Constants {
 
     public static final double kGearRatio = 30.0;
     public static final double kConversion = 3 * 0.04475 * 0.5;
-    public static final double kMaxTorqueCurrent = 30;
+    public static final double kMaxTorqueCurrent = 40;
     public static final boolean motorInverted = false;
 
     public static final double kTolerance = 0.05;
@@ -150,9 +150,8 @@ public final class Constants {
   public static class IntakeConstants {
     public static final double kGearRatio = 5;
     public static final boolean kMotorInverted = false;
-    public static final double kMaxTorqueCurrent = 80;
     public static final double kMaxVel = 4;
-    public static final double kStallCurrent = 40;
+    public static final double kStallCurrent = 50;
 
     public static final TalonFXConfiguration kInitialConfigs =
         new TalonFXConfiguration()
@@ -168,7 +167,7 @@ public final class Constants {
   }
 
   public static class WristConstants {
-    public static final double kTolerance = 0.2;
+    public static final double kTolerance = 0.35;
     public static final double kGearRatio = 25.0;
     public static final int kCurrentLimit = 40;
 

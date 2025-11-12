@@ -23,8 +23,8 @@ public class DriveToPose extends Command {
           0.0,
           0.0,
           new TrapezoidProfile.Constraints(
-              TunerConstants.kSpeedAt12Volts.magnitude(),
-              Constants.robot.MAX_ACCELERATION.magnitude()),
+              TunerConstants.kSpeedAt12Volts.magnitude() * 0.8,
+              Constants.robot.MAX_ACCELERATION.magnitude() * 0.4),
           0.02);
 
   private final ProfiledPIDController thetaController =
@@ -33,8 +33,8 @@ public class DriveToPose extends Command {
           0.0,
           0.0,
           new TrapezoidProfile.Constraints(
-              TunerConstants.kSpeedAt12Volts.magnitude(),
-              Constants.robot.MAX_ACCELERATION.magnitude()),
+              TunerConstants.kSpeedAt12Volts.magnitude() * 0.8,
+              Constants.robot.MAX_ACCELERATION.magnitude() * 0.4),
           0.02);
 
   private Drive driveSubsystem;
