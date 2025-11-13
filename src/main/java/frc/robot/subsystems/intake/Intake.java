@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
   /** Returns the current intake velocity in rpm. */
   @AutoLogOutput(key = "Intake/RPM")
   public double getRPM() {
-    return inputs.velocityRotPerSec * 60;
+    return inputs.velocityRotPerSec * 60.0;
   }
 
   public void updatePID(double kp, double ki, double kd, double kg) {

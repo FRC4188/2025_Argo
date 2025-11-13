@@ -308,6 +308,17 @@ public class RobotContainer {
                 intake))
         .onFalse(Commands.runOnce(intake::stop, intake));
 
+    // intakeInput.whileTrue(
+    //     Commands.run(
+    //         () ->
+    //             IntakeCommands.driveIntake(
+    //                 intake,
+    //                 () -> {
+    //                   if (pilot.getLeftT(Scale.LINEAR) > 0.5) return 1000;
+    //                   else if (pilot.getRightT(Scale.LINEAR) > 0.5) return -1000;
+    //                   else return 0;
+    //                 })));
+
     // intakeInput.whileTrue(IntakeCommands.driveIntake(intake, () ->
     // (copilot.getLeftT(Scale.LINEAR) - copilot.getRightT(Scale.LINEAR))), intake);
 

@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-  public static final PIDTuning pid_mode = PIDTuning.INTAKE;
+  public static final PIDTuning pid_mode = PIDTuning.NONE;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -161,7 +161,8 @@ public final class Constants {
                     .withStatorCurrentLimit(80)
                     .withStatorCurrentLimitEnable(true));
 
-    public static final Slot0Configs kMotorGains = new Slot0Configs().withKP(0.0).withKD(0.0);
+    public static final Slot0Configs kMotorGains =
+        new Slot0Configs().withKP(2.0).withKI(20.0).withKD(0.0);
 
     public static final ClosedLoopOutputType motorClosedLoopOutput = ClosedLoopOutputType.Voltage;
   }
