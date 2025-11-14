@@ -150,7 +150,7 @@ public final class Constants {
   public static class IntakeConstants {
     public static final double kGearRatio = 5;
     public static final boolean kMotorInverted = false;
-    public static final double kMaxVel = 4;
+    public static final double kMaxVel = 1100;
     public static final double kStallCurrent = 50;
 
     public static final TalonFXConfiguration kInitialConfigs =

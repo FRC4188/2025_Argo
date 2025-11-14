@@ -111,7 +111,7 @@ public class IntakeIOReal implements IntakeIO {
   @Override
   public boolean isStalled() {
     return currentAmps.getValueAsDouble() > Constants.IntakeConstants.kStallCurrent
-        && velocity.getValueAsDouble() < 0.001;
+        && velocity.getValueAsDouble() < 0.01;
   }
 
   @Override

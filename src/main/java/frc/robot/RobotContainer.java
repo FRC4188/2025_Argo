@@ -27,6 +27,7 @@ import frc.robot.CSPLib.pidtuning.PIDTuning;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveTo;
 import frc.robot.commands.drive.DriveToPose;
+import frc.robot.commands.intake.IntakeCommands;
 import frc.robot.commands.superstructure.AutoScore;
 import frc.robot.commands.superstructure.ScoreNet;
 import frc.robot.commands.superstructure.SuperCommands;
@@ -296,7 +297,8 @@ public class RobotContainer {
 
     Trigger intakeInput =
         new Trigger(
-            () -> (pilot.getLeftT(Scale.LINEAR) != 0.0 || pilot.getRightT(Scale.LINEAR) != 0.0));
+            () ->
+                (copilot.getLeftT(Scale.LINEAR) != 0.0 || copilot.getRightT(Scale.LINEAR) != 0.0));
 
     // temp command
     intakeInput
@@ -304,8 +306,13 @@ public class RobotContainer {
             Commands.run(
                 () ->
                     intake.runVolts(
-                        12 * (pilot.getLeftT(Scale.LINEAR) - pilot.getRightT(Scale.LINEAR))),
+                        12 * (copilot.getLeftT(Scale.LINEAR) - copilot.getRightT(Scale.LINEAR))),
                 intake))
+        .onFalse(Commands.runOnce(intake::stop, intake));
+
+    copilot
+        .x()
+        .whileTrue(IntakeCommands.unstickIntake(intake))
         .onFalse(Commands.runOnce(intake::stop, intake));
 
     // intakeInput.whileTrue(
@@ -368,7 +375,9 @@ public class RobotContainer {
             SuperCommands.superToState(
                 superstruct, SuperPreset.START.getState(), Rotation2d.fromRadians(0.0)));
 
-    copilot.rightBumper().onTrue(new ScoreNet(superstruct, intake));
+    copilot
+        .rightBumper()
+        .onTrue((new ScoreNet(superstruct, intake)).handleInterrupt(() -> intake.stop()));
 
     copilot
         .x()
