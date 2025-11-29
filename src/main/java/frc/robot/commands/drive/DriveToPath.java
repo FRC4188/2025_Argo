@@ -39,16 +39,16 @@ public class DriveToPath extends Command {
 
     ProfiledPIDController angleController =
         new ProfiledPIDController(
-            Constants.robot.ANGLE_KP,
-            0.0,
-            Constants.robot.ANGLE_KD,
+            Constants.robot.ANGLE_PID.kP,
+            Constants.robot.ANGLE_PID.kI,
+            Constants.robot.ANGLE_PID.kD,
             new TrapezoidProfile.Constraints(
                 Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     controller =
         new HolonomicDriveController(
-            new PIDController(0.1, 0, 0), new PIDController(0.0, 0, 0), angleController);
+            new PIDController(5.0, 0, 0), new PIDController(5.0, 0, 0), angleController);
   }
 
   @Override
@@ -80,7 +80,5 @@ public class DriveToPath extends Command {
   @Override
   public boolean isFinished() {
     return Timer.getFPGATimestamp() - start_time >= traj.getTotalTimeSeconds() + 0.5;
-    // AllianceFlip.flipDS(drive.getPose()).getTranslation().getDistance(end_goal.getTranslation())
-    // <= Units.inchesToMeters(1);
   }
 }

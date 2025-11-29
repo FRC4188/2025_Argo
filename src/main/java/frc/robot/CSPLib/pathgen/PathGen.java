@@ -7,9 +7,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import frc.robot.CSPLib.pathgen.fieldobjects.CircleFO;
 import frc.robot.CSPLib.pathgen.fieldobjects.FOHandler;
-import frc.robot.CSPLib.pathgen.fieldobjects.PolygonFO;
+import frc.robot.CSPLib.pathgen.fieldobjects.FieldObject;
 import frc.robot.Constants;
 import frc.robot.util.FieldConstant;
 import java.util.ArrayList;
@@ -19,74 +18,33 @@ public class PathGen {
   private static PathGen instance;
 
   public static synchronized PathGen getInstance() {
-    if (instance == null) instance = new PathGen(0.1f, (float) Constants.robot.B_CROSSLENGTH);
+    if (instance == null) instance = new PathGen();
     return instance;
   }
 
   private Grid a_star;
   private float clearance = 0.0f;
 
-  public PathGen(float sample, float clearance) {
-    this.clearance = clearance;
+  // default config
+  public PathGen() {
+    this.clearance = (float) Constants.robot.B_CROSSLENGTH;
+    a_star = new Grid((float) FieldConstant.field_length, (float) FieldConstant.field_width, 0.1f);
+  }
+
+  public void configure(double sample_size, double clearance, FieldObject... field_objects) {
+
+    this.clearance = (float) clearance;
     a_star =
-        new Grid((float) FieldConstant.field_length, (float) FieldConstant.field_width, sample);
+        new Grid(
+            (float) FieldConstant.field_length,
+            (float) FieldConstant.field_width,
+            (float) sample_size);
 
-    init_obstacles();
+    for (FieldObject fo : field_objects) {
+      FOHandler.getInstance().addFO(fo);
+    }
+
     update_obstacles();
-  }
-
-  public void set_clearance(float clearance) {
-    this.clearance = clearance;
-  }
-
-  public void init_obstacles() {
-    FOHandler.getInstance()
-        .addFO(
-            new PolygonFO(
-                true,
-                FieldConstant.Reef.Base.left_brg_corner,
-                FieldConstant.Reef.Base.right_brg_corner,
-                FieldConstant.Reef.Base.right_field_corner,
-                FieldConstant.Reef.Base.right_src_corner,
-                FieldConstant.Reef.Base.left_src_corner,
-                FieldConstant.Reef.Base.left_field_corner));
-
-    FOHandler.getInstance()
-        .addFO(
-            new PolygonFO(
-                true,
-                FieldConstant.Field.all_wall_left_corner,
-                FieldConstant.Field.alliance_left_corner,
-                FieldConstant.Field.alliance_right_corner,
-                FieldConstant.Field.all_wall_right_corner,
-                FieldConstant.Field.mid_right_wall,
-                FieldConstant.Field.mid_left_wall));
-    // FOHandler.getInstance().addFO(
-    //         new RectFO(
-    //             (float) FieldConstant.field_center_x,
-    //             (float) FieldConstant.field_center_y,
-    //             (float) FieldConstant.Field.brg_length,
-    //             (float) FieldConstant.Field.brg_width));
-
-    FOHandler.getInstance()
-        .addFO(
-            new CircleFO(
-                (float) FieldConstant.Elem_Locations.corals_locations[0].getX(),
-                (float) FieldConstant.Elem_Locations.corals_locations[0].getY(),
-                (float) FieldConstant.algae_radius));
-
-    FOHandler.getInstance()
-        .addFO(
-            new CircleFO(
-                (float) FieldConstant.Elem_Locations.corals_locations[1].getX(),
-                (float) FieldConstant.Elem_Locations.corals_locations[1].getY(),
-                (float) FieldConstant.algae_radius));
-    FOHandler.getInstance()
-        .addFO(
-            new CircleFO(
-                (float) FieldConstant.Elem_Locations.corals_locations[2].getX(),
-                (float) FieldConstant.Elem_Locations.corals_locations[2].getY(),
-                (float) FieldConstant.algae_radius));
   }
 
   public void update_obstacles() {

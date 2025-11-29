@@ -8,9 +8,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.superstructure.SuperState.SuperPreset;
 import frc.robot.subsystems.superstructure.SuperStructure;
 
-// TODO temp until intake is fully in place
 public class ScoreNet extends SequentialCommandGroup {
-  private double start_time = 0.0;
 
   public ScoreNet(SuperStructure superstruct, Intake intake) {
 

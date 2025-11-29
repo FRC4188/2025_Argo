@@ -1,9 +1,5 @@
 package frc.robot.CSPLib.inputs;
 
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 
-/** Add your docs here. */
 public class CSP_Controller extends CommandXboxController {
   public enum Scale {
     LINEAR,
@@ -26,19 +21,8 @@ public class CSP_Controller extends CommandXboxController {
     super(port);
   }
 
-  /**
-   * Calculates joystick output to account for scale and deadband
-   *
-   * @param input input value
-   * @param scale input scale
-   * @return adjusted value
-   */
   private static double getOutput(double input, Scale scale) {
-    if (Math.abs(input) > Constants.controller.DEADBAND) {
-      return scaleValue(input, scale);
-    } else {
-      return 0;
-    }
+    return scaleValue(MathUtil.applyDeadband(input, Constants.controller.DEADBAND), scale);
   }
 
   private static double scaleValue(double input, Scale scale) {
@@ -56,9 +40,7 @@ public class CSP_Controller extends CommandXboxController {
     }
   }
 
-  // new corrected for circle deadband instead of square
   public Translation2d getCorrectedRight(Scale scale) {
-    // Apply deadband
     double linearMagnitude =
         MathUtil.applyDeadband(
             Math.hypot(super.getRightX(), super.getRightY()), Constants.controller.DEADBAND);
@@ -66,15 +48,12 @@ public class CSP_Controller extends CommandXboxController {
 
     linearMagnitude = scaleValue(linearMagnitude, scale);
 
-    // Return new linear velocity
     return new Pose2d(new Translation2d(), linearDirection)
         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
 
-  // new corrected for circle deadband instead of square
   public Translation2d getCorrectedLeft(Scale scale) {
-    // Apply deadband
     double linearMagnitude =
         MathUtil.applyDeadband(
             Math.hypot(super.getLeftX(), super.getLeftY()), Constants.controller.DEADBAND);
@@ -82,7 +61,6 @@ public class CSP_Controller extends CommandXboxController {
 
     linearMagnitude = scaleValue(linearMagnitude, scale);
 
-    // Return new linear velocity
     return new Pose2d(new Translation2d(), linearDirection)
         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
         .getTranslation();

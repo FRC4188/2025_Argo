@@ -1,10 +1,3 @@
-// Copyright (c) 2021-2025 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot.subsystems.superstructure.wrist;
 
 import static frc.robot.util.SparkUtil.*;
@@ -35,26 +28,18 @@ import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
-/**
- * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
- * and duty cycle absolute encoder.
- */
 public class WristIOReal implements WristIO {
   private final Rotation2d zeroRotation;
 
-  // Hardware objects
   private final SparkBase wristSpark;
   private final RelativeEncoder wristEncoder;
   private final CANcoder cancoder;
 
-  // wrist config
   private SparkMaxConfig wristConfig;
 
-  // Closed loop controllers
   private final SparkClosedLoopController wristController;
   private final ArmFeedforward wristff;
 
-  // status singals for CTRE stuff
   private final StatusSignal<Angle> wristAbsolutePosition;
 
   private final Debouncer wristConnectedDebounce =
@@ -74,7 +59,6 @@ public class WristIOReal implements WristIO {
 
     cancoder = new CANcoder(Constants.Id.kWristCANCoder, Constants.robot.rio);
 
-    // Configure turn motor
     wristConfig = new SparkMaxConfig();
     wristConfig
         .inverted(Constants.WristConstants.kSparkInverted)
@@ -110,7 +94,6 @@ public class WristIOReal implements WristIO {
             wristSpark.configure(
                 wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.MagnetOffset = Constants.WristConstants.kEncoderOffset;
     cancoderConfig.MagnetSensor.SensorDirection =
@@ -126,7 +109,6 @@ public class WristIOReal implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
 
-    // Update turn inputs
     sparkStickyFault = false;
     ifOk(
         wristSpark,
