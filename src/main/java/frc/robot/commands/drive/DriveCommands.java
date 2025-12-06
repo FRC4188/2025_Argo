@@ -94,6 +94,12 @@ public class DriveCommands {
                       : angleController.calculate(
                           drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
+              omega +=
+                  Constants.robot.ANGLE_FF
+                      * Math.pow(drive.getChassisSpeeds().omegaRadiansPerSecond, 3);
+
+              Logger.recordOutput("Omega PID Input", omega);
+
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
                       xSupplier.getAsDouble() * drive.getMaxLinearSpeedMetersPerSec(),

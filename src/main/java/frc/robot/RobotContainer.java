@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -190,7 +189,7 @@ public class RobotContainer {
                 FieldConstant.Field.mid_right_wall,
                 FieldConstant.Field.mid_left_wall));
 
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices"); // , AutoBuilder.buildAutoChooser()
 
     configureDashboard();
     configureButtonBindings();
@@ -244,10 +243,7 @@ public class RobotContainer {
                     () ->
                         -pilot.getCorrectedLeft(Scale.SQUARED).getX()
                             * (pilot.rightBumper().getAsBoolean() ? 0.5 : 1.0),
-                    () ->
-                        FieldConstant.Reef.center
-                            .minus(drive.getPose().getTranslation())
-                            .getAngle())
+                    () -> drive.getPose().getTranslation().getAngle())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
         .onFalse(Commands.runOnce(drive::stopWithX, drive));
 
@@ -257,7 +253,7 @@ public class RobotContainer {
             Commands.runOnce(
                     () ->
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                            new Pose2d()), // drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
 
