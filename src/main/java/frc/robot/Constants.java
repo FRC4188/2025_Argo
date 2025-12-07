@@ -53,12 +53,9 @@ public final class Constants {
 
     public static final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
     public static final PIDConstants ANGLE_PID = new PIDConstants(5.0, 0.0, 0.4);
-    public static final PIDConstants ANGLE_PID = new PIDConstants(5.0, 0.0, 0.4);
     public static final double ANGLE_TOL = 0.05;
     public static final double ANGLE_FF = 0.5;
 
-    public static final double A_LENGTH = Units.inchesToMeters(29);
-    public static final double A_WIDTH = Units.inchesToMeters(30);
     public static final double A_LENGTH = Units.inchesToMeters(29);
     public static final double A_WIDTH = Units.inchesToMeters(30);
     public static final double A_CROSSLENGTH = Math.hypot(A_LENGTH, A_WIDTH);
@@ -88,7 +85,6 @@ public final class Constants {
                     .withStatorCurrentLimit(80)
                     .withStatorCurrentLimitEnable(true));
 
-    public static final double BASE_HEIGHT = Units.inchesToMeters(9.13250);
     public static final double BASE_HEIGHT = Units.inchesToMeters(9.13250);
     public static final double RANGE = Units.inchesToMeters(72);
 
