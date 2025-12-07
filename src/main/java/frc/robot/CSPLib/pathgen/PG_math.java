@@ -64,7 +64,6 @@ public class PG_math {
     return ccw(l11, l21, l22) != ccw(l12, l21, l22) && ccw(l11, l12, l21) != ccw(l11, l12, l22);
   }
 
-  // returns -180 - 180
   public static Rotation2d interpolate_mod(Rotation2d orig, Rotation2d goal, double t) {
     double orig_mod = modulate(orig).getDegrees();
     double goal_mod = modulate(goal).getDegrees();

@@ -18,8 +18,6 @@ public class IntakeCommands {
         intake);
   }
 
-  private static double start_time = 0.0;
-
   public static Command driveVolts(Intake intake, DoubleSupplier input) {
 
     return Commands.runOnce(
@@ -28,6 +26,8 @@ public class IntakeCommands {
         },
         intake);
   }
+
+  private static double start_time = 0.0;
 
   public static Command unstickIntake(Intake intake) {
     return Commands.repeatingSequence(

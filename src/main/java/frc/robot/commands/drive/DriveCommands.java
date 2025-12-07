@@ -1,16 +1,3 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.commands.drive;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -39,9 +26,9 @@ public class DriveCommands {
 
   public static ProfiledPIDController angleController =
       new ProfiledPIDController(
-          Constants.robot.ANGLE_KP,
-          0.0,
-          Constants.robot.ANGLE_KD,
+          Constants.robot.ANGLE_PID.kP,
+          Constants.robot.ANGLE_PID.kI,
+          Constants.robot.ANGLE_PID.kD,
           new TrapezoidProfile.Constraints(
               Constants.robot.ANGLE_MAX_VELOCITY, Constants.robot.ANGLE_MAX_ACCELERATION));
 
@@ -64,9 +51,6 @@ public class DriveCommands {
 
   private DriveCommands() {}
 
-  /**
-   * Field relative drive command using two joysticks (controlling linear and angular velocities).
-   */
   public static Command joystickDrive(
       Drive drive,
       DoubleSupplier xSupplier,
@@ -74,8 +58,6 @@ public class DriveCommands {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-
-          // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
                   xSupplier.getAsDouble() * drive.getMaxLinearSpeedMetersPerSec(),
@@ -92,28 +74,19 @@ public class DriveCommands {
         drive);
   }
 
-  /**
-   * Field relative drive command using joystick for linear control and PID for angular control.
-   * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
-   * absolute rotation with a joystick.
-   */
   public static Command joystickDriveAtAngle(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
 
-    // ConstructPID
     angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    // Construct command
     return Commands.run(
             () -> {
               Logger.recordOutput("Drive/Angle Target", rotationSupplier.get().getRadians());
               Logger.recordOutput(
                   "Drive/Angle Current", drive.getPose().getRotation().getRadians());
 
-              // Calculate angular speed
               double omega =
                   (Math.abs(drive.getRotation().getRadians() - rotationSupplier.get().getRadians())
                           < Constants.robot.ANGLE_TOL)
@@ -121,15 +94,22 @@ public class DriveCommands {
                       : angleController.calculate(
                           drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
-              // Convert to field relative speeds & send command
+              omega +=
+                  Constants.robot.ANGLE_FF
+                      * Math.pow(drive.getChassisSpeeds().omegaRadiansPerSecond, 3);
+
+              Logger.recordOutput("Omega PID Input", omega);
+
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
                       xSupplier.getAsDouble() * drive.getMaxLinearSpeedMetersPerSec(),
                       ySupplier.getAsDouble() * drive.getMaxLinearSpeedMetersPerSec(),
                       omega);
+
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
+
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
@@ -138,8 +118,6 @@ public class DriveCommands {
                           : drive.getRotation()));
             },
             drive)
-
-        // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 

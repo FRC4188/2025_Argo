@@ -1,16 +1,3 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.subsystems.superstructure.elevator;
 
 import edu.wpi.first.math.MathUtil;
@@ -39,12 +26,10 @@ public class Elevator {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
 
-    // Update alerts
     leaderDisconnectedAlert.set(!inputs.leaderConnected);
     followerDisconnectedAlert.set(!inputs.followConnected);
   }
 
-  /** Runs the elevator to a set height meters */
   public void setHeight(double height) {
     Logger.recordOutput("Elevator/SetPoint", height);
     height = MathUtil.clamp(height, 0, Constants.EleConstants.RANGE);
@@ -52,7 +37,6 @@ public class Elevator {
     io.setPosition(new Rotation2d(height / Constants.EleConstants.kConversion));
   }
 
-  /** Runs the elevator with the specified output. */
   public void runVolts(double output) {
     output = MathUtil.clamp(output, -12.0, 12.0);
     io.setOpenLoop(output);
@@ -62,18 +46,15 @@ public class Elevator {
     io.setZero();
   }
 
-  /** Disables output to elevator. */
   public void stop() {
     io.setOpenLoop(0.0);
   }
 
   @AutoLogOutput(key = "Elevator/Height Meters")
-  /** Returns the current elevator position in meters. */
   public double getPositionMeters() {
     return inputs.positionRad * Constants.EleConstants.kConversion;
   }
 
-  /** Returns the current elevator velocity of the module in meters per second. */
   public double getVelocityMetersPerSec() {
     return inputs.velocityRadPerSec * Constants.EleConstants.kConversion;
   }

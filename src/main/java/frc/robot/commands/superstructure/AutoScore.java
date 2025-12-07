@@ -203,7 +203,6 @@ public class AutoScore extends Command {
       scoring =
           Commands.sequence(
               Commands.race(
-                  // intake.ingest(() -> 5),
                   Commands.parallel(
                       Commands.sequence(
                           new DriveTo(drive, goal), Commands.runOnce(drive::stopWithX, drive)),
@@ -251,7 +250,6 @@ public class AutoScore extends Command {
         scoring =
             Commands.sequence(
                 Commands.race(
-                    // intake.ingest(() -> 5),
                     Commands.parallel(
                         Commands.sequence(
                             new DriveTo(drive, goal), Commands.runOnce(drive::stopWithX, drive)),

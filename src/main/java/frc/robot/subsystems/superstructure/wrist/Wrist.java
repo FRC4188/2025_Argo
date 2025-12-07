@@ -1,10 +1,3 @@
-// Copyright (c) 2021-2025 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot.subsystems.superstructure.wrist;
 
 import edu.wpi.first.math.MathUtil;
@@ -28,11 +21,9 @@ public class Wrist {
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);
 
-    // Update alerts
     wristDisconnectedAlert.set(!inputs.wristConnected);
   }
 
-  /** Runs the wrist to a specified angle */
   public void setPosition(Rotation2d angle) {
     angle = Rotation2d.fromRadians(MathUtil.clamp(angle.getRadians(), 0, Math.PI / 2));
 
@@ -40,13 +31,11 @@ public class Wrist {
     io.setPosition(angle);
   }
 
-  /** Runs the wrist with a specified output. */
   public void runVolts(double output) {
     output = MathUtil.clamp(output, -12.0, 12.0);
     io.setOpenLoop(output);
   }
 
-  /** Disables all outputs to motors. */
   public void stop() {
     io.setOpenLoop(0.0);
   }
@@ -55,7 +44,6 @@ public class Wrist {
     io.updatePID(kp, ki, kd, kg);
   }
 
-  /** Returns the current angle of the wrist. */
   public Rotation2d getAngle() {
     return inputs.wristPosition;
   }

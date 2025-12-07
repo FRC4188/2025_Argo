@@ -25,11 +25,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -182,30 +179,6 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected",
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
-  }
-
-  public static Pose2d targetID(Drive drive) {
-    ArrayList<Pose2d> tags = new ArrayList<Pose2d>();
-    if (DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-      tags.add(VisConstants.AprilTagPose.tag6.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag7.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag8.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag9.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag10.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag11.toPose2d());
-
-      return drive.getPose().nearest(tags);
-    } else {
-      tags.add(VisConstants.AprilTagPose.tag17.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag18.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag19.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag20.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag21.toPose2d());
-      tags.add(VisConstants.AprilTagPose.tag22.toPose2d());
-
-      return drive.getPose().nearest(tags);
-    }
   }
 
   @FunctionalInterface
