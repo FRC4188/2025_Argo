@@ -12,6 +12,8 @@ import frc.robot.CSPLib.inputs.CSP_Controller;
 import frc.robot.CSPLib.inputs.CSP_Controller.Scale;
 import frc.robot.CSPLib.pathgen.PathGen;
 import frc.robot.CSPLib.pathgen.fieldobjects.*;
+import frc.robot.CSPLib.pathgen.PathGen;
+import frc.robot.CSPLib.pathgen.fieldobjects.*;
 import frc.robot.CSPLib.pidtuning.PIDTuning;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.drive.DriveTo;
@@ -40,6 +42,7 @@ import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhoton;
 import frc.robot.util.AllianceFlip;
 import frc.robot.util.FieldConstant;
@@ -53,6 +56,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   private final Drive drive;
+  private final Vision vis;
   private final Vision vis;
   private final SuperStructure superstruct;
   private final Intake intake;
@@ -97,6 +101,8 @@ public class RobotContainer {
 
         vis = new Vision(drive::addVisionMeasurement, new VisionIO() {});
 
+        vis = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+
         superstruct = new SuperStructure(new ElevatorIOSim(), new WristIOSim());
         intake = new Intake(new IntakeIOSim());
         break;
@@ -109,6 +115,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        vis = new Vision(drive::addVisionMeasurement, new VisionIO() {});
 
         vis = new Vision(drive::addVisionMeasurement, new VisionIO() {});
 
@@ -199,11 +207,13 @@ public class RobotContainer {
   public void autoInit() {
     superstruct.setState(SuperState.SuperPreset.START.getState());
     FieldConstant.Reef.AlgaeSource.reloadAsources();
+    FieldConstant.Reef.AlgaeSource.reloadAsources();
   }
 
   public void teleInit() {
     superstruct.setState(SuperState.SuperPreset.START.getState());
     intake.runVolts(0.0);
+    FieldConstant.Reef.AlgaeSource.reloadAsources();
     FieldConstant.Reef.AlgaeSource.reloadAsources();
   }
 
@@ -257,7 +267,7 @@ public class RobotContainer {
             Commands.runOnce(
                     () ->
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                            new Pose2d()), // drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
 
@@ -284,6 +294,7 @@ public class RobotContainer {
     Trigger intakeInput =
         new Trigger(
             () -> (pilot.getLeftT(Scale.LINEAR) != 0.0 || pilot.getRightT(Scale.LINEAR) != 0.0));
+            () -> (pilot.getLeftT(Scale.LINEAR) != 0.0 || pilot.getRightT(Scale.LINEAR) != 0.0));
 
     intakeInput
         .whileTrue(
@@ -291,9 +302,13 @@ public class RobotContainer {
                 () ->
                     intake.runVolts(
                         12 * (pilot.getLeftT(Scale.LINEAR) - pilot.getRightT(Scale.LINEAR))),
+                        12 * (pilot.getLeftT(Scale.LINEAR) - pilot.getRightT(Scale.LINEAR))),
                 intake))
         .onFalse(Commands.runOnce(intake::stop, intake));
 
+    pilot
+        .getRightTButton()
+        .and(pilot.leftBumper())
     pilot
         .getRightTButton()
         .and(pilot.leftBumper())
@@ -358,6 +373,7 @@ public class RobotContainer {
 
   private void configureDashboard() {
     // Sequences for Tuning
+    // Sequences for Tuning
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
     autoChooser.addOption(
@@ -375,8 +391,11 @@ public class RobotContainer {
 
     // Actual Autos
     autoChooser.addOption("Push", Commands.sequence(AutoScore.pushLeave(drive)));
+    // Actual Autos
+    autoChooser.addOption("Push", Commands.sequence(AutoScore.pushLeave(drive)));
 
     autoChooser.addOption(
+        "Coral and 2 Processor",
         "Coral and 2 Processor",
         Commands.sequence(
             new AutoScore.coralScore(drive, superstruct, intake),
@@ -386,6 +405,7 @@ public class RobotContainer {
 
     autoChooser.addOption(
         "2 Processor",
+        "2 Processor",
         Commands.sequence(
             new AutoScore.algaeSource(drive, superstruct, intake),
             new AutoScore.algaeProcess(drive, superstruct, intake),
@@ -394,6 +414,7 @@ public class RobotContainer {
 
     autoChooser.addOption(
         "Coral and 1.5 Net",
+        "Coral and 1.5 Net",
         Commands.sequence(
             new AutoScore.coralScore(drive, superstruct, intake),
             new AutoScore.algaeNet(drive, superstruct, intake),
@@ -401,8 +422,10 @@ public class RobotContainer {
 
     autoChooser.addOption(
         "Coral", Commands.sequence(new AutoScore.coralScore(drive, superstruct, intake)));
+        "Coral", Commands.sequence(new AutoScore.coralScore(drive, superstruct, intake)));
 
     autoChooser.addOption(
+        "Ring Around The Rosie",
         "Ring Around The Rosie",
         Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.alliance_src),
@@ -420,12 +443,14 @@ public class RobotContainer {
 
     autoChooser.addOption(
         "Ring Around One Rosie",
+        "Ring Around One Rosie",
         Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.left_src_src),
             new DriveTo(drive, FieldConstant.start_right),
             new DriveTo(drive, FieldConstant.Source.left_src_mid)));
 
     autoChooser.addOption(
+        "Test Pathing",
         "Test Pathing",
         Commands.sequence(
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.mid_brg_src),
