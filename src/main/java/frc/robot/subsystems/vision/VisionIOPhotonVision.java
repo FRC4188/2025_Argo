@@ -17,12 +17,16 @@ import static frc.robot.subsystems.vision.VisConstants.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
@@ -43,10 +47,11 @@ public class VisionIOPhotonVision implements VisionIO {
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     inputs.connected = camera.isConnected();
-
+    
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
+    Transform2d camToTarget;
     for (var result : camera.getAllUnreadResults()) {
       // Update latest target observation
       if (result.hasTargets()) {
@@ -57,7 +62,17 @@ public class VisionIOPhotonVision implements VisionIO {
       } else {
         inputs.latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
       }
-
+      if(result.hasTargets()){
+        var xTune = 1.3;
+        var yTune = 1.3; 
+        PhotonTrackedTarget target = result.getBestTarget();
+        var xDist = target.getPitch() * xTune;
+        var yDist = target.getYaw() * yTune;
+        camToTarget =
+            new Transform2d(
+                new Translation2d(xDist, yDist),
+                new Rotation2d(target.getYaw()));
+      }
       // Add pose observation
       if (result.multitagResult.isPresent()) { // Multitag result
         var multitagResult = result.multitagResult.get();
