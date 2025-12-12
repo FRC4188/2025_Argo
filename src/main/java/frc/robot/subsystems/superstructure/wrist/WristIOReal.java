@@ -47,7 +47,6 @@ public class WristIOReal implements WristIO {
   private final Debouncer cancoderConnectedDebounce = new Debouncer(0.5);
 
   public WristIOReal() {
-
     zeroRotation = new Rotation2d();
 
     wristSpark = new SparkMax(Constants.Id.kWrist, MotorType.kBrushless);

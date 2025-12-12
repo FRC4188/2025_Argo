@@ -88,15 +88,13 @@ public class DriveCommands {
                   "Drive/Angle Current", drive.getPose().getRotation().getRadians());
 
               double omega =
-                  (Math.abs(drive.getRotation().getRadians() - rotationSupplier.get().getRadians())
-                          < Constants.robot.ANGLE_TOL)
-                      ? 0
-                      : angleController.calculate(
-                          drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                  angleController.calculate(
+                          drive.getRotation().getRadians(), rotationSupplier.get().getRadians())
+                      + angleController.getSetpoint().velocity * 2;
 
-              omega +=
-                  Constants.robot.ANGLE_FF
-                      * Math.pow(drive.getChassisSpeeds().omegaRadiansPerSecond, 3);
+              if (Math.abs(drive.getRotation().getRadians() - rotationSupplier.get().getRadians())
+                      < Constants.robot.ANGLE_TOL
+                  && angleController.getSetpoint().velocity == 0.0) omega = 0.0;
 
               Logger.recordOutput("Omega PID Input", omega);
 

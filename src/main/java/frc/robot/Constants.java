@@ -54,7 +54,6 @@ public final class Constants {
     public static final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
     public static final PIDConstants ANGLE_PID = new PIDConstants(5.0, 0.0, 0.4);
     public static final double ANGLE_TOL = 0.05;
-    public static final double ANGLE_FF = 0.5;
 
     public static final double A_LENGTH = Units.inchesToMeters(29);
     public static final double A_WIDTH = Units.inchesToMeters(30);
@@ -100,8 +99,7 @@ public final class Constants {
             .withKP(25.0)
             .withKG(0.2);
 
-    public static final ClosedLoopOutputType motorClosedLoopOutput =
-        ClosedLoopOutputType.Voltage;
+    public static final ClosedLoopOutputType motorClosedLoopOutput = ClosedLoopOutputType.Voltage;
   }
 
   public static class IntakeConstants {
@@ -130,7 +128,6 @@ public final class Constants {
     public static final int kCurrentLimit = 40;
 
     public static final boolean kSparkInverted = true;
-
 
     public static final double turnMotorReduction = 9424.0 / 203.0;
     public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
