@@ -27,4 +27,8 @@ public interface ElevatorIO {
   public default void setPosition(Rotation2d rotation) {}
 
   public default void updatePID(double kP, double kI, double kD, double kG) {}
+
+  public default double getSetpoint() {
+    return 0;
+  }
 }

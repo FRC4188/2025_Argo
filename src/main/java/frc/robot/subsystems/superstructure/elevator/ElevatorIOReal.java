@@ -132,6 +132,11 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
+  public double getSetpoint() {
+    return leaderTalon.getClosedLoopReference().getValueAsDouble();
+  }
+
+  @Override
   public void setPosition(Rotation2d rotation) {
     leaderTalon.setControl(
         switch (Constants.EleConstants.motorClosedLoopOutput) {

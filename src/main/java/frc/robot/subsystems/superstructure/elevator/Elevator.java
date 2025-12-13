@@ -50,6 +50,11 @@ public class Elevator {
     io.setOpenLoop(0.0);
   }
 
+  @AutoLogOutput(key = "Elevator/At Height")
+  public boolean atHeight() {
+    return (Math.abs(getPositionMeters() - io.getSetpoint()) <= Constants.EleConstants.HEIGHT_TOL);
+  }
+
   @AutoLogOutput(key = "Elevator/Height Meters")
   public double getPositionMeters() {
     return inputs.positionRad * Constants.EleConstants.kConversion;

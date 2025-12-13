@@ -90,7 +90,8 @@ public class DriveCommands {
               double omega =
                   angleController.calculate(
                           drive.getRotation().getRadians(), rotationSupplier.get().getRadians())
-                      + angleController.getSetpoint().velocity * 2;
+                      + angleController.getSetpoint().velocity
+                          * Constants.robot.ANGLE_FF_COEFFICIENT;
 
               if (Math.abs(drive.getRotation().getRadians() - rotationSupplier.get().getRadians())
                       < Constants.robot.ANGLE_TOL

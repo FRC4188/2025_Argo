@@ -50,6 +50,7 @@ public final class Constants {
 
     public static final double ANGLE_MAX_VELOCITY = 3.0 * Math.PI;
     public static final double ANGLE_MAX_ACCELERATION = 40.0;
+    public static final double ANGLE_FF_COEFFICIENT = 2.0;
 
     public static final PIDConstants DRIVE_PID = new PIDConstants(5.0, 0.0, 0.0);
     public static final PIDConstants ANGLE_PID = new PIDConstants(5.0, 0.0, 0.4);
@@ -86,6 +87,8 @@ public final class Constants {
 
     public static final double BASE_HEIGHT = Units.inchesToMeters(9.13250);
     public static final double RANGE = Units.inchesToMeters(72);
+
+    public static final double HEIGHT_TOL = 0.01;
 
     public static final double kGearRatio = 30.0;
     public static final double kConversion = 3 * 0.04475 * 0.5;
