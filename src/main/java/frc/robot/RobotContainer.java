@@ -3,6 +3,7 @@ package frc.robot;
 // import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,6 +38,9 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.superstructure.wrist.WristIOReal;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
+import frc.robot.subsystems.tracking.Tracking;
+import frc.robot.subsystems.tracking.TrackingIO;
+import frc.robot.subsystems.tracking.TrackingIOPhoton;
 import frc.robot.subsystems.vision.VisConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -54,6 +58,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   private final Drive drive;
   private final Vision vis;
+  private final Tracking track;
   private final SuperStructure superstruct;
   private final Intake intake;
   private PIDTuning tuner = null;
@@ -84,6 +89,8 @@ public class RobotContainer {
         superstruct = new SuperStructure(new ElevatorIOReal(), new WristIOReal());
         intake = new Intake(new IntakeIOReal());
 
+        track = new Tracking(new TrackingIOPhoton("tracking", new Transform3d()));
+
         break;
 
       case SIM:
@@ -96,6 +103,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
 
         vis = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        track = new Tracking(new TrackingIO() {});
 
         superstruct = new SuperStructure(new ElevatorIOSim(), new WristIOSim());
         intake = new Intake(new IntakeIOSim());
@@ -111,6 +119,7 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         vis = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        track = new Tracking(new TrackingIO() {});
 
         superstruct = new SuperStructure(new ElevatorIO() {}, new WristIO() {});
 

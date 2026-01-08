@@ -188,4 +188,9 @@ public class Vision extends SubsystemBase {
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
   }
+
+  @FunctionalInterface
+  public static interface TrackingConsumer {
+    public void accept(Rotation2d objectDetectedYawRotation, double timestampSeconds);
+  }
 }
