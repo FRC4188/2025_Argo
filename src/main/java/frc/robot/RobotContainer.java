@@ -1,8 +1,10 @@
 package frc.robot;
 
-// import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -190,7 +192,7 @@ public class RobotContainer {
                 FieldConstant.Field.mid_right_wall,
                 FieldConstant.Field.mid_left_wall));
 
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices"); /*AutoBuilder.buildAutoChooser());*/
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices");//, AutoBuilder.buildAutoChooser());
 
     configureDashboard();
     configureButtonBindings();
@@ -434,6 +436,8 @@ public class RobotContainer {
             new DriveTo(drive, FieldConstant.Processor.processor_goal),
             new DriveTo(drive, FieldConstant.Reef.AlgaeSource.right_brg_src),
             new DriveTo(drive, FieldConstant.Processor.processor_goal)));
+
+    autoChooser.addOption("Path Planner Test", getAutonomousCommand());
   }
 
   /**
@@ -442,6 +446,15 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    try {
+      PathPlannerPath path = PathPlannerPath.fromPathFile("Example Auto");
+      return AutoBuilder.followPath(path);
+    } catch (Exception e) {
+      DriverStation.reportError("Uh oh" + e.getMessage(), e.getStackTrace());
+      return Commands.none();
+    }
+
+    // undo the below comment later ig
+    // return autoChooser.get();
   }
 }
